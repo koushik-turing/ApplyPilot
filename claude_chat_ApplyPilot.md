@@ -332,4 +332,22 @@ What was added/changed after the doc's first draft:
 4. Daily **scheduling** (Task Scheduler), **email loop**, Adzuna key, Fantastic.jobs eval.
 5. Ideas vs Jobright (brainstormed): referral/hiring-manager finder, interview prep, company research
    card, AI copilot chat, analytics/funnel, A/B resume variants, daily digest email.
+
+### 12h. JOBRIGHT-INSPIRED FEATURES (DONE) — researched their flow + best practices, then built
+Research takeaways (sources in chat): prefill screening answers once & reuse; QUALITY beats volume
+(11-20 targeted apps ~9.25% interview vs 100+ at 2.58% → validates our fit-gating); keyword sweet
+spot ~65-75% (don't over-optimize); human-review/edit beats blind auto-submit; learn from edits.
+We're already ahead on multi-candidate + sponsorship + golden tailoring + true submit.
+1. **Answer knowledge bank** (`Profile.answer_bank`, optional/partial): recruiter-provided knowledge
+   (relocation/start-date/why-interested/how-heard/references/notes). The answer engine L3 feeds it to
+   Claude as KNOWLEDGE to COMPOSE each form answer intelligently (adapt to the question/company, NEVER
+   paste verbatim, NEVER fabricate). Editable in the console ("Application answers" section).
+2. **Apply mode** (`Profile.apply_mode` supervised|automated + `auto_min_match`): per-candidate toggle in
+   the console (pill on cards). Supervised = review+edit+approve each; Automated = auto-submit matches
+   >= threshold (safety gate still blocks unresolved hard fields).
+3. **Application review** (`GET/POST /api/clients/{slug}/application/{file}` + "Review" modal): edit the
+   tailored resume (summary + per-role bullets — PDF reflects edits), edit each generated form answer,
+   add recruiter comments, see "what the AI changed", then Save / Download PDF / Approve & submit. Sets
+   status (pending/approved/submitted/skipped); status pill on the golden-resume row. Edits+comments are
+   stored (foundation for the "learn from edits" loop — feeding back into tailoring is still TODO).
 ```
