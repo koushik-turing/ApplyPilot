@@ -92,25 +92,36 @@ def fill_form(
         page.goto(job.url, wait_until="domcontentloaded")
         page.wait_for_timeout(1500)
 
+        # Map field_name -> its question, so we know type + options (label<->value).
+        qmap = {fn: q for q in job.questions for fn in q.field_names}
+
         for a in sheet.answers:
             if not a.value:
                 result["skipped"].append(a.label)
                 continue
+            q = next((qmap[fn] for fn in a.field_names if fn in qmap), None)
+            is_select = bool(q and q.options)
+            # The answer stores the option *value/id*; the UI needs the *label*.
+            ui_value = a.value
+            if is_select:
+                ui_value = next((o.get("label") for o in q.options
+                                 if str(o.get("value")) == str(a.value)), a.value)
+
             placed = False
             for name in a.field_names:
-                sel = f'[name="{name}"]'
-                try:
-                    if page.locator(sel).count():
-                        el = page.locator(sel).first
-                        tag = el.evaluate("e => e.tagName.toLowerCase()")
-                        if tag == "select":
-                            el.select_option(a.value)
-                        else:
-                            el.fill(a.value)
-                        placed = True
-                        break
-                except Exception:
+                el = _find_field(page, name)
+                if el is None:
                     continue
+                try:
+                    if is_select:
+                        placed = _select_option(page, el, ui_value)
+                    else:
+                        el.fill(ui_value)
+                        placed = True
+                except Exception:
+                    placed = False
+                if placed:
+                    break
             (result["filled"] if placed else result["skipped"]).append(a.label)
 
         # Upload resume to the file input
@@ -150,6 +161,53 @@ def fill_form(
         browser.close()
 
     return result
+
+
+def _find_field(page, name: str):
+    """Locate a form control by name OR id (Greenhouse uses id). Returns a locator or None."""
+    for sel in (f'[name="{name}"]', f'[id="{name}"]', f'#{name}'):
+        try:
+            loc = page.locator(sel).first
+            if loc.count():
+                return loc
+        except Exception:
+            continue
+    return None
+
+
+def _select_option(page, el, label: str) -> bool:
+    """Handle native <select> and Greenhouse custom dropdowns. Picks the option by label."""
+    try:
+        tag = el.evaluate("e => e.tagName.toLowerCase()")
+    except Exception:
+        tag = ""
+    if tag == "select":
+        try:
+            el.select_option(label=label)
+            return True
+        except Exception:
+            return False
+    # Custom combobox: click to open, then click the matching option.
+    try:
+        el.click()
+        page.wait_for_timeout(300)
+        option = page.get_by_role("option", name=label, exact=True)
+        if not option.count():
+            option = page.locator(f'text="{label}"').last
+        if option.count():
+            option.click()
+            page.wait_for_timeout(200)
+            return True
+    except Exception:
+        pass
+    # Fallback: type the label and press Enter (filterable comboboxes).
+    try:
+        el.fill(label)
+        page.wait_for_timeout(300)
+        page.keyboard.press("Enter")
+        return True
+    except Exception:
+        return False
 
 
 def _safe(s: str) -> str:
