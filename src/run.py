@@ -23,8 +23,9 @@ from .answer.engine import answer_form
 from .discover.ats_client import GreenhouseClient, parse_greenhouse_url
 from .models import Job, FormQuestion
 from .profile.complete import complete_profile, load_profile
-from .profile.parse import parse_resume, save_profile
+from .profile.parse import parse_resume, save_profile, read_pdf_text
 from .submit.apply import build_review, save_review, fill_form
+from .tailor.batch import batch_tailor
 
 
 def cmd_add(args):
@@ -92,9 +93,46 @@ def cmd_apply(args):
         print(f"  screenshot: {result['screenshot']}")
 
 
+def cmd_tailor_all(args):
+    """Tailor the candidate's resume to MANY jobs at once (batch, parallel)."""
+    resume = _find_resume(args.name, args.resume)
+    if not resume:
+        raise SystemExit("No resume found. Pass --resume <file> or put a PDF in the candidate folder.")
+    resume_text = read_pdf_text(resume)
+
+    # Gather jobs: either explicit URLs, or the first N live jobs from a board.
+    jobs: list[Job] = []
+    if args.urls:
+        for u in args.urls:
+            jobs.append(_fetch_job(u))
+    else:
+        c = GreenhouseClient()
+        try:
+            live = c.list_jobs(args.board, content=True)
+        finally:
+            c.close()
+        for raw in live[: args.count]:
+            jobs.append(Job(board=raw.board, job_id=raw.job_id, title=raw.title,
+                            location=raw.location, url=raw.absolute_url, content=raw.content))
+    print(f"Batch tailoring {len(jobs)} job(s) for {args.name} with {args.workers} workers...")
+    results = batch_tailor(resume_text, jobs, args.name,
+                           max_workers=args.workers, on_progress=print)
+    print("\n=== RANKED (best match first) ===")
+    for i, r in enumerate(results[:15], 1):
+        if "error" in r:
+            print(f"{i:>2}. FAILED  {r['title'][:50]}  ({r['error'][:30]})")
+        else:
+            print(f"{i:>2}. {r['score_after']:>3} (was {r['score_before']:>3})  {r['title'][:50]}")
+    print(f"\nSaved per-job resumes + SUMMARY.md in candidates/{_slug(args.name)}/tailored/")
+
+
 def cmd_show(args):
     p = load_profile(args.name)
     print(json.dumps(json.loads(p.model_dump_json()), indent=2)[:2000])
+
+
+def _slug(name: str) -> str:
+    return "".join(c if c.isalnum() else "_" for c in name).strip("_").lower()
 
 
 def _find_resume(name: str, override: str | None) -> str | None:
@@ -115,6 +153,14 @@ def main(argv=None):
     a = sub.add_parser("add", help="parse resume -> profile"); a.add_argument("name"); a.add_argument("resume"); a.set_defaults(func=cmd_add)
     c = sub.add_parser("complete", help="fill extra fields from intake.json"); c.add_argument("name"); c.add_argument("intake"); c.set_defaults(func=cmd_complete)
     s = sub.add_parser("show", help="print profile"); s.add_argument("name"); s.set_defaults(func=cmd_show)
+    ta = sub.add_parser("tailor-all", help="batch-tailor resume to many jobs at once")
+    ta.add_argument("name")
+    ta.add_argument("--resume", help="resume file (defaults to one in candidate folder)")
+    ta.add_argument("--board", default="", help="Greenhouse board token to pull jobs from")
+    ta.add_argument("--count", type=int, default=5, help="how many jobs from the board")
+    ta.add_argument("--urls", nargs="*", help="explicit job URLs instead of a board")
+    ta.add_argument("--workers", type=int, default=3, help="parallel tailoring workers")
+    ta.set_defaults(func=cmd_tailor_all)
     ap_ = sub.add_parser("apply", help="answer + review (+optional fill/submit) one job URL")
     ap_.add_argument("name"); ap_.add_argument("url")
     ap_.add_argument("--resume", help="resume file to upload (defaults to one in candidate folder)")
