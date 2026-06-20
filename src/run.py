@@ -27,11 +27,19 @@ from .profile.parse import parse_resume, save_profile, read_pdf_text
 from .submit.apply import build_review, save_review, fill_form
 from .tailor.batch import batch_tailor
 from .discover.daily import daily_crawl
+from .pipeline import run_candidate_daily, run_all_candidates
 
 
 def cmd_add(args):
+    import shutil
     prof = parse_resume(args.resume)
     path = save_profile(prof, args.name)
+    # keep a copy of the resume in the candidate folder so the daily pipeline can find it
+    dest = config.candidate_dir(args.name) / Path(args.resume).name
+    try:
+        shutil.copy(args.resume, dest)
+    except Exception:
+        pass
     print(f"✓ Parsed resume -> {path}")
     print(f"  {prof.full_name} | {len(prof.skills)} skills | {len(prof.experience)} roles")
     print(f"  Target titles: {', '.join(prof.target_titles)}")
@@ -146,6 +154,27 @@ def cmd_daily(args):
     print(f"\nSaved -> candidates/{_slug(args.name)}/daily_shortlist.csv")
 
 
+def cmd_run_daily(args):
+    """Full daily pipeline for ONE client: crawl fresh+fit -> golden tailor top N."""
+    s = run_candidate_daily(args.name, args.boards, max_days=args.days, min_fit=args.fit,
+                            top_n=args.top, workers=args.workers, on_progress=print)
+    print(f"\n=== {args.name}: {s.get('golden',0)}/{s.get('tailored',0)} golden, "
+          f"from {s.get('fresh_fit_jobs',0)} fresh+fit jobs ===")
+
+
+def cmd_run_all(args):
+    """Run the daily pipeline for EVERY client."""
+    reports = run_all_candidates(args.boards, max_days=args.days, min_fit=args.fit,
+                                 top_n=args.top, workers=args.workers, on_progress=print)
+    print("\n=== ALL CLIENTS — daily report ===")
+    for r in reports:
+        if "error" in r:
+            print(f"  {r['candidate']:<20} ERROR: {r['error'][:40]}")
+        else:
+            print(f"  {r['candidate']:<20} {r['golden']}/{r['tailored']} golden "
+                  f"({r['fresh_fit_jobs']} fresh+fit)")
+
+
 def cmd_show(args):
     p = load_profile(args.name)
     print(json.dumps(json.loads(p.model_dump_json()), indent=2)[:2000])
@@ -188,6 +217,18 @@ def main(argv=None):
     dl.add_argument("--days", type=int, default=7, help="max posting age in days")
     dl.add_argument("--fit", type=int, default=55, help="min fit score (0-100)")
     dl.set_defaults(func=cmd_daily)
+
+    for cmd, fn, helptxt in (("run-daily", cmd_run_daily, "full daily pipeline for ONE client"),
+                             ("run-all", cmd_run_all, "full daily pipeline for ALL clients")):
+        p = sub.add_parser(cmd, help=helptxt)
+        if cmd == "run-daily":
+            p.add_argument("name")
+        p.add_argument("--boards", nargs="*", help="ATS board tokens (default: a few)")
+        p.add_argument("--days", type=int, default=7, help="max posting age in days")
+        p.add_argument("--fit", type=int, default=55, help="min fit score")
+        p.add_argument("--top", type=int, default=8, help="how many top-fit jobs to tailor")
+        p.add_argument("--workers", type=int, default=3, help="parallel tailoring workers")
+        p.set_defaults(func=fn)
     ap_ = sub.add_parser("apply", help="answer + review (+optional fill/submit) one job URL")
     ap_.add_argument("name"); ap_.add_argument("url")
     ap_.add_argument("--resume", help="resume file to upload (defaults to one in candidate folder)")

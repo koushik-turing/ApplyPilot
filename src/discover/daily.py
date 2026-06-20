@@ -17,19 +17,19 @@ from . import dates
 from .ats_client import GreenhouseClient
 
 
-def daily_crawl(
+def scored_fresh_jobs(
     candidate: str,
     boards: list[str],
     *,
     max_days: int = 7,
     min_fit: int = 55,
     on_progress=None,
-) -> list[dict]:
-    """Return today's ranked shortlist of FRESH, good-fit jobs for the candidate, and
-    save it to candidates/<name>/daily_shortlist.csv."""
+) -> list[tuple[dict, object]]:
+    """Sweep boards, keep FRESH + good-fit jobs, return [(fit_result, Job)] ranked by fit
+    and de-duplicated. The Job objects carry full JD content (ready for tailoring)."""
     matcher = build_matcher(load_profile(candidate))
     client = GreenhouseClient()
-    shortlist: list[dict] = []
+    graded: list[tuple[dict, object]] = []
     try:
         for board in boards:
             try:
@@ -43,31 +43,45 @@ def daily_crawl(
             for j in fresh:
                 r = score_job(matcher, j.title, clean_jd(j.content))
                 if r["final"] >= min_fit:
-                    shortlist.append({
-                        "fit": r["final"], "confidence": r["confidence"],
-                        "days_ago": j.days_ago, "posted_on": j.posted_on,
-                        "title": j.title, "company": board, "location": j.location,
-                        "min_years_req": r["min_years_req"],
-                        "red_flags": "; ".join(r["red_flags"]),
-                        "url": j.absolute_url,
-                    })
+                    graded.append((r, j))
                     kept += 1
             if on_progress:
                 on_progress(f"  {board}: {len(jobs)} jobs, {len(fresh)} fresh, {kept} good-fit")
     finally:
         client.close()
 
-    # de-duplicate the same role posted across multiple locations (title+company)
+    # rank by fit, de-duplicate the same role across locations (title+board)
     seen: set = set()
-    deduped: list[dict] = []
-    for r in sorted(shortlist, key=lambda d: (-d["fit"], d["days_ago"])):
-        key = (r["title"].strip().lower(), r["company"])
+    out: list[tuple[dict, object]] = []
+    for r, j in sorted(graded, key=lambda x: (-x[0]["final"], x[1].days_ago or 999)):
+        key = (j.title.strip().lower(), j.board)
         if key in seen:
             continue
         seen.add(key)
-        deduped.append(r)
-    _save(deduped, candidate)
-    return deduped
+        out.append((r, j))
+    return out
+
+
+def daily_crawl(
+    candidate: str,
+    boards: list[str],
+    *,
+    max_days: int = 7,
+    min_fit: int = 55,
+    on_progress=None,
+) -> list[dict]:
+    """Return today's ranked shortlist (dicts) and save candidates/<name>/daily_shortlist.csv."""
+    graded = scored_fresh_jobs(candidate, boards, max_days=max_days,
+                               min_fit=min_fit, on_progress=on_progress)
+    shortlist = [{
+        "fit": r["final"], "confidence": r["confidence"],
+        "days_ago": j.days_ago, "posted_on": j.posted_on,
+        "title": j.title, "company": j.board, "location": j.location,
+        "min_years_req": r["min_years_req"], "red_flags": "; ".join(r["red_flags"]),
+        "url": j.absolute_url,
+    } for r, j in graded]
+    _save(shortlist, candidate)
+    return shortlist
 
 
 def _save(shortlist: list[dict], candidate: str):
