@@ -46,6 +46,7 @@ class Job:
     location: str
     absolute_url: str
     content: str = ""
+    first_published: str = ""        # ISO timestamp from the ATS (for freshness)
     questions: list[FormQuestion] = field(default_factory=list)
 
 
@@ -70,6 +71,7 @@ class GreenhouseClient:
                 board=board, job_id=str(j["id"]), title=j.get("title", ""),
                 location=loc, absolute_url=j.get("absolute_url", ""),
                 content=j.get("content", ""),
+                first_published=j.get("first_published") or j.get("updated_at") or "",
             ))
         return jobs
 

@@ -26,6 +26,7 @@ from .profile.complete import complete_profile, load_profile
 from .profile.parse import parse_resume, save_profile, read_pdf_text
 from .submit.apply import build_review, save_review, fill_form
 from .tailor.batch import batch_tailor
+from .discover.daily import daily_crawl
 
 
 def cmd_add(args):
@@ -133,6 +134,18 @@ def cmd_tailor_all(args):
     print(f"\nSaved per-job resumes + SUMMARY.md in candidates/{_slug(args.name)}/tailored/")
 
 
+def cmd_daily(args):
+    """Daily fresh-links crawl: fresh + good-fit jobs for the candidate, ranked."""
+    boards = args.boards or ["stripe", "databricks", "anthropic", "gitlab"]
+    print(f"Daily crawl for {args.name}: {len(boards)} boards, fresh<={args.days}d, fit>={args.fit}")
+    shortlist = daily_crawl(args.name, boards, max_days=args.days,
+                            min_fit=args.fit, on_progress=print)
+    print(f"\n=== {len(shortlist)} fresh + good-fit jobs today ===")
+    for r in shortlist[:20]:
+        print(f"  fit {r['fit']:>3.0f}  {r['days_ago']:>2}d ago  {r['title'][:44]}  ({r['company']})")
+    print(f"\nSaved -> candidates/{_slug(args.name)}/daily_shortlist.csv")
+
+
 def cmd_show(args):
     p = load_profile(args.name)
     print(json.dumps(json.loads(p.model_dump_json()), indent=2)[:2000])
@@ -169,6 +182,12 @@ def main(argv=None):
     ta.add_argument("--workers", type=int, default=3, help="parallel tailoring workers")
     ta.add_argument("--fit", type=int, default=55, help="min fit score to tailor a job (0-100)")
     ta.set_defaults(func=cmd_tailor_all)
+    dl = sub.add_parser("daily", help="daily fresh-links crawl: fresh + good-fit jobs")
+    dl.add_argument("name")
+    dl.add_argument("--boards", nargs="*", help="ATS board tokens (default: a few)")
+    dl.add_argument("--days", type=int, default=7, help="max posting age in days")
+    dl.add_argument("--fit", type=int, default=55, help="min fit score (0-100)")
+    dl.set_defaults(func=cmd_daily)
     ap_ = sub.add_parser("apply", help="answer + review (+optional fill/submit) one job URL")
     ap_.add_argument("name"); ap_.add_argument("url")
     ap_.add_argument("--resume", help="resume file to upload (defaults to one in candidate folder)")

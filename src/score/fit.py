@@ -47,6 +47,12 @@ _RE_ROLE_HEAD = re.compile(
     r"engineer|developer|manager|analyst|designer|scientist|architect|consultant|"
     r"specialist|administrator|coordinator|director|programmer|recruiter|marketer|"
     r"accountant|nurse|teacher|writer|strategist", re.I)
+# Titles that LOOK technical (contain engineer/specialist/architect) but are actually
+# sales / pre-sales / non-engineering — a wrong role family for a software candidate.
+_RE_NONTECH = re.compile(
+    r"\b(sales|account executive|account manager|business development|customer success|"
+    r"solutions engineer|sales engineer|pre[- ]?sales|sales specialist|partner|"
+    r"recruiter|recruiting|marketing|support engineer)\b", re.I)
 
 
 # Generic words inside a skill phrase that shouldn't be matched alone (too common in JDs).
@@ -149,6 +155,8 @@ def _a_skill(m: CandidateMatcher, text: str) -> tuple[float, list[str], list[str
 
 def _b_role(m: CandidateMatcher, title: str) -> int:
     t = title.lower()
+    if _RE_NONTECH.search(t):
+        return 2                      # sales/pre-sales/support — wrong role family
     head_hit = any(h in t for h in m.role_heads)
     tok_hits = sum(1 for tok in m.role_tokens if re.search(r"(?<![a-z])" + re.escape(tok) + r"(?![a-z])", t))
     if not head_hit and tok_hits == 0:
@@ -196,6 +204,10 @@ def score_job(m: CandidateMatcher, title: str, jd_text: str | None) -> dict:
     D, foreign = _d_stack(m, text)
 
     flags, pen = [], 0
+    if _RE_NONTECH.search(title.lower()):
+        # tech-company sales/support JDs name the candidate's skills (high A_skill) but the
+        # ROLE is wrong — penalize hard so keyword overlap can't carry a non-engineering job.
+        flags.append("non-engineering role (sales/pre-sales/support)"); pen += 28
     if _RE_CLEARANCE.search(text):
         flags.append("clearance/US-citizen required"); pen += 35
     if m.needs_sponsorship and _RE_NO_SPONSOR.search(text):
