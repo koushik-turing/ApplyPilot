@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATS Resume Maker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">📄 <span>ATS Resume Maker</span></div>
+    <div id="ai-badge" class="badge badge-muted">checking AI…</div>
+  </header>
+
+  <main class="container">
+    <h1>Make your resume beat the ATS</h1>
+    <p class="lede">Upload your resume, paste the job description, and get a tailored,
+       ATS-optimized resume — or just check your ATS score.</p>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="tailor">✨ Tailor to a Job</button>
+      <button class="tab" data-tab="score">📊 Check ATS Score</button>
+    </nav>
+
+    <!-- ============ TAILOR TAB ============ -->
+    <section id="tab-tailor" class="panel">
+      <div class="grid">
+        <div>
+          <label class="field-label">1. Your resume</label>
+          <div class="dropzone" id="dz-tailor">
+            <input type="file" id="file-tailor" accept=".pdf,.docx,.txt" hidden />
+            <p>📎 <b>Drag &amp; drop</b> or <span class="link">browse</span></p>
+            <small>PDF, DOCX or TXT · max 8 MB</small>
+            <p class="filename" id="fn-tailor"></p>
+          </div>
+        </div>
+        <div>
+          <label class="field-label">2. Job description</label>
+          <textarea id="jd-tailor" rows="9"
+            placeholder="Paste the full job description here…"></textarea>
+        </div>
+      </div>
+      <button class="primary" id="btn-tailor">Generate tailored resume →</button>
+    </section>
+
+    <!-- ============ SCORE TAB ============ -->
+    <section id="tab-score" class="panel hidden">
+      <div class="grid">
+        <div>
+          <label class="field-label">Your resume</label>
+          <div class="dropzone" id="dz-score">
+            <input type="file" id="file-score" accept=".pdf,.docx,.txt" hidden />
+            <p>📎 <b>Drag &amp; drop</b> or <span class="link">browse</span></p>
+            <small>PDF, DOCX or TXT · max 8 MB</small>
+            <p class="filename" id="fn-score"></p>
+          </div>
+        </div>
+        <div>
+          <label class="field-label">Job description <em>(optional)</em></label>
+          <textarea id="jd-score" rows="9"
+            placeholder="Optional — paste a JD to score keyword match too…"></textarea>
+        </div>
+      </div>
+      <button class="primary" id="btn-score">Check ATS score →</button>
+    </section>
+
+    <!-- ============ RESULTS ============ -->
+    <div id="loading" class="loading hidden"><span class="spinner"></span> <span id="loading-text">Working…</span></div>
+    <div id="error" class="error hidden"></div>
+    <section id="results" class="results hidden"></section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
