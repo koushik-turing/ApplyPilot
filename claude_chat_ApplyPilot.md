@@ -73,8 +73,10 @@ E:\Apply_Pilot_Project_Folder\
 │  ├─ run.py           CLI: add/complete/show/daily/tailor-all/apply/run-daily/run-all
 │  ├─ discover/
 │  │  ├─ ats_client.py    Greenhouse public API: list_jobs(), get_job_form() (forms as data)
+│  │  ├─ sources.py       multi-ATS fetchers: fetch_greenhouse/lever/ashby -> unified Job
+│  │  ├─ sweep.py         cached multi-source sweep (15k boards): build_live_cache/sweep_targets/sweep
 │  │  ├─ dates.py         posting freshness: first_published->days_ago, fresh_only()
-│  │  └─ daily.py         scored_fresh_jobs() (2-stage), daily_crawl(), shortlist_row()
+│  │  └─ daily.py         rank_jobs() (2-stage), scored_fresh_jobs/_multi(), daily_crawl(), shortlist_row()
 │  ├─ profile/
 │  │  ├─ parse.py         M1: resume PDF -> Profile JSON (Claude), freezes resume_facts
 │  │  └─ complete.py      fill extra fields (visa/sponsorship/salary/EEO) once
@@ -249,18 +251,13 @@ currently a handful of Greenhouse boards (see next).
 
 ## 10. NEXT STEPS (in priority order)
 
-1. **⭐ BIGGER SOURCING (current ask):** fetch from **all** API-friendly job sites, fast, to get far more
-   jobs, then filter by match. Specifically:
-   - Add **Lever** (`api.lever.co/v0/postings/{org}`) and **Ashby**
-     (`api.ashbyhq.com/posting-api/job-board/{org}`) and **Workable** fetchers to `discover/`.
-   - Load the **15,533-board seed lists** (`D:\...\New_Project\seed\*.json`) into this folder; sweep with
-     pacing + a **live-token cache** (sweep once, keep only boards that have jobs) to beat 429s.
-   - Aggregators that give volume + dates: **Adzuna** (`adzuna_jobs.py` ready, needs free key),
-     evaluate **Fantastic.jobs** (one API indexing 54 ATS / 175k+ sites).
-   - For sources WITHOUT a posting date, fall back to JSON-LD `datePosted` scrape, else mark "unknown"
-     (don't drop silently).
-   - Then the existing 2-stage match (heuristic → AI %) filters the firehose down per candidate.
-2. **Sponsorship layer:** tag each job `sponsors_h1b: yes (N)` from USCIS/LCA data (`D:\...\us govt data\`)
+0. **✅ DONE — BIGGER SOURCING:** `sources.py` (Greenhouse+Lever+Ashby fetchers) + `sweep.py`
+   (cached multi-source sweep) + `seed/` (15,533 boards). `--seed` on run-daily/run-all sweeps them;
+   `build-cache` finds live tokens. Verified: 300 boards → 4,681 jobs → matched. STILL TODO here:
+   add **Workable** fetcher; **Adzuna** (`adzuna_jobs.py` ready, needs free key) + **Fantastic.jobs**
+   for volume; JSON-LD `datePosted` fallback for no-date sources (mark "unknown", don't drop);
+   run a FULL `build-cache` over all 15k to make daily `--seed` fast.
+1. **Sponsorship layer:** tag each job `sponsors_h1b: yes (N)` from USCIS/LCA data (`D:\...\us govt data\`)
    — critical for visa candidates; use as a knockout for those needing sponsorship.
 3. **Daily scheduling:** Windows Task Scheduler runs `run-all` each morning; keep ATS engine + dashboard
    up (as services). Makes it truly hands-free.
