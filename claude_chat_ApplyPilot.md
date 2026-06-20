@@ -73,10 +73,11 @@ E:\Apply_Pilot_Project_Folder\
 │  ├─ run.py           CLI: add/complete/show/daily/tailor-all/apply/run-daily/run-all
 │  ├─ discover/
 │  │  ├─ ats_client.py    Greenhouse public API: list_jobs(), get_job_form() (forms as data)
-│  │  ├─ sources.py       multi-ATS fetchers: fetch_greenhouse/lever/ashby -> unified Job
+│  │  ├─ sources.py       multi-ATS fetchers: greenhouse/lever/ashby/workable/adzuna -> unified Job
 │  │  ├─ sweep.py         cached multi-source sweep (15k boards): build_live_cache/sweep_targets/sweep
-│  │  ├─ dates.py         posting freshness: first_published->days_ago, fresh_only()
-│  │  └─ daily.py         rank_jobs() (2-stage), scored_fresh_jobs/_multi(), daily_crawl(), shortlist_row()
+│  │  ├─ usfilter.py      US-ONLY location filter: is_us(), us_only() (drop all non-US jobs)
+│  │  ├─ dates.py         posting freshness: first_published->days_ago, fresh_only(), jsonld fallback
+│  │  └─ daily.py         rank_jobs() (US filter -> sponsorship -> 2-stage), scored_fresh_jobs/_multi()
 │  ├─ profile/
 │  │  ├─ parse.py         M1: resume PDF -> Profile JSON (Claude), freezes resume_facts
 │  │  └─ complete.py      fill extra fields (visa/sponsorship/salary/EEO) once
@@ -91,9 +92,11 @@ E:\Apply_Pilot_Project_Folder\
 │  ├─ tailor/
 │  │  ├─ client.py        calls the ATS engine /api/tailor, clean_jd()
 │  │  └─ batch.py         fit-gated GOLDEN batch tailoring (parallel), {tailored, skipped}
-│  └─ dashboard/
-│     ├─ app.py           FastAPI :8050 — clients, detail, run buttons, resume PDF download
-│     └─ static/          index.html / style.css / app.js (vanilla)
+│  └─ dashboard/          RECRUITER CONSOLE (:8050)
+│     ├─ app.py           clients list/detail; POST create (resume upload->profile), PATCH edit,
+│     │                   DELETE; run-one/run-all (bg); resume PDF download
+│     └─ static/          index.html / style.css / app.js — add-candidate modal, editable profile,
+│                         shortlist SORT toggle (match% / most-recent), search, status pills
 ├─ ats_resume_maker/                ← the ATS ENGINE (copied in, git-tracked)
 │  ├─ backend/.env                  ← ANTHROPIC_API_KEY (GIT-IGNORED)
 │  └─ backend/app/                  main.py, keywords.py, scoring.py, tailor.py, export.py,
@@ -275,4 +278,58 @@ currently a handful of Greenhouse boards (see next).
 - When to flip a candidate from review→auto-submit.
 - Whether to get the Adzuna key now and/or evaluate Fantastic.jobs for production sourcing.
 - Exact required profile fields / visa wording for forms (esp. OPT vs H-1B nuances).
+
+---
+
+## 12. SESSION UPDATE — 2026-06-21 (sourcing finished, sponsorship, US-only, recruiter console)
+
+What was added/changed after the doc's first draft:
+
+### 12a. Bigger sourcing (DONE)
+- `sources.py`: **Workable** (search API, query-driven by the candidate's target titles, paginated)
+  and **Adzuna** (aggregator; needs a free key at `config/adzuna_key.txt` as `app_id:app_key` or env
+  `ADZUNA_APP_ID`/`ADZUNA_APP_KEY`) added alongside Greenhouse/Lever/Ashby.
+- `sweep.py`: cached multi-source sweep + `build-cache` CLI to find live tokens (beats 429s).
+- `seed/`: 15,533 board tokens copied in (`live_tokens.json` git-ignored).
+- `dates.py`: `jsonld_date()` + `enrich_missing_dates()`; `fresh_only` now KEEPS unknown-date jobs
+  (marked None) instead of dropping. Verified: 300 boards → 4,681 jobs; Workable 40/query.
+
+### 12b. Sponsorship layer (DONE)
+- `score/sponsorship.py`: USCIS H-1B Data Hub (FY21-23) → `sponsorship/h1b_sponsors.json` (82,280
+  employers, normalized name → max Initial Approvals). `info(company)`, `tag_jobs()`. Distinguishes
+  UNKNOWN (not in data) from CONFIRMED non-sponsor (in data, 0). For candidates needing sponsorship,
+  `rank_jobs` KNOCKS OUT confirmed non-sponsors (keeps unknowns). Shown in shortlist + console.
+  Raw CSVs git-ignored; compact json tracked.
+
+### 12c. US-ONLY filter (DONE)
+- `discover/usfilter.py` `is_us()`: explicit US / US state / "City, ST" / bare remote / multi-loc
+  incl. US → keep; known non-US country/region/city → drop. Applied FIRST in `rank_jobs` (before
+  scoring, so non-US costs no AI). Verified: gitlab 90 fresh → 62 US kept, 28 dropped.
+  **We target USA jobs ONLY.**
+
+### 12d. Freshness / volume tuning (DONE)
+- Default freshness window **7 days** (user OK'd up to 7), recency-ranked (today-first as tiebreak).
+- `rank_jobs` `ai_cap=130` so the shortlist can surface **~80-90 matches/candidate**. Hitting 80-90
+  reliably needs the FULL `build-cache` over all 15k boards (still TODO) — the ~230k live-job pool.
+
+### 12e. RECRUITER CONSOLE (DONE) — the big UI upgrade
+- Dashboard is now a full management console so ONE recruiter handles ALL candidates:
+  **+ Add candidate** (drop a resume → auto-build personalized profile + optional visa/salary/
+  sponsorship/location), **editable profile** (skills/titles/visa/salary — re-drives matching),
+  **delete**, **search**, per-candidate **Run daily** + **Run all**, status pills, golden-resume PDF
+  downloads, and the matched-jobs **SORT toggle (Match % / Most recent)** with sponsorship + days-ago
+  tags. Backend: `POST/PATCH/DELETE /api/clients`. Verified end-to-end (create from resume, screenshots).
+
+### 12f. Match scoring = 2-stage + AI (DONE earlier this session, recap)
+- Stage 1 heuristic (`score/fit.py`, per-profile) → Stage 2 **AI match %** (`score/ai_match.py`,
+  Claude reads resume vs JD) → the precise "90% / 40%" with verdict + strengths + gaps. Non-eng roles
+  (sales/pre-sales/support) penalized so keyword-rich JDs can't carry a wrong-role job.
+
+### 12g. STILL TODO (priority)
+1. **Full `build-cache`** over all 15,533 boards → daily `--seed` then hits 80-90 US matches fast.
+2. **Application tracker** — status pipeline (found→applied→interview→offer) in the console + SQLite.
+3. **Cover-letter generator** + **"Why this job" report** (quick, high-value; ATS engine can do letters).
+4. Daily **scheduling** (Task Scheduler), **email loop**, Adzuna key, Fantastic.jobs eval.
+5. Ideas vs Jobright (brainstormed): referral/hiring-manager finder, interview prep, company research
+   card, AI copilot chat, analytics/funnel, A/B resume variants, daily digest email.
 ```
