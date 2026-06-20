@@ -198,6 +198,7 @@ def client_detail(slug: str):
                 "fit_score": r.get("fit_score"), "score_before": r.get("score_before"),
                 "score_after": r.get("score_after"), "golden": r.get("golden"),
                 "location": r.get("location"), "file": f.name,
+                "status": r.get("status", "pending"),
                 "changes": (r.get("changes") or [])[:6],
             })
     tailored.sort(key=lambda r: (r.get("fit_score") or 0, r.get("score_after") or 0), reverse=True)
@@ -229,6 +230,80 @@ def download_resume(slug: str, fname: str, fmt: str = "pdf"):
     base = (r.get("title") or "resume").replace(" ", "_")[:40]
     return StreamingResponse(iter([resp.content]), media_type="application/pdf",
                              headers={"Content-Disposition": f'attachment; filename="{base}.{fmt}"'})
+
+
+def _gen_answers(slug: str, url: str) -> list[dict]:
+    """Best-effort: generate the form answers for a job (Greenhouse) for review/edit."""
+    try:
+        from ..discover.ats_client import GreenhouseClient, parse_greenhouse_url
+        from ..models import Job, FormQuestion
+        from ..answer.engine import answer_form
+        parsed = parse_greenhouse_url(url)
+        if not parsed:
+            return []
+        board, job_id = parsed
+        c = GreenhouseClient()
+        try:
+            raw = c.get_job_form(board, job_id)
+        finally:
+            c.close()
+        job = Job(board=raw.board, job_id=raw.job_id, title=raw.title, location=raw.location,
+                  url=raw.absolute_url, content=raw.content,
+                  questions=[FormQuestion(label=q.label, required=q.required, field_type=q.field_type,
+                             field_names=q.field_names, options=q.options) for q in raw.questions])
+        prof = load_profile_by_slug(slug)
+        sheet = answer_form(job, prof, prof.full_name or slug)   # test-mode dummy contact by default
+        return [{"label": a.label.strip(), "value": a.value, "source": a.source.value,
+                 "needs_human": a.needs_human} for a in sheet.answers]
+    except Exception:
+        return []
+
+
+@app.get("/api/clients/{slug}/application/{fname}")
+def get_application(slug: str, fname: str):
+    f = config.CANDIDATES_DIR / slug / "tailored" / fname
+    r = _read_json(f)
+    if not r or "tailored_resume" not in r:
+        raise HTTPException(404, "application not found")
+    tr = r["tailored_resume"]
+    return {
+        "file": fname, "title": r.get("title"), "url": r.get("url"),
+        "fit_score": r.get("fit_score"), "score_before": r.get("score_before"),
+        "score_after": r.get("score_after"), "golden": r.get("golden"),
+        "changes": (r.get("changes") or [])[:8],
+        "resume": {
+            "summary": tr.get("summary", ""),
+            "experience": [{"title": e.get("title", ""), "company": e.get("company", ""),
+                            "bullets": e.get("bullets", [])} for e in tr.get("experience", [])],
+        },
+        "answers": r.get("answers") or _gen_answers(slug, r.get("url", "")),
+        "comments": r.get("comments", ""),
+        "status": r.get("status", "pending"),
+    }
+
+
+@app.post("/api/clients/{slug}/application/{fname}")
+def save_application(slug: str, fname: str, payload: dict):
+    """Save recruiter edits to the tailored resume + answers + comments + status."""
+    f = config.CANDIDATES_DIR / slug / "tailored" / fname
+    r = _read_json(f)
+    if not r or "tailored_resume" not in r:
+        raise HTTPException(404, "application not found")
+    tr = r["tailored_resume"]
+    if isinstance(payload.get("summary"), str):
+        tr["summary"] = payload["summary"]
+    if isinstance(payload.get("experience"), list):
+        for i, e in enumerate(payload["experience"]):
+            if i < len(tr.get("experience", [])) and isinstance(e.get("bullets"), list):
+                tr["experience"][i]["bullets"] = [str(b) for b in e["bullets"] if str(b).strip()]
+    if isinstance(payload.get("answers"), list):
+        r["answers"] = payload["answers"]
+    if "comments" in payload:
+        r["comments"] = str(payload["comments"])
+    if payload.get("status") in ("pending", "approved", "submitted", "skipped"):
+        r["status"] = payload["status"]
+    f.write_text(json.dumps(r, indent=2), encoding="utf-8")
+    return {"ok": True, "status": r.get("status")}
 
 
 def _bg_run(key: str, fn, *args, **kw):

@@ -102,3 +102,22 @@ a.joblink{ color:var(--accent); text-decoration:none; font-weight:500; } a.jobli
 .form-grid input,.form-grid select{ border:1px solid var(--line); border-radius:8px; padding:8px 10px; font-size:13px; }
 .modal-foot{ display:flex; justify-content:flex-end; align-items:center; gap:12px; margin-top:18px; }
 .hidden{ display:none; }
+
+/* application review modal */
+.wide-modal{ width:1000px; max-width:96vw; }
+.appmeta{ font-size:12px; color:var(--mut); margin-top:3px; }
+.app-grid{ display:grid; grid-template-columns:1.1fr 1fr; gap:24px; }
+.app-grid h4{ margin:0 0 8px; font-size:14px; } .app-grid h4 small{ color:var(--mut); font-weight:400; }
+.lbl{ font-size:11px; color:var(--mut); display:block; margin:10px 0 3px; text-transform:uppercase; letter-spacing:.03em; }
+.app-grid textarea{ width:100%; border:1px solid var(--line); border-radius:8px; padding:9px 11px;
+  font-size:13px; font-family:inherit; resize:vertical; line-height:1.5; }
+.role-edit{ margin-bottom:10px; }
+.role-h{ font-size:12.5px; font-weight:600; color:#334155; margin:8px 0 3px; }
+.ansrow{ margin-bottom:9px; }
+.ansrow label{ font-size:11.5px; color:#475569; display:block; margin-bottom:3px; }
+.ansrow input{ width:100%; border:1px solid var(--line); border-radius:7px; padding:7px 9px; font-size:13px; }
+.changes-d{ margin-top:12px; font-size:12px; color:var(--mut); }
+.changes-d ul{ margin:6px 0; padding-left:18px; } .changes-d li{ margin:3px 0; }
+.statepill{ font-size:10.5px; padding:2px 8px; border-radius:20px; margin-left:8px; font-weight:600; }
+.statepill.submitted{ background:#ecfdf3; color:var(--gold); } .statepill.approved{ background:#dbeafe; color:#1d4ed8; }
+.statepill.skipped{ background:#f1f5f9; color:#64748b; }

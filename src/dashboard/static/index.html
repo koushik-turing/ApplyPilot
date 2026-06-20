@@ -75,6 +75,23 @@
     </div>
   </div>
 
+  <!-- APPLICATION REVIEW MODAL -->
+  <div id="appModal" class="modal hidden">
+    <div class="modal-card wide-modal">
+      <div class="modal-head">
+        <div><h3 id="appTitle">Application review</h3><div id="appMeta" class="appmeta"></div></div>
+        <button class="x" onclick="closeApp()">✕</button>
+      </div>
+      <div id="appBody"></div>
+      <div class="modal-foot">
+        <span id="appStatus" class="status"></span>
+        <a id="appPdf" class="btn" href="#" target="_blank">⬇ PDF</a>
+        <button class="btn" id="appSave">Save edits</button>
+        <button class="btn primary" id="appSubmit">✓ Approve &amp; submit</button>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

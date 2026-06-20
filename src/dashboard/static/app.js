@@ -78,8 +78,9 @@ function renderDetail() {
       <td class="fit ${t.fit_score >= 75 ? "hi" : "mid"}">${Math.round(t.fit_score)}%</td>
       <td>${t.score_before} → <b>${t.score_after}</b></td>
       <td>${t.golden ? '<span class="gold-pill">✓ golden</span>' : '<span class="warn-pill">below 75</span>'}</td>
-      <td><a class="joblink" href="${t.url}" target="_blank">${t.title}</a></td>
-      <td><a class="btn sm" href="/api/clients/${d.slug}/resume/${t.file}">PDF</a></td>
+      <td><a class="joblink" href="${t.url}" target="_blank">${t.title}</a>
+        ${t.status && t.status !== "pending" ? `<span class="statepill ${t.status}">${t.status}</span>` : ""}</td>
+      <td><button class="btn sm primary" data-review="${t.file}">Review</button></td>
     </tr>`).join("");
 
   $("#detail").innerHTML = `
@@ -152,6 +153,7 @@ function renderDetail() {
   $("#saveProfile").onclick = saveProfile;
   $("#delClient").onclick = deleteClient;
   document.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { sortMode = b.dataset.sort; renderDetail(); });
+  document.querySelectorAll("[data-review]").forEach(b => b.onclick = () => openApp(b.dataset.review));
 }
 
 function renderShortlist() {
@@ -254,6 +256,67 @@ $("#addForm").onsubmit = async (e) => {
     $("#addStatus").className = "status error"; $("#addStatus").textContent = String(err.message || err);
   } finally { $("#addSubmit").disabled = false; }
 };
+
+/* ---------------- application review (edit + comments + submit) ---------------- */
+let appData = null;
+async function openApp(file) {
+  appData = await api(`/api/clients/${detailData.slug}/application/${file}`);
+  appData.file = file;
+  $("#appTitle").textContent = appData.title || "Application review";
+  $("#appMeta").innerHTML = `Fit <b>${Math.round(appData.fit_score||0)}%</b> · ATS ${appData.score_before} → <b>${appData.score_after}</b>
+     ${appData.golden ? '<span class="gold-pill">✓ golden</span>' : ''} · <a class="joblink" href="${appData.url}" target="_blank">job ↗</a>`;
+  const r = appData.resume;
+  const ans = (appData.answers || []).map((a, i) => `
+    <div class="ansrow">
+      <label>${a.label}${a.needs_human ? ' <span class="warn-pill">⚠ check</span>' : ''}</label>
+      <input id="ans_${i}" value="${(a.value || "").replace(/"/g, "&quot;")}">
+    </div>`).join("");
+  const roles = r.experience.map((e, i) => `
+    <div class="role-edit">
+      <div class="role-h">${e.title}${e.company ? " — " + e.company : ""}</div>
+      <textarea id="bul_${i}" rows="${Math.max(3, e.bullets.length)}">${e.bullets.join("\n")}</textarea>
+    </div>`).join("");
+
+  $("#appBody").innerHTML = `
+    <div class="app-grid">
+      <div>
+        <h4>Tailored resume <small>(edit freely — PDF reflects your edits)</small></h4>
+        <label class="lbl">Summary</label>
+        <textarea id="app_summary" rows="4">${r.summary || ""}</textarea>
+        <label class="lbl">Experience bullets (one per line)</label>
+        ${roles}
+        ${appData.changes && appData.changes.length ? `<details class="changes-d"><summary>What the AI changed (${appData.changes.length})</summary><ul>${appData.changes.map(c => `<li>${c}</li>`).join("")}</ul></details>` : ""}
+      </div>
+      <div>
+        <h4>Application answers <small>(edit any)</small></h4>
+        ${ans || '<p style="color:#6b7280;font-size:13px">No form answers (non-Greenhouse or none generated).</p>'}
+        <h4 style="margin-top:18px">Recruiter comments</h4>
+        <textarea id="app_comments" rows="4" placeholder="Notes / instructions — saved with this application">${appData.comments || ""}</textarea>
+      </div>
+    </div>`;
+  $("#appPdf").href = `/api/clients/${detailData.slug}/resume/${file}`;
+  $("#appStatus").textContent = appData.status !== "pending" ? `status: ${appData.status}` : "";
+  $("#appSubmit").textContent = detailData._mode === "automated" ? "✓ Mark submitted" : "✓ Approve & submit";
+  $("#appModal").classList.remove("hidden");
+}
+function collectApp() {
+  const exp = (appData.resume.experience || []).map((e, i) => ({
+    bullets: ($("#bul_" + i).value || "").split("\n").map(s => s.trim()).filter(Boolean) }));
+  const answers = (appData.answers || []).map((a, i) => ({ ...a, value: $("#ans_" + i)?.value ?? a.value }));
+  return { summary: $("#app_summary").value, experience: exp, answers, comments: $("#app_comments").value };
+}
+async function saveApp(status) {
+  const payload = collectApp();
+  if (status) payload.status = status;
+  $("#appStatus").textContent = "saving…";
+  await fetch(`/api/clients/${detailData.slug}/application/${appData.file}`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+  $("#appStatus").textContent = status ? `status: ${status}` : "saved ✓";
+}
+function closeApp() { $("#appModal").classList.add("hidden"); appData = null; }
+window.openApp = openApp; window.closeApp = closeApp;
+$("#appSave").onclick = () => saveApp(null);
+$("#appSubmit").onclick = async () => { await saveApp("submitted"); setTimeout(() => { closeApp(); openDetail(detailData.slug); }, 700); };
 
 /* ---------------- nav / global ---------------- */
 function backToClients() {
