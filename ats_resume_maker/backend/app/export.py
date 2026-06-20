@@ -20,6 +20,23 @@ HEADINGS = {
     "projects": "Projects",
 }
 
+# Selectable, ATS-safe templates. Only colors/typography differ — every template stays
+# single-column, real-text, no tables/graphics, so parse-ability is identical.
+#   accent  = name + heading color (RGB)   |   rule = heading underline color
+TEMPLATES = {
+    "classic": {"accent": (31, 41, 59),   "rule": (176, 183, 195), "name": (17, 24, 39),
+                "name_size": 20, "heading_rule": True,  "name_align": "L"},
+    "modern":  {"accent": (37, 99, 235),  "rule": (37, 99, 235),   "name": (17, 24, 39),
+                "name_size": 22, "heading_rule": True,  "name_align": "L"},
+    "executive": {"accent": (15, 23, 42), "rule": (148, 163, 184), "name": (15, 23, 42),
+                "name_size": 24, "heading_rule": True,  "name_align": "C"},
+}
+DEFAULT_TEMPLATE = "modern"
+
+
+def _style(template: str | None) -> dict:
+    return TEMPLATES.get((template or DEFAULT_TEMPLATE).lower(), TEMPLATES[DEFAULT_TEMPLATE])
+
 
 def _contact(r: Resume) -> str:
     return "  |  ".join(x for x in [r.email, r.phone, r.location, *r.links] if x)
@@ -56,12 +73,17 @@ def to_text(r: Resume) -> str:
 
 
 # ---------------- DOCX ----------------
-def to_docx(r: Resume) -> bytes:
+def to_docx(r: Resume, template: str | None = None) -> bytes:
     from docx import Document
     from docx.shared import Pt, RGBColor, Inches
     from docx.enum.text import WD_TAB_ALIGNMENT, WD_ALIGN_PARAGRAPH
     from docx.oxml.ns import qn
     from docx.oxml import OxmlElement
+
+    st = _style(template)
+    accent = RGBColor(*st["accent"])
+    rule_hex = "%02X%02X%02X" % st["rule"]
+    name_rgb = RGBColor(*st["name"])
 
     doc = Document()
     for s in doc.sections:
@@ -84,25 +106,31 @@ def to_docx(r: Resume) -> bytes:
         run = p.add_run(text.upper())
         run.bold = True
         run.font.size = Pt(11)
-        run.font.color.rgb = RGBColor(0x1F, 0x29, 0x3B)
-        # full-width bottom border = the heading rule
+        run.font.color.rgb = accent
+        # full-width bottom border = the heading rule (template-colored)
         pPr = p._p.get_or_add_pPr()
         pbdr = OxmlElement("w:pBdr")
         bottom = OxmlElement("w:bottom")
-        for k, v in (("w:val", "single"), ("w:sz", "6"), ("w:space", "2"), ("w:color", "B0B7C3")):
+        for k, v in (("w:val", "single"), ("w:sz", "6"), ("w:space", "2"), ("w:color", rule_hex)):
             bottom.set(qn(k), v)
         pbdr.append(bottom)
         pPr.append(pbdr)
 
+    center = (st["name_align"] == "C")
+
     # ---- header ----
     if r.name:
         p = _tight(doc.add_paragraph())
+        if center:
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         run = p.add_run(r.name)
         run.bold = True
-        run.font.size = Pt(20)
-        run.font.color.rgb = RGBColor(0x11, 0x18, 0x27)
+        run.font.size = Pt(st["name_size"])
+        run.font.color.rgb = name_rgb
     if _contact(r):
         p = _tight(doc.add_paragraph())
+        if center:
+            p.alignment = WD_ALIGN_PARAGRAPH.CENTER
         run = p.add_run(_contact(r))
         run.font.size = Pt(9.5)
         run.font.color.rgb = RGBColor(0x44, 0x4A, 0x57)
@@ -160,9 +188,12 @@ def to_docx(r: Resume) -> bytes:
 
 
 # ---------------- PDF ----------------
-def to_pdf(r: Resume) -> bytes:
+def to_pdf(r: Resume, template: str | None = None) -> bytes:
     from fpdf import FPDF
     from fpdf.enums import XPos, YPos
+
+    st = _style(template)
+    accent, rule, name_rgb = st["accent"], st["rule"], st["name"]
 
     pdf = FPDF(format="A4")
     pdf.set_auto_page_break(auto=True, margin=14)
@@ -174,22 +205,25 @@ def to_pdf(r: Resume) -> bytes:
                  .replace("“", '"').replace("”", '"').replace("•", "-").replace("·", "-")
                  .encode("latin-1", "replace").decode("latin-1"))
 
-    def cell(text: str, h: float = 5.0):
-        pdf.multi_cell(0, h, txt(text), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
+    def cell(text: str, h: float = 5.0, align: str = "L"):
+        pdf.multi_cell(0, h, txt(text), new_x=XPos.LMARGIN, new_y=YPos.NEXT, align=align)
 
     def hr(gap: float = 1.0):
         y = pdf.get_y() + gap
-        pdf.set_draw_color(176, 183, 195)
-        pdf.set_line_width(0.3)
+        pdf.set_draw_color(*rule)
+        pdf.set_line_width(0.4)
         pdf.line(pdf.l_margin, y, pdf.l_margin + pdf.epw, y)
         pdf.ln(gap + 1.6)
 
     def heading(t: str):
         pdf.ln(2.5)
         pdf.set_font("Helvetica", "B", 11)
-        pdf.set_text_color(31, 41, 59)
+        pdf.set_text_color(*accent)
         pdf.cell(0, 5.5, txt(t.upper()), new_x=XPos.LMARGIN, new_y=YPos.NEXT)
-        hr()
+        if st["heading_rule"]:
+            hr()
+        else:
+            pdf.ln(1.0)
         pdf.set_text_color(0, 0, 0)
         pdf.set_font("Helvetica", "", 10)
 
@@ -213,15 +247,21 @@ def to_pdf(r: Resume) -> bytes:
 
     # ---- header ----
     if r.name:
-        pdf.set_font("Helvetica", "B", 20)
-        pdf.set_text_color(17, 24, 39)
-        cell(r.name, h=8.5)
+        pdf.set_font("Helvetica", "B", st["name_size"])
+        pdf.set_text_color(*name_rgb)
+        cell(r.name, h=9.0, align=st["name_align"])
         pdf.set_text_color(0, 0, 0)
     if _contact(r):
         pdf.set_font("Helvetica", "", 9.5)
         pdf.set_text_color(68, 74, 87)
-        cell(_contact(r), h=5)
+        cell(_contact(r), h=5, align=st["name_align"])
         pdf.set_text_color(0, 0, 0)
+    # accent rule under the header for a polished, modern finish
+    pdf.ln(0.5)
+    pdf.set_draw_color(*accent)
+    pdf.set_line_width(0.6)
+    pdf.line(pdf.l_margin, pdf.get_y(), pdf.l_margin + pdf.epw, pdf.get_y())
+    pdf.ln(1.0)
 
     if r.summary:
         heading(HEADINGS["summary"])

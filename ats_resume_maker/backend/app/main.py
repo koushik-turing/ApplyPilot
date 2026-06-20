@@ -148,15 +148,15 @@ async def tailor_endpoint(
 
 
 @app.post("/api/export")
-async def export_endpoint(resume: Resume, format: str = "pdf"):
+async def export_endpoint(resume: Resume, format: str = "pdf", template: str = "modern"):
     resume, _ = polish.polish_resume(resume)  # guarantee a clean, standard document
     fmt = format.lower()
     if fmt == "docx":
-        data = export.to_docx(resume)
+        data = export.to_docx(resume, template=template)
         media = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         ext = "docx"
     elif fmt == "pdf":
-        data = export.to_pdf(resume)
+        data = export.to_pdf(resume, template=template)
         media, ext = "application/pdf", "pdf"
     elif fmt == "txt":
         data = export.to_text(resume).encode("utf-8")
