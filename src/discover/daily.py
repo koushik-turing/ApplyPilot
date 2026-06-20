@@ -24,10 +24,10 @@ def rank_jobs(
     candidate: str,
     jobs: list,
     *,
-    min_fit: int = 55,
+    min_fit: int = 50,
     ai_score: bool = True,
     prefilter: int = 35,
-    ai_cap: int = 60,
+    ai_cap: int = 130,        # AI-score enough survivors to surface ~80-90 matches
     on_progress=None,
 ) -> list[tuple[dict, object]]:
     """Two-stage scoring over an ALREADY-FETCHED job list. Returns [(score, Job)] ranked
