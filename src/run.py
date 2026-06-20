@@ -116,15 +116,20 @@ def cmd_tailor_all(args):
         for raw in live[: args.count]:
             jobs.append(Job(board=raw.board, job_id=raw.job_id, title=raw.title,
                             location=raw.location, url=raw.absolute_url, content=raw.content))
-    print(f"Batch tailoring {len(jobs)} job(s) for {args.name} with {args.workers} workers...")
-    results = batch_tailor(resume_text, jobs, args.name,
-                           max_workers=args.workers, on_progress=print)
-    print("\n=== RANKED (best match first) ===")
+    print(f"Fit-scoring + batch tailoring {len(jobs)} job(s) for {args.name} "
+          f"({args.workers} workers, fit>={args.fit})...")
+    out = batch_tailor(resume_text, jobs, args.name, max_workers=args.workers,
+                       fit_threshold=args.fit, on_progress=print)
+    results = out["tailored"]
+    golden = sum(1 for r in results if r.get("golden"))
+    print(f"\n=== {golden}/{len(results)} GOLDEN (ATS>=75) | {len(out['skipped'])} skipped (poor fit) ===")
+    print("Ranked by job fit:")
     for i, r in enumerate(results[:15], 1):
         if "error" in r:
-            print(f"{i:>2}. FAILED  {r['title'][:50]}  ({r['error'][:30]})")
+            print(f"{i:>2}. FAILED  {r['title'][:46]}")
         else:
-            print(f"{i:>2}. {r['score_after']:>3} (was {r['score_before']:>3})  {r['title'][:50]}")
+            g = "GOLD" if r["golden"] else "----"
+            print(f"{i:>2}. [{g}] fit {r['fit_score']:>3.0f}  ATS {r['score_before']:>3}->{r['score_after']:>3}  {r['title'][:42]}")
     print(f"\nSaved per-job resumes + SUMMARY.md in candidates/{_slug(args.name)}/tailored/")
 
 
@@ -162,6 +167,7 @@ def main(argv=None):
     ta.add_argument("--count", type=int, default=5, help="how many jobs from the board")
     ta.add_argument("--urls", nargs="*", help="explicit job URLs instead of a board")
     ta.add_argument("--workers", type=int, default=3, help="parallel tailoring workers")
+    ta.add_argument("--fit", type=int, default=55, help="min fit score to tailor a job (0-100)")
     ta.set_defaults(func=cmd_tailor_all)
     ap_ = sub.add_parser("apply", help="answer + review (+optional fill/submit) one job URL")
     ap_.add_argument("name"); ap_.add_argument("url")
