@@ -82,7 +82,8 @@ E:\Apply_Pilot_Project_Folder\
 │  │  └─ complete.py      fill extra fields (visa/sponsorship/salary/EEO) once
 │  ├─ score/
 │  │  ├─ fit.py           heuristic fit (A_skill+B_role+C_exp+D_stack-penalties), per-profile
-│  │  └─ ai_match.py      AI match %: Claude reads profile vs JD -> %, verdict, strengths, gaps
+│  │  ├─ ai_match.py      AI match %: Claude reads profile vs JD -> %, verdict, strengths, gaps
+│  │  └─ sponsorship.py   USCIS H-1B lookup: info(company), tag_jobs(); knockout for visa candidates
 │  ├─ answer/
 │  │  └─ engine.py        M4 3-layer answers (L1 deterministic / L2 cache / L3 Claude) + TEST MODE
 │  ├─ submit/
@@ -251,15 +252,16 @@ currently a handful of Greenhouse boards (see next).
 
 ## 10. NEXT STEPS (in priority order)
 
-0. **✅ DONE — BIGGER SOURCING:** `sources.py` (Greenhouse+Lever+Ashby fetchers) + `sweep.py`
-   (cached multi-source sweep) + `seed/` (15,533 boards). `--seed` on run-daily/run-all sweeps them;
-   `build-cache` finds live tokens. Verified: 300 boards → 4,681 jobs → matched. STILL TODO here:
-   add **Workable** fetcher; **Adzuna** (`adzuna_jobs.py` ready, needs free key) + **Fantastic.jobs**
-   for volume; JSON-LD `datePosted` fallback for no-date sources (mark "unknown", don't drop);
-   run a FULL `build-cache` over all 15k to make daily `--seed` fast.
-1. **Sponsorship layer:** tag each job `sponsors_h1b: yes (N)` from USCIS/LCA data (`D:\...\us govt data\`)
-   — critical for visa candidates; use as a knockout for those needing sponsorship.
-3. **Daily scheduling:** Windows Task Scheduler runs `run-all` each morning; keep ATS engine + dashboard
+0. **✅ DONE — BIGGER SOURCING:** `sources.py` (Greenhouse+Lever+Ashby+**Workable**+**Adzuna**) +
+   `sweep.py` (cached multi-source sweep) + `seed/` (15,533 boards). `--seed` sweeps them; `build-cache`
+   finds live tokens; Workable/Adzuna query-driven by target titles; no-date JSON-LD fallback (keeps
+   unknowns). Verified: 300 boards → 4,681 jobs; Workable 40/query. STILL TODO: Adzuna key
+   (`config/adzuna_key.txt`), evaluate **Fantastic.jobs**, run a FULL `build-cache` over all 15k.
+1. **✅ DONE — Sponsorship layer:** `score/sponsorship.py` tags jobs with real USCIS H-1B approvals
+   (82,280 employers in `sponsorship/h1b_sponsors.json`); knocks out confirmed non-sponsors for
+   candidates needing sponsorship; shown in shortlist + dashboard. FUTURE: add LCA/PERM data; better
+   entity resolution for tricky company names.
+2. **Daily scheduling:** Windows Task Scheduler runs `run-all` each morning; keep ATS engine + dashboard
    up (as services). Makes it truly hands-free.
 4. **Apply automation + tracker:** fold review-gated submit into the daily run; status pipeline
    (found→matched→tailored→review→submitted→confirmed) in SQLite; show in dashboard.
