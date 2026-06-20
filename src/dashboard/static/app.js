@@ -55,11 +55,15 @@ async function openDetail(slug) {
   const wa = p.work_auth || {};
   const rows = (d.shortlist || []).map(j => `
     <tr>
-      <td class="fit ${(+j.fit) >= 75 ? "hi" : ""}">${Math.round(j.fit)}</td>
+      <td class="fit ${(+j.match) >= 75 ? "hi" : ""}">${Math.round(j.match)}%</td>
+      <td>${j.verdict || ""}</td>
       <td>${j.days_ago}d ago</td>
-      <td><a class="joblink" href="${j.url}" target="_blank">${j.title}</a></td>
+      <td>
+        <a class="joblink" href="${j.url}" target="_blank">${j.title}</a>
+        ${j.strengths ? `<div class="changes">✓ ${j.strengths}</div>` : ""}
+        ${j.gaps ? `<div class="changes" style="color:#b45309">△ ${j.gaps}</div>` : ""}
+      </td>
       <td>${j.company}</td>
-      <td>${j.red_flags || ""}</td>
     </tr>`).join("");
   const tail = (d.tailored || []).map(t => `
     <tr>
@@ -84,7 +88,7 @@ async function openDetail(slug) {
     ${tail ? `<table><thead><tr><th>Fit</th><th>ATS</th><th>Standard</th><th>Job</th><th>Resume</th></tr></thead><tbody>${tail}</tbody></table>`
            : `<p style="color:#6b7280">No tailored resumes yet — click “Run daily”.</p>`}
     <h3 class="section">Today's fresh + fit shortlist (${(d.shortlist||[]).length})</h3>
-    ${rows ? `<table><thead><tr><th>Fit</th><th>Posted</th><th>Job</th><th>Company</th><th>Flags</th></tr></thead><tbody>${rows}</tbody></table>`
+    ${rows ? `<table><thead><tr><th>Match</th><th>Verdict</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th></tr></thead><tbody>${rows}</tbody></table>`
            : `<p style="color:#6b7280">No shortlist yet — click “Run daily”.</p>`}
   `;
 }

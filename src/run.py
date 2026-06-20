@@ -148,9 +148,9 @@ def cmd_daily(args):
     print(f"Daily crawl for {args.name}: {len(boards)} boards, fresh<={args.days}d, fit>={args.fit}")
     shortlist = daily_crawl(args.name, boards, max_days=args.days,
                             min_fit=args.fit, on_progress=print)
-    print(f"\n=== {len(shortlist)} fresh + good-fit jobs today ===")
+    print(f"\n=== {len(shortlist)} fresh + matching jobs today ===")
     for r in shortlist[:20]:
-        print(f"  fit {r['fit']:>3.0f}  {r['days_ago']:>2}d ago  {r['title'][:44]}  ({r['company']})")
+        print(f"  {r['match']:>3}% [{r.get('verdict','')[:9]:<9}] {r['days_ago']:>2}d ago  {r['title'][:40]} ({r['company']})")
     print(f"\nSaved -> candidates/{_slug(args.name)}/daily_shortlist.csv")
 
 

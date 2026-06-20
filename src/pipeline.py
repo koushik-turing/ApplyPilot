@@ -12,7 +12,7 @@ import json
 from pathlib import Path
 
 from . import config
-from .discover.daily import scored_fresh_jobs, _save as _save_shortlist
+from .discover.daily import scored_fresh_jobs, shortlist_row, _save as _save_shortlist
 from .models import Job
 from .profile.parse import read_pdf_text
 from .tailor.batch import batch_tailor
@@ -50,14 +50,8 @@ def run_candidate_daily(
     log(f"[{candidate}] crawling fresh+fit jobs...")
     graded = scored_fresh_jobs(candidate, boards or DEFAULT_BOARDS,
                                max_days=max_days, min_fit=min_fit, on_progress=on_progress)
-    # save the day's shortlist
-    shortlist = [{
-        "fit": r["final"], "confidence": r["confidence"], "days_ago": j.days_ago,
-        "posted_on": j.posted_on, "title": j.title, "company": j.board,
-        "location": j.location, "min_years_req": r["min_years_req"],
-        "red_flags": "; ".join(r["red_flags"]), "url": j.absolute_url,
-    } for r, j in graded]
-    _save_shortlist(shortlist, candidate)
+    # save the day's shortlist (precise AI match % + reasoning per job)
+    _save_shortlist([shortlist_row(r, j) for r, j in graded], candidate)
 
     top = [j for _, j in graded[:top_n]]
     jobs = [Job(board=j.board, job_id=j.job_id, title=j.title, location=j.location,
