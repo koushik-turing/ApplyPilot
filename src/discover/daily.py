@@ -35,14 +35,28 @@ def rank_jobs(
       Stage 1 (heuristic, cheap): keep jobs whose coarse fit >= prefilter; dedup.
       Stage 2 (AI, precise): AI-score only the top `ai_cap` heuristic survivors (bounds cost
                              when the firehose is huge) -> real match %; keep >= min_fit."""
+    from ..score.sponsorship import tag_jobs
+
     profile = load_profile(candidate)
     matcher = build_matcher(profile)
     gate = prefilter if ai_score else min_fit
+
+    # Sponsorship layer: tag every job; for candidates who NEED sponsorship, knock out
+    # CONFIRMED non-sponsors (in USCIS data with 0 approvals). Unknown companies are kept.
+    tag_jobs(jobs)
+    needs_sponsor = bool(profile.work_auth.requires_sponsorship)
+    if needs_sponsor:
+        before = len(jobs)
+        jobs = [j for j in jobs if getattr(j, "sponsors_h1b", None) is not False]
+        if on_progress and before != len(jobs):
+            on_progress(f"  sponsorship knockout: dropped {before - len(jobs)} confirmed non-sponsors")
 
     survivors = []
     for j in jobs:
         r = score_job(matcher, j.title, clean_jd(j.content))
         if r["final"] >= gate:
+            r["sponsors_h1b"] = getattr(j, "sponsors_h1b", None)
+            r["h1b_approvals"] = getattr(j, "h1b_approvals", 0)
             survivors.append((r, j))
 
     # de-duplicate the same role across locations (title+board)
@@ -170,11 +184,15 @@ def _adzuna_key() -> tuple[str | None, str | None]:
 
 def shortlist_row(r: dict, j) -> dict:
     """One shortlist record: the precise match % + reasoning + freshness for a job."""
+    spons = r.get("sponsors_h1b", getattr(j, "sponsors_h1b", None))
+    appr = r.get("h1b_approvals", getattr(j, "h1b_approvals", 0))
     return {
         "match": r.get("ai_match", r["final"]),
         "verdict": r.get("verdict", ""),
         "days_ago": j.days_ago, "posted_on": j.posted_on,
         "title": j.title, "company": j.board, "location": j.location,
+        "sponsors_h1b": ("yes" if spons else "no" if spons is False else "unknown"),
+        "h1b_approvals": appr,
         "strengths": " | ".join(r.get("strengths", [])),
         "gaps": " | ".join(r.get("gaps", [])),
         "min_years_req": r.get("min_years_req"),
@@ -202,8 +220,9 @@ def daily_crawl(
 
 def _save(shortlist: list[dict], candidate: str):
     path = config.candidate_dir(candidate) / "daily_shortlist.csv"
-    cols = ["match", "verdict", "days_ago", "posted_on", "title", "company",
-            "location", "strengths", "gaps", "min_years_req", "red_flags", "url"]
+    cols = ["match", "verdict", "sponsors_h1b", "h1b_approvals", "days_ago", "posted_on",
+            "title", "company", "location", "strengths", "gaps", "min_years_req",
+            "red_flags", "url"]
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=cols)
         w.writeheader()

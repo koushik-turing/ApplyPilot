@@ -53,11 +53,15 @@ async function openDetail(slug) {
   $("#detailView").classList.remove("hidden");
   const p = d.profile;
   const wa = p.work_auth || {};
+  const spons = (s, n) => s === "yes" ? `<span class="gold-pill">H-1B ✓ (${n})</span>`
+                        : s === "no" ? `<span class="warn-pill">no H-1B</span>`
+                        : `<span style="color:#9ca3af">H-1B ?</span>`;
   const rows = (d.shortlist || []).map(j => `
     <tr>
       <td class="fit ${(+j.match) >= 75 ? "hi" : ""}">${Math.round(j.match)}%</td>
       <td>${j.verdict || ""}</td>
-      <td>${j.days_ago}d ago</td>
+      <td>${spons(j.sponsors_h1b, j.h1b_approvals)}</td>
+      <td>${j.days_ago != null && j.days_ago !== "" ? j.days_ago + "d ago" : "—"}</td>
       <td>
         <a class="joblink" href="${j.url}" target="_blank">${j.title}</a>
         ${j.strengths ? `<div class="changes">✓ ${j.strengths}</div>` : ""}
@@ -88,7 +92,7 @@ async function openDetail(slug) {
     ${tail ? `<table><thead><tr><th>Fit</th><th>ATS</th><th>Standard</th><th>Job</th><th>Resume</th></tr></thead><tbody>${tail}</tbody></table>`
            : `<p style="color:#6b7280">No tailored resumes yet — click “Run daily”.</p>`}
     <h3 class="section">Today's fresh + fit shortlist (${(d.shortlist||[]).length})</h3>
-    ${rows ? `<table><thead><tr><th>Match</th><th>Verdict</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th></tr></thead><tbody>${rows}</tbody></table>`
+    ${rows ? `<table><thead><tr><th>Match</th><th>Verdict</th><th>Sponsorship</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th></tr></thead><tbody>${rows}</tbody></table>`
            : `<p style="color:#6b7280">No shortlist yet — click “Run daily”.</p>`}
   `;
 }
