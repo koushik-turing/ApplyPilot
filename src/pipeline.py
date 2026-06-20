@@ -12,7 +12,9 @@ import json
 from pathlib import Path
 
 from . import config
-from .discover.daily import scored_fresh_jobs, shortlist_row, _save as _save_shortlist
+from .discover.daily import (scored_fresh_jobs, scored_fresh_multi, shortlist_row,
+                             _save as _save_shortlist)
+from .discover.sweep import sweep_targets
 from .models import Job
 from .profile.parse import read_pdf_text
 from .tailor.batch import batch_tailor
@@ -38,18 +40,29 @@ def run_candidate_daily(
     min_fit: int = 55,
     top_n: int = 10,
     workers: int = 3,
+    use_seed: bool = False,
+    seed_limit: int = 400,
     on_progress=None,
 ) -> dict:
-    """Full daily run for ONE client: fresh+fit shortlist -> golden tailor top N."""
+    """Full daily run for ONE client: fresh+fit shortlist -> golden tailor top N.
+
+    use_seed=True sweeps the big multi-ATS seed lists (live-token cached) for far more
+    jobs; otherwise it uses the small fixed `boards` list."""
     log = on_progress or (lambda m: None)
     resume = find_resume(candidate)
     if not resume:
         return {"candidate": candidate, "error": "no resume in candidate folder (run `add`)"}
     resume_text = read_pdf_text(resume)
 
-    log(f"[{candidate}] crawling fresh+fit jobs...")
-    graded = scored_fresh_jobs(candidate, boards or DEFAULT_BOARDS,
-                               max_days=max_days, min_fit=min_fit, on_progress=on_progress)
+    if use_seed:
+        log(f"[{candidate}] sweeping seed boards (multi-ATS, cached)...")
+        targets = sweep_targets(limit_per_ats=seed_limit, use_cache=True)
+        graded = scored_fresh_multi(candidate, targets, max_days=max_days,
+                                    min_fit=min_fit, on_progress=on_progress)
+    else:
+        log(f"[{candidate}] crawling fresh+fit jobs...")
+        graded = scored_fresh_jobs(candidate, boards or DEFAULT_BOARDS,
+                                   max_days=max_days, min_fit=min_fit, on_progress=on_progress)
     # save the day's shortlist (precise AI match % + reasoning per job)
     _save_shortlist([shortlist_row(r, j) for r, j in graded], candidate)
 

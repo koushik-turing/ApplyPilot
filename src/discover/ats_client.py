@@ -47,6 +47,7 @@ class Job:
     absolute_url: str
     content: str = ""
     first_published: str = ""        # ISO timestamp from the ATS (for freshness)
+    ats: str = "greenhouse"          # greenhouse | lever | ashby | workable
     questions: list[FormQuestion] = field(default_factory=list)
 
 

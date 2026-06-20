@@ -20,46 +20,30 @@ from . import dates
 from .ats_client import GreenhouseClient
 
 
-def scored_fresh_jobs(
+def rank_jobs(
     candidate: str,
-    boards: list[str],
+    jobs: list,
     *,
-    max_days: int = 7,
     min_fit: int = 55,
     ai_score: bool = True,
     prefilter: int = 35,
+    ai_cap: int = 60,
     on_progress=None,
 ) -> list[tuple[dict, object]]:
-    """Two-stage scoring, returns [(score, Job)] ranked by the precise match %.
-
-    Stage 1 (heuristic, cheap): keep FRESH jobs whose coarse fit >= `prefilter`.
-    Stage 2 (AI, precise): Claude scores each survivor resume-vs-JD -> the real match %
-    ('ai_match' + strengths/gaps); keep those >= `min_fit`, rank by it. With ai_score=False
-    it ranks by the heuristic alone (no API cost)."""
+    """Two-stage scoring over an ALREADY-FETCHED job list. Returns [(score, Job)] ranked
+    by the precise match %.
+      Stage 1 (heuristic, cheap): keep jobs whose coarse fit >= prefilter; dedup.
+      Stage 2 (AI, precise): AI-score only the top `ai_cap` heuristic survivors (bounds cost
+                             when the firehose is huge) -> real match %; keep >= min_fit."""
     profile = load_profile(candidate)
     matcher = build_matcher(profile)
-    client = GreenhouseClient()
-    survivors: list[tuple[dict, object]] = []
     gate = prefilter if ai_score else min_fit
-    try:
-        for board in boards:
-            try:
-                jobs = client.list_jobs(board, content=True)
-            except Exception as e:
-                if on_progress:
-                    on_progress(f"  {board}: fetch failed ({type(e).__name__})")
-                continue
-            fresh = dates.fresh_only(jobs, max_days)
-            kept = 0
-            for j in fresh:
-                r = score_job(matcher, j.title, clean_jd(j.content))
-                if r["final"] >= gate:
-                    survivors.append((r, j))
-                    kept += 1
-            if on_progress:
-                on_progress(f"  {board}: {len(jobs)} jobs, {len(fresh)} fresh, {kept} pass stage-1")
-    finally:
-        client.close()
+
+    survivors = []
+    for j in jobs:
+        r = score_job(matcher, j.title, clean_jd(j.content))
+        if r["final"] >= gate:
+            survivors.append((r, j))
 
     # de-duplicate the same role across locations (title+board)
     seen: set = set()
@@ -71,28 +55,75 @@ def scored_fresh_jobs(
             deduped.append((r, j))
 
     if not ai_score:
-        return sorted(deduped, key=lambda x: (-x[0]["final"], x[1].days_ago or 999))
+        return [x for x in sorted(deduped, key=lambda x: (-x[0]["final"], x[1].days_ago or 999))
+                if x[0]["final"] >= min_fit]
 
-    # ---- Stage 2: precise AI match % on the survivors (parallel) ----
+    # AI-score only the strongest heuristic survivors (cost control on big sweeps)
+    top = deduped[:ai_cap]
     if on_progress:
-        on_progress(f"  AI-scoring {len(deduped)} shortlisted jobs (precise match %)...")
+        on_progress(f"  stage-1: {len(deduped)} candidates; AI-scoring top {len(top)} (precise %)...")
 
     def _ai(item):
         r, j = item
         a = ai_match(profile, j.title, clean_jd(j.content))
         if a["match"] is not None:
-            r["ai_match"] = a["match"]
-            r["verdict"] = a["verdict"]
-            r["strengths"] = a["strengths"]
-            r["gaps"] = a["gaps"]
-            r["final"] = a["match"]      # the precise match % becomes the headline score
+            r.update(ai_match=a["match"], verdict=a["verdict"],
+                     strengths=a["strengths"], gaps=a["gaps"], final=a["match"])
         return r, j
 
     with ThreadPoolExecutor(max_workers=6) as ex:
-        scored = list(ex.map(_ai, deduped))
+        scored = list(ex.map(_ai, top))
 
     out = [(r, j) for r, j in scored if r["final"] >= min_fit]
     return sorted(out, key=lambda x: (-x[0]["final"], x[1].days_ago or 999))
+
+
+def scored_fresh_jobs(
+    candidate: str,
+    boards: list[str],
+    *,
+    max_days: int = 7,
+    min_fit: int = 55,
+    ai_score: bool = True,
+    on_progress=None,
+) -> list[tuple[dict, object]]:
+    """Greenhouse-only path (a fixed board list): fetch -> fresh -> rank."""
+    client = GreenhouseClient()
+    fresh_jobs: list = []
+    try:
+        for board in boards:
+            try:
+                jobs = client.list_jobs(board, content=True)
+            except Exception as e:
+                if on_progress:
+                    on_progress(f"  {board}: fetch failed ({type(e).__name__})")
+                continue
+            fresh = dates.fresh_only(jobs, max_days)
+            fresh_jobs.extend(fresh)
+            if on_progress:
+                on_progress(f"  {board}: {len(jobs)} jobs, {len(fresh)} fresh")
+    finally:
+        client.close()
+    return rank_jobs(candidate, fresh_jobs, min_fit=min_fit, ai_score=ai_score, on_progress=on_progress)
+
+
+def scored_fresh_multi(
+    candidate: str,
+    ats_orgs: dict[str, list[str]],
+    *,
+    max_days: int = 7,
+    min_fit: int = 55,
+    ai_score: bool = True,
+    max_workers: int = 12,
+    on_progress=None,
+) -> list[tuple[dict, object]]:
+    """Multi-source path: sweep many ATS boards -> freshness filter -> rank. The firehose."""
+    from .sweep import sweep
+    all_jobs, _live = sweep(ats_orgs, max_workers=max_workers, on_progress=on_progress)
+    fresh = dates.fresh_only(all_jobs, max_days)
+    if on_progress:
+        on_progress(f"  {len(all_jobs)} jobs swept -> {len(fresh)} fresh (<= {max_days}d)")
+    return rank_jobs(candidate, fresh, min_fit=min_fit, ai_score=ai_score, on_progress=on_progress)
 
 
 def shortlist_row(r: dict, j) -> dict:

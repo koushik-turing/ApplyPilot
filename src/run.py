@@ -157,7 +157,8 @@ def cmd_daily(args):
 def cmd_run_daily(args):
     """Full daily pipeline for ONE client: crawl fresh+fit -> golden tailor top N."""
     s = run_candidate_daily(args.name, args.boards, max_days=args.days, min_fit=args.fit,
-                            top_n=args.top, workers=args.workers, on_progress=print)
+                            top_n=args.top, workers=args.workers, use_seed=args.seed,
+                            seed_limit=args.seed_limit, on_progress=print)
     print(f"\n=== {args.name}: {s.get('golden',0)}/{s.get('tailored',0)} golden, "
           f"from {s.get('fresh_fit_jobs',0)} fresh+fit jobs ===")
 
@@ -165,7 +166,8 @@ def cmd_run_daily(args):
 def cmd_run_all(args):
     """Run the daily pipeline for EVERY client."""
     reports = run_all_candidates(args.boards, max_days=args.days, min_fit=args.fit,
-                                 top_n=args.top, workers=args.workers, on_progress=print)
+                                 top_n=args.top, workers=args.workers, use_seed=args.seed,
+                                 seed_limit=args.seed_limit, on_progress=print)
     print("\n=== ALL CLIENTS — daily report ===")
     for r in reports:
         if "error" in r:
@@ -173,6 +175,15 @@ def cmd_run_all(args):
         else:
             print(f"  {r['candidate']:<20} {r['golden']}/{r['tailored']} golden "
                   f"({r['fresh_fit_jobs']} fresh+fit)")
+
+
+def cmd_build_cache(args):
+    """Sweep the seed boards once to find which have jobs (the live-token cache)."""
+    from .discover.sweep import build_live_cache
+    live = build_live_cache(limit_per_ats=args.limit, max_workers=args.workers, on_progress=print)
+    total = sum(len(v) for v in live.values())
+    print(f"\nLive-token cache built: {total} live boards "
+          f"({', '.join(f'{a}:{len(v)}' for a,v in live.items())}) -> seed/live_tokens.json")
 
 
 def cmd_show(args):
@@ -218,6 +229,11 @@ def main(argv=None):
     dl.add_argument("--fit", type=int, default=55, help="min fit score (0-100)")
     dl.set_defaults(func=cmd_daily)
 
+    bc = sub.add_parser("build-cache", help="sweep seed boards to find live ones (run periodically)")
+    bc.add_argument("--limit", type=int, default=None, help="max boards per ATS (default: all)")
+    bc.add_argument("--workers", type=int, default=12, help="parallel fetch workers")
+    bc.set_defaults(func=cmd_build_cache)
+
     for cmd, fn, helptxt in (("run-daily", cmd_run_daily, "full daily pipeline for ONE client"),
                              ("run-all", cmd_run_all, "full daily pipeline for ALL clients")):
         p = sub.add_parser(cmd, help=helptxt)
@@ -228,6 +244,8 @@ def main(argv=None):
         p.add_argument("--fit", type=int, default=55, help="min fit score")
         p.add_argument("--top", type=int, default=8, help="how many top-fit jobs to tailor")
         p.add_argument("--workers", type=int, default=3, help="parallel tailoring workers")
+        p.add_argument("--seed", action="store_true", help="sweep the big multi-ATS seed lists (15k boards)")
+        p.add_argument("--seed-limit", type=int, default=400, help="max boards per ATS when using --seed")
         p.set_defaults(func=fn)
     ap_ = sub.add_parser("apply", help="answer + review (+optional fill/submit) one job URL")
     ap_.add_argument("name"); ap_.add_argument("url")

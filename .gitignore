@@ -20,6 +20,9 @@ Sai_*
 *_cache.json
 *.jsonl
 
+# ===== Generated caches =====
+seed/live_tokens.json
+
 # ===== Generated / large outputs =====
 *.xlsx
 *.csv
