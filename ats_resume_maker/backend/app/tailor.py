@@ -85,10 +85,25 @@ def tailor_resume(
                 )
                 try:
                     t2, c2 = _claude_tailor(best, jd, still, feedback=fb)
-                    if scorer(t2) > best_score:
-                        best, best_changes = t2, c2
+                    s2 = scorer(t2)
+                    if s2 > best_score:
+                        best, best_changes, best_score = t2, c2, s2
                 except Exception:
                     pass  # keep the first (already valid) pass on any retry hiccup
+
+            # Critic -> refine: an INDEPENDENT recruiter-grade quality pass. Unlike the
+            # keyword retry above, this judges writing strength (impact, specificity, weak
+            # bullets, summary, title) and feeds concrete fixes back for one more revision.
+            # This is what lifts output from "keyword-matched" to genuinely competitive.
+            try:
+                critique = _claude_critic(best, jd)
+                if critique:
+                    t3, c3 = _claude_tailor(best, jd, _missing_from_context(best, jd),
+                                            feedback=critique)
+                    if scorer(t3) >= best_score:   # accept if it doesn't regress the match
+                        best, best_changes = t3, c3
+            except Exception:
+                pass  # keep the best valid pass on any critic/refine hiccup
             return best, best_changes, "claude"
         except Exception as e:  # never let a paid-call hiccup break the request
             fallback_note = (f"Note: Claude API call failed ({type(e).__name__}); "
@@ -204,6 +219,58 @@ def _claude_tailor(resume: Resume, jd: JobDescription,
     changes = [c for c in result.changes if c and c.strip()] or \
               ["Rewrote summary, skills, and experience bullets to match the job (AI)."]
     return result.tailored_resume, changes
+
+
+# ---------------- Critic (independent quality reviewer) ----------------
+_CRITIC_SYSTEM = (
+    "You are a brutally honest senior technical recruiter and professional resume critic "
+    "(Rezi / Teal / Resume Worded calibre). You review a tailored resume against a target job "
+    "and find the SPECIFIC weaknesses that keep it from being a top-tier, interview-winning "
+    "resume. You do not rewrite — you give precise, actionable fixes the writer must apply."
+)
+
+
+def _claude_critic(resume: Resume, jd: JobDescription) -> str:
+    """Return concrete, prioritized improvement instructions for the tailored resume.
+    Empty string if the resume is already excellent or the call fails."""
+    client = claude_client.get_client()
+    hard = jd.hard_skills or [k for k in jd.keywords if k not in jd.soft_skills]
+    user = (
+        f"TARGET JOB TITLE: {jd.title or '(unspecified)'}\n"
+        f"REQUIRED HARD SKILLS: {', '.join(hard[:25]) or '(none)'}\n\n"
+        f"TAILORED RESUME (JSON):\n{resume.model_dump_json(indent=2)}\n\n"
+        "Critique this resume as if deciding whether to forward it for the target job. "
+        "Identify the most important, concrete weaknesses, e.g.:\n"
+        "- Bullets that are vague, generic, duty-style, or missing measurable impact.\n"
+        "- The summary not leading with the exact target title, or being weak/long.\n"
+        "- Required skills not demonstrated inside an experience bullet.\n"
+        "- Repetitive metrics/verbs, padding, or unprofessional phrasing.\n"
+        "- Anything that reads junior or would fail a 6-second recruiter scan.\n\n"
+        "Return ONLY a JSON object: {\"verdict\": str, \"fixes\": [str, ...]}. "
+        "Each fix must be a specific instruction (reference the role/bullet) the writer can apply. "
+        "If the resume is already excellent, return an empty fixes array."
+    )
+    try:
+        resp = client.messages.create(
+            model=settings.claude_tailor_model,
+            max_tokens=1200,
+            system=_CRITIC_SYSTEM,
+            messages=[{"role": "user", "content": user}],
+        )
+        text = "".join(b.text for b in resp.content if b.type == "text")
+        data = _extract_json(text)
+    except Exception:
+        return ""
+    if not data:
+        return ""
+    fixes = [str(f).strip() for f in data.get("fixes", []) if str(f).strip()]
+    if not fixes:
+        return ""
+    return (
+        "A SENIOR RECRUITER REVIEWED YOUR PREVIOUS DRAFT AND REQUIRES THESE SPECIFIC FIXES "
+        "(apply every one while keeping all facts/dates truthful):\n- "
+        + "\n- ".join(fixes[:10]) + "\n\n"
+    )
 
 
 # ---------------- rule-based (always works, and stays honest) ----------------

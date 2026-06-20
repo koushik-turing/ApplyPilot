@@ -25,8 +25,10 @@ class Settings:
     # uses no model). Tiered default = Sonnet for tailoring (quality writing),
     # Haiku for the review card (lighter analysis) — ~balanced cost vs quality.
     claude_model: str = os.getenv("CLAUDE_MODEL", "claude-opus-4-8")
+    # Tailoring is the deliverable — default to Opus for top quality (the critic->refine
+    # loop makes the extra cost worth it). Set CLAUDE_TAILOR_MODEL=claude-sonnet-4-6 to save cost.
     claude_tailor_model: str = os.getenv(
-        "CLAUDE_TAILOR_MODEL", os.getenv("CLAUDE_MODEL", "claude-sonnet-4-6")
+        "CLAUDE_TAILOR_MODEL", os.getenv("CLAUDE_MODEL", "claude-opus-4-8")
     )
     claude_review_model: str = os.getenv(
         "CLAUDE_REVIEW_MODEL", os.getenv("CLAUDE_MODEL", "claude-haiku-4-5")
