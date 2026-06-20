@@ -225,7 +225,7 @@ def main(argv=None):
     dl = sub.add_parser("daily", help="daily fresh-links crawl: fresh + good-fit jobs")
     dl.add_argument("name")
     dl.add_argument("--boards", nargs="*", help="ATS board tokens (default: a few)")
-    dl.add_argument("--days", type=int, default=3, help="max posting age in days (freshness)")
+    dl.add_argument("--days", type=int, default=7, help="max posting age in days (freshness)")
     dl.add_argument("--fit", type=int, default=50, help="min fit score (0-100)")
     dl.set_defaults(func=cmd_daily)
 
@@ -240,7 +240,7 @@ def main(argv=None):
         if cmd == "run-daily":
             p.add_argument("name")
         p.add_argument("--boards", nargs="*", help="ATS board tokens (default: a few)")
-        p.add_argument("--days", type=int, default=3, help="max posting age in days (freshness)")
+        p.add_argument("--days", type=int, default=7, help="max posting age in days (freshness)")
         p.add_argument("--fit", type=int, default=55, help="min fit score")
         p.add_argument("--top", type=int, default=8, help="how many top-fit jobs to tailor")
         p.add_argument("--workers", type=int, default=3, help="parallel tailoring workers")
