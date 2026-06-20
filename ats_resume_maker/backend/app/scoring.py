@@ -197,7 +197,7 @@ def score_resume(
                   + (f" ({len(partial)} only in your skills list — move these into experience)" if partial else "")
                   + ".")
         subs.append(SubScore(name="Keyword match (hard skills weighted)",
-                             score=kw_component, weight=0.50, detail=detail))
+                             score=kw_component, weight=0.58, detail=detail))
         if missing:
             suggestions.append("Add these missing job keywords where genuinely true: "
                                + ", ".join([m for m in missing if m in hard][:6] or missing[:6]) + ".")
@@ -209,7 +209,7 @@ def score_resume(
             resume_titles = (resume.summary + " " + " ".join(e.title for e in resume.experience)).lower()
             hit = sum(1 for w in title_words if re.search(r"(?<![A-Za-z0-9])" + re.escape(w) + r"(?![A-Za-z0-9])", resume_titles))
             title_score = round(100 * hit / len(title_words))
-            subs.append(SubScore(name="Job title match", score=title_score, weight=0.18,
+            subs.append(SubScore(name="Job title match", score=title_score, weight=0.14,
                                  detail=f"'{jd.title[:50]}' — {hit}/{len(title_words)} title words found in your roles/summary."))
             if title_score < 60:
                 suggestions.append(f"Mirror the target job title ('{jd.title[:40]}') in your summary or a recent role.")
@@ -223,7 +223,7 @@ def score_resume(
     }
     struct_score = round(100 * sum(present.values()) / len(present))
     subs.append(SubScore(name="Section structure", score=struct_score,
-                         weight=0.05 if has_jd else 0.30,
+                         weight=0.03 if has_jd else 0.30,
                          detail="Detected: " + (", ".join(s for s, ok in present.items() if ok) or "none")))
     miss_sec = [s for s, ok in present.items() if not ok]
     if miss_sec:
@@ -246,7 +246,7 @@ def score_resume(
         fmt -= 10; notes.append("tabs/columns may break parsing")
     fmt = max(0, fmt)
     subs.append(SubScore(name="Formatting & parse-ability", score=fmt,
-                         weight=0.10 if has_jd else 0.30,
+                         weight=0.07 if has_jd else 0.30,
                          detail="; ".join(notes) if notes else "Contact info present, clean single-column text."))
     if not resume.email:
         suggestions.append("Add a professional email near the top.")
@@ -259,7 +259,7 @@ def score_resume(
         content, cdetail = 25, "No experience bullet points detected."
         suggestions.append("Describe each role with bullet points focused on impact.")
     subs.append(SubScore(name="Content quality", score=content,
-                         weight=0.17 if has_jd else 0.25, detail=cdetail))
+                         weight=0.18 if has_jd else 0.25, detail=cdetail))
 
     if not has_jd:
         n = len(resume.skills)

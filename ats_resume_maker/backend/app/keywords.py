@@ -221,12 +221,37 @@ def analyze_jd(text: str) -> dict:
     skill_words = {w for s in skills for w in s.split()}
     title = extract_job_title(text)
     title_words = {w for w in _WORD.findall(title.lower()) if w not in STOPWORDS and len(w) > 2}
-    # "Other" domain keywords: must appear at least twice (a real emphasis, not a
-    # one-off), and not be a skill/title word we already counted.
-    other = [w for w, c in sorted(freq.items(), key=lambda kv: -kv[1])
-             if w not in skill_words and w not in title_words and c >= 2][:12]
 
+    # Multi-word domain phrases the JD emphasizes ("distributed systems", "financial
+    # reporting", "data pipelines"). Real ATS (Jobscan) extract many of these, which
+    # widens the keyword universe and keeps the match rate honest — you must demonstrate
+    # them, not just hit a handful of single words.
+    phrases = _noun_phrases(text, skill_words | title_words)
+    phrase_words = {w for p in phrases for w in p.split()}
+
+    # Single-word domain terms: emphasized (freq>=2), not already a skill/title/phrase word.
+    singles = [w for w, c in sorted(freq.items(), key=lambda kv: -kv[1])
+               if w not in skill_words and w not in title_words and w not in phrase_words
+               and c >= 2]
+
+    other = list(dict.fromkeys([*phrases, *singles]))[:20]
     return {"hard": hard, "soft": soft, "other": other, "title": title}
+
+
+def _noun_phrases(text: str, exclude_words: set[str]) -> list[str]:
+    """Frequent content-bearing 2-word phrases — a lightweight noun-phrase signal so we
+    score real domain terms ('data pipelines', 'distributed systems'), not just tokens."""
+    toks = [m.group(0) for m in _WORD.finditer(text.lower())]
+    freq: dict[str, int] = {}
+    for a, b in zip(toks, toks[1:]):
+        if (len(a) < 3 or len(b) < 3 or a in STOPWORDS or b in STOPWORDS
+                or _is_junk(a) or _is_junk(b) or a.isdigit() or b.isdigit()):
+            continue
+        phrase = f"{a} {b}"
+        freq[phrase] = freq.get(phrase, 0) + 1
+    out = [p for p, c in sorted(freq.items(), key=lambda kv: -kv[1])
+           if c >= 2 and not all(w in exclude_words for w in p.split())]
+    return out[:10]
 
 
 def _norm(text: str) -> str:
