@@ -149,6 +149,9 @@ def edit_client(slug: str, payload: dict):
         prof.work_auth.requires_sponsorship = _as_bool(wa["requires_sponsorship"])
     if "authorized_us" in wa:
         prof.work_auth.authorized_us = _as_bool(wa["authorized_us"])
+    if "answer_bank" in payload and isinstance(payload["answer_bank"], dict):
+        # replace with the provided set (drop blanks) so the recruiter can edit/remove entries
+        prof.answer_bank = {k: str(v).strip() for k, v in payload["answer_bank"].items() if str(v).strip()}
     (d / "profile.json").write_text(prof.model_dump_json(indent=2), encoding="utf-8")
     return {"ok": True, "card": _client_card(slug)}
 
@@ -194,7 +197,7 @@ def client_detail(slug: str):
         "card": _client_card(slug),
         "profile": {k: prof.get(k) for k in
                     ("full_name", "email", "location", "years_experience", "skills",
-                     "target_titles", "work_auth", "desired_salary")},
+                     "target_titles", "work_auth", "desired_salary", "answer_bank")},
         "shortlist": _read_shortlist(d)[:50],
         "tailored": tailored,
     }

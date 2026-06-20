@@ -107,6 +107,13 @@ function renderDetail() {
       </div>
     </div>
 
+    <div class="profile">
+      <strong style="font-size:13px;color:#475569">Application answers (optional knowledge — the AI uses these intelligently, never pasted)</strong>
+      <div class="row" style="margin-top:10px">
+        ${bankFields(p.answer_bank || {})}
+      </div>
+    </div>
+
     <div class="section-head">
       <h3>Golden tailored resumes <span style="color:#6b7280;font-weight:400">(${golden})</span></h3>
     </div>
@@ -155,13 +162,32 @@ function renderShortlist() {
   $("#shortlistTable").innerHTML = rows.length ? html : `<p style="color:#6b7280">No matches yet — click “Run daily”.</p>`;
 }
 
+const BANK_TOPICS = [
+  ["why_interested", "Why interested (role/company fit)"],
+  ["willing_to_relocate", "Willing to relocate?"],
+  ["start_date", "Start date / notice period"],
+  ["remote_preference", "Remote / hybrid / onsite"],
+  ["how_heard", "How did you hear about us"],
+  ["references", "References"],
+  ["portfolio", "Portfolio / GitHub"],
+  ["notes", "Other notes for screening Qs"],
+];
+function bankFields(bank) {
+  return BANK_TOPICS.map(([k, label]) =>
+    `<div class="fld" style="flex:1 1 300px"><span>${label}</span>
+       <input id="bank_${k}" value="${(bank[k] || "").replace(/"/g, "&quot;")}" style="width:100%"></div>`).join("");
+}
+
 async function saveProfile() {
   const v = (id) => $(id).value.trim();
   const list = (id) => v(id) ? v(id).split(",").map(s => s.trim()).filter(Boolean) : [];
+  const bank = {};
+  BANK_TOPICS.forEach(([k]) => { const el = $("#bank_" + k); if (el && el.value.trim()) bank[k] = el.value.trim(); });
   const payload = {
     email: v("#e_email"), location: v("#e_location"), desired_salary: v("#e_salary"),
     years_experience: v("#e_years"), skills: list("#e_skills"), target_titles: list("#e_titles"),
     work_auth: { visa_status: v("#e_visa"), requires_sponsorship: v("#e_sponsor") },
+    answer_bank: bank,
   };
   await fetch(`/api/clients/${detailData.slug}`, {
     method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
