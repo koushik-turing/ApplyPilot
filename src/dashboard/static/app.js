@@ -35,6 +35,7 @@ function renderClients() {
         <span class="pill ${c.status}">${c.status}</span>
       </div>
       <h3>${c.name}</h3>
+      <div style="margin:2px 0 4px"><span class="mode ${c.apply_mode}">${c.apply_mode === "automated" ? "⚡ Automated" : "👁 Supervised"}</span></div>
       <div class="titles">${(c.titles || []).join(" · ") || "—"}</div>
       <div class="stats">
         <div class="stat"><b>${c.shortlist_count}</b><span>matches</span></div>
@@ -86,7 +87,14 @@ function renderDetail() {
     <div class="profile">
       <div class="editbar">
         <strong style="font-size:13px;color:#475569">Profile (driven by their resume — editable)</strong>
-        <div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:12px;color:#6b7280">Apply mode:</span>
+          <div class="seg">
+            <button id="mode_supervised" class="${p.apply_mode!=='automated'?'active':''}">👁 Supervised</button>
+            <button id="mode_automated" class="${p.apply_mode==='automated'?'active':''}">⚡ Automated</button>
+          </div>
+          <span id="autoWrap" style="font-size:12px;color:#6b7280;${p.apply_mode==='automated'?'':'display:none'}">
+            auto-submit ≥ <input id="e_automin" value="${p.auto_min_match ?? 80}" style="width:46px;border:1px solid var(--line);border-radius:6px;padding:3px 5px">%</span>
           <button class="btn sm primary" id="saveProfile">Save changes</button>
           <button class="btn sm danger" id="delClient">Delete</button>
         </div>
@@ -132,6 +140,15 @@ function renderDetail() {
     <div id="shortlistTable"></div>`;
 
   renderShortlist();
+  detailData._mode = p.apply_mode || "supervised";
+  const setMode = (m) => {
+    detailData._mode = m;
+    $("#mode_supervised").classList.toggle("active", m !== "automated");
+    $("#mode_automated").classList.toggle("active", m === "automated");
+    $("#autoWrap").style.display = m === "automated" ? "" : "none";
+  };
+  $("#mode_supervised").onclick = () => setMode("supervised");
+  $("#mode_automated").onclick = () => setMode("automated");
   $("#saveProfile").onclick = saveProfile;
   $("#delClient").onclick = deleteClient;
   document.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { sortMode = b.dataset.sort; renderDetail(); });
@@ -188,6 +205,8 @@ async function saveProfile() {
     years_experience: v("#e_years"), skills: list("#e_skills"), target_titles: list("#e_titles"),
     work_auth: { visa_status: v("#e_visa"), requires_sponsorship: v("#e_sponsor") },
     answer_bank: bank,
+    apply_mode: detailData._mode || "supervised",
+    auto_min_match: v("#e_automin") || 80,
   };
   await fetch(`/api/clients/${detailData.slug}`, {
     method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });

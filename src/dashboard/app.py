@@ -62,6 +62,7 @@ def _client_card(slug: str) -> dict:
         "shortlist_count": len(shortlist),
         "golden": run.get("golden", 0),
         "tailored": run.get("tailored", len(tailored)),
+        "apply_mode": prof.get("apply_mode", "supervised"),
         "status": _runs.get(slug, "idle"),
     }
 
@@ -152,6 +153,13 @@ def edit_client(slug: str, payload: dict):
     if "answer_bank" in payload and isinstance(payload["answer_bank"], dict):
         # replace with the provided set (drop blanks) so the recruiter can edit/remove entries
         prof.answer_bank = {k: str(v).strip() for k, v in payload["answer_bank"].items() if str(v).strip()}
+    if payload.get("apply_mode") in ("supervised", "automated"):
+        prof.apply_mode = payload["apply_mode"]
+    if "auto_min_match" in payload:
+        try:
+            prof.auto_min_match = int(payload["auto_min_match"])
+        except (TypeError, ValueError):
+            pass
     (d / "profile.json").write_text(prof.model_dump_json(indent=2), encoding="utf-8")
     return {"ok": True, "card": _client_card(slug)}
 
@@ -197,7 +205,8 @@ def client_detail(slug: str):
         "card": _client_card(slug),
         "profile": {k: prof.get(k) for k in
                     ("full_name", "email", "location", "years_experience", "skills",
-                     "target_titles", "work_auth", "desired_salary", "answer_bank")},
+                     "target_titles", "work_auth", "desired_salary", "answer_bank",
+                     "apply_mode", "auto_min_match")},
         "shortlist": _read_shortlist(d)[:50],
         "tailored": tailored,
     }

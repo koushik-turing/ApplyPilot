@@ -65,6 +65,13 @@ def complete_profile(candidate: str, intake: dict) -> Path:
         p.preferred_locations = [s.strip() for s in locs.split(",")] if isinstance(locs, str) else list(locs)
     if "open_to_remote" in intake:
         p.open_to_remote = _as_bool(intake["open_to_remote"])
+    if intake.get("apply_mode") in ("supervised", "automated"):
+        p.apply_mode = intake["apply_mode"]
+    if "auto_min_match" in intake:
+        try:
+            p.auto_min_match = int(intake["auto_min_match"])
+        except (TypeError, ValueError):
+            pass
     if "eeo" in intake and isinstance(intake["eeo"], dict):
         p.eeo.update(intake["eeo"])
     # Optional answer-bank knowledge (partial fine). Accept a nested dict OR flat keys.

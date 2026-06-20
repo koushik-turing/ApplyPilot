@@ -51,6 +51,10 @@ h2{ font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--
 .pill.idle{ background:#f1f5f9; color:#64748b; } .pill.running{ background:#dbeafe; color:#1d4ed8; }
 .pill.done{ background:#ecfdf3; color:var(--gold); } .pill.error{ background:#fef2f2; color:#dc2626; }
 
+.mode{ font-size:10.5px; padding:2px 8px; border-radius:6px; font-weight:600; }
+.mode.supervised{ background:#eef2ff; color:var(--accent); }
+.mode.automated{ background:#fff7ed; color:#c2410c; }
+
 .empty{ text-align:center; padding:60px 0; color:var(--mut); }
 
 /* tables */

@@ -45,6 +45,12 @@ class Profile(BaseModel):
     preferred_locations: list[str] = Field(default_factory=list)
     open_to_remote: bool | None = None
 
+    # How applications are submitted for this candidate:
+    #   "supervised" (default) — review + edit + approve each before it goes out
+    #   "automated" — auto-submit matches above auto_min (still blocked if a hard field is unresolved)
+    apply_mode: str = "supervised"
+    auto_min_match: int = 80           # in automated mode, only auto-submit matches >= this %
+
     # EEO / voluntary self-id defaults (candidate's stated preference, else "Decline")
     eeo: dict[str, str] = Field(default_factory=dict)
 
