@@ -145,17 +145,26 @@ def _cache_key(label: str) -> str:
 # ---------------- L3: Claude reasoning for free-text ----------------
 
 L3_SYSTEM = (
-    "You answer a single job-application question for a specific candidate, using ONLY "
-    "their profile and the job description. Be concise, professional, truthful. "
-    "Never invent facts not supported by the profile. Return JSON: "
-    '{"answer": str, "confidence": 0.0-1.0}'
+    "You answer a single job-application question for a specific candidate. You are given "
+    "the candidate's profile and an optional ANSWER BANK (things the recruiter knows about "
+    "them). Use the answer bank as KNOWLEDGE to understand the candidate — do NOT copy it "
+    "verbatim. Intelligently COMPOSE an answer tailored to THIS exact question and THIS "
+    "company/job: adapt wording, pick what's relevant, keep it concise and professional. "
+    "Stay strictly truthful — never invent facts not supported by the profile or answer bank. "
+    "If you don't have enough to answer confidently, say so with low confidence. "
+    'Return JSON: {"answer": str, "confidence": 0.0-1.0}'
 )
 
 
 def _l3_answer(q: FormQuestion, p: Profile, job: Job) -> Answer:
+    bank = "\n".join(f"  - {k}: {v}" for k, v in (p.answer_bank or {}).items()) or "  (none provided)"
     prompt = f"""\
 CANDIDATE PROFILE (truth — do not contradict):
 {p.model_dump_json(indent=2)}
+
+ANSWER BANK (recruiter-provided knowledge — use intelligently, adapt to the question,
+NEVER paste verbatim, NEVER fabricate beyond it):
+{bank}
 
 JOB: {job.title} at {job.board}
 JOB DESCRIPTION (first 2000 chars):
@@ -164,7 +173,9 @@ JOB DESCRIPTION (first 2000 chars):
 QUESTION: {q.label}
 {"OPTIONS: " + ", ".join(o.get("label","") for o in q.options) if q.options else ""}
 
-Answer the question for this candidate. If it's multiple-choice, return the exact option label.
+Compose the best answer for THIS candidate and THIS specific job/company. Draw on the
+answer bank where relevant but tailor it — don't repeat it word-for-word. If multiple-choice,
+return the exact option label.
 """
     try:
         data = llm.complete_json(prompt, system=L3_SYSTEM, model=config.MODEL_SMART, max_tokens=600)

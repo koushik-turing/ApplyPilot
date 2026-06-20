@@ -23,6 +23,22 @@ INTAKE_FIELDS = {
     "open_to_remote": "Open to remote? (true/false)",
 }
 
+# Optional ANSWER-BANK topics — common application questions. All optional; whatever is
+# provided becomes knowledge the AI uses (intelligently, not verbatim) when filling forms.
+ANSWER_BANK_TOPICS = {
+    "willing_to_relocate": "Open to relocating? Any constraints?",
+    "start_date": "Earliest start date / notice period",
+    "why_interested": "What kind of role/company excites the candidate (used to compose 'why us')",
+    "remote_preference": "Remote / hybrid / onsite preference",
+    "work_schedule": "Any schedule constraints (full-time, shifts, travel %)",
+    "references": "References available? Any note",
+    "linkedin": "LinkedIn URL (if not on resume)",
+    "portfolio": "Portfolio / GitHub URL",
+    "how_heard": "How did you hear about us (default answer)",
+    "criminal_record": "Any disclosures the candidate wants handled a certain way",
+    "notes": "Anything else the recruiter knows that helps answer screening questions",
+}
+
 
 def load_profile(candidate: str) -> Profile:
     path = config.candidate_dir(candidate) / "profile.json"
@@ -51,6 +67,12 @@ def complete_profile(candidate: str, intake: dict) -> Path:
         p.open_to_remote = _as_bool(intake["open_to_remote"])
     if "eeo" in intake and isinstance(intake["eeo"], dict):
         p.eeo.update(intake["eeo"])
+    # Optional answer-bank knowledge (partial fine). Accept a nested dict OR flat keys.
+    if "answer_bank" in intake and isinstance(intake["answer_bank"], dict):
+        p.answer_bank.update({k: str(v) for k, v in intake["answer_bank"].items() if str(v).strip()})
+    for topic in ANSWER_BANK_TOPICS:
+        if topic in intake and str(intake[topic]).strip():
+            p.answer_bank[topic] = str(intake[topic]).strip()
 
     path = config.candidate_dir(candidate) / "profile.json"
     path.write_text(p.model_dump_json(indent=2), encoding="utf-8")

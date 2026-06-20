@@ -48,6 +48,12 @@ class Profile(BaseModel):
     # EEO / voluntary self-id defaults (candidate's stated preference, else "Decline")
     eeo: dict[str, str] = Field(default_factory=dict)
 
+    # Optional answer KNOWLEDGE bank — whatever the recruiter knows about the candidate
+    # (relocation, start date, why-interested notes, references, etc.). Partial is fine.
+    # The answer engine uses this as KNOWLEDGE to compose form answers intelligently
+    # (adapt to the question/company) — it is NOT copy-pasted verbatim.
+    answer_bank: dict[str, str] = Field(default_factory=dict)
+
     # Frozen ground-truth: exact companies/titles/metrics the AI must never alter.
     resume_facts: dict[str, str] = Field(default_factory=dict)
 
