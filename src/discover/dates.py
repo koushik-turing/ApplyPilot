@@ -47,11 +47,49 @@ def annotate(jobs, ref: datetime.date | None = None) -> list:
     return jobs
 
 
-def fresh_only(jobs, max_days: int = 7, ref: datetime.date | None = None) -> list:
-    """Keep only jobs posted within `max_days` (unknown dates are dropped)."""
+def fresh_only(jobs, max_days: int = 7, ref: datetime.date | None = None,
+               keep_unknown: bool = True) -> list:
+    """Keep jobs posted within `max_days`. Jobs with an UNKNOWN posting date are KEPT by
+    default (marked days_ago=None) rather than silently dropped — set keep_unknown=False
+    to drop them."""
     annotate(jobs, ref)
-    return [j for j in jobs if getattr(j, "days_ago", None) is not None
-            and j.days_ago <= max_days]
+    out = []
+    for j in jobs:
+        da = getattr(j, "days_ago", None)
+        if da is None:
+            if keep_unknown:
+                out.append(j)
+        elif da <= max_days:
+            out.append(j)
+    return out
+
+
+def jsonld_date(url: str) -> datetime.date | None:
+    """Best-effort: scrape a job page's JSON-LD `datePosted` (for sources without an API date)."""
+    try:
+        r = httpx.get(url, headers=_UA, timeout=12, follow_redirects=True)
+        for m in re.finditer(r'"datePosted"\s*:\s*"([^"]+)"', r.text):
+            d = parse_iso_date(m.group(1))
+            if d:
+                return d
+    except Exception:
+        pass
+    return None
+
+
+def enrich_missing_dates(jobs, ref: datetime.date | None = None, limit: int = 60) -> list:
+    """For up to `limit` jobs missing a posting date, scrape JSON-LD datePosted. Bounded so
+    we don't scrape thousands — use on a shortlist, not the full firehose."""
+    ref = ref or today()
+    done = 0
+    for j in jobs:
+        if getattr(j, "days_ago", None) is None and getattr(j, "absolute_url", "") and done < limit:
+            d = jsonld_date(j.absolute_url)
+            if d:
+                j.posted_on = d.isoformat()
+                j.days_ago = (ref - d).days
+            done += 1
+    return jobs
 
 
 def freshness_summary(jobs) -> dict:

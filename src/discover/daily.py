@@ -115,15 +115,57 @@ def scored_fresh_multi(
     min_fit: int = 55,
     ai_score: bool = True,
     max_workers: int = 12,
+    include_workable: bool = True,
     on_progress=None,
 ) -> list[tuple[dict, object]]:
-    """Multi-source path: sweep many ATS boards -> freshness filter -> rank. The firehose."""
+    """Multi-source path: sweep ATS boards + query Workable/Adzuna -> freshness -> rank.
+    The firehose. Workable/Adzuna are query-driven by the candidate's target titles."""
     from .sweep import sweep
+    from .sources import fetch_workable, fetch_adzuna
+    from .profile.complete import load_profile
+
     all_jobs, _live = sweep(ats_orgs, max_workers=max_workers, on_progress=on_progress)
-    fresh = dates.fresh_only(all_jobs, max_days)
+
+    profile = load_profile(candidate)
+    queries = (profile.target_titles or ["software engineer"])[:3]
+
+    if include_workable:
+        for q in queries:
+            try:
+                wk = fetch_workable(q, max_pages=2)
+                all_jobs.extend(wk)
+                if on_progress:
+                    on_progress(f"  Workable '{q}': +{len(wk)} jobs")
+            except Exception:
+                pass
+
+    aid, akey = _adzuna_key()
+    if aid and akey:
+        for q in queries:
+            try:
+                az = fetch_adzuna(q, app_id=aid, app_key=akey, pages=2)
+                all_jobs.extend(az)
+                if on_progress:
+                    on_progress(f"  Adzuna '{q}': +{len(az)} jobs")
+            except Exception:
+                pass
+
+    fresh = dates.fresh_only(all_jobs, max_days)   # keeps unknown-date jobs (not dropped)
     if on_progress:
-        on_progress(f"  {len(all_jobs)} jobs swept -> {len(fresh)} fresh (<= {max_days}d)")
+        on_progress(f"  {len(all_jobs)} jobs total -> {len(fresh)} fresh/unknown (<= {max_days}d)")
     return rank_jobs(candidate, fresh, min_fit=min_fit, ai_score=ai_score, on_progress=on_progress)
+
+
+def _adzuna_key() -> tuple[str | None, str | None]:
+    """Adzuna app_id:app_key from config/adzuna_key.txt or env ADZUNA_APP_ID/ADZUNA_APP_KEY."""
+    import os
+    f = config.CONFIG_DIR / "adzuna_key.txt"
+    if f.exists():
+        raw = f.read_text(encoding="utf-8").strip()
+        if ":" in raw:
+            a, b = raw.split(":", 1)
+            return a.strip(), b.strip()
+    return os.getenv("ADZUNA_APP_ID"), os.getenv("ADZUNA_APP_KEY")
 
 
 def shortlist_row(r: dict, j) -> dict:
