@@ -1,0 +1,45 @@
+# ===== SECRETS — never commit =====
+.env
+*.key
+*_key.txt
+adzuna_key.txt
+secrets/
+**/credentials*.json
+**/token*.json
+
+# ===== CANDIDATE PII — never commit real people's data =====
+candidates/
+data/
+*.pdf
+*.docx
+*_resume*.pdf
+*_tailored.*
+Likhitha_*
+Sai_*
+*_checkpoint.json
+*_cache.json
+*.jsonl
+
+# ===== Generated / large outputs =====
+*.xlsx
+*.csv
+*_Jobs.txt
+*_Matches.txt
+api_cache/
+__pycache__/
+*.pyc
+*.log
+*.log.*
+
+# ===== Python env =====
+.venv/
+venv/
+env/
+*.egg-info/
+.pytest_cache/
+
+# ===== OS / editor =====
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
