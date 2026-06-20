@@ -11,12 +11,44 @@ Every answer carries a source + confidence + needs_human flag for the review gat
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from pathlib import Path
 
 from .. import config, llm
 from ..models import Answer, AnswerSheet, AnswerSource, FormQuestion, Job, Profile
+
+
+# ---------------- TEST MODE: never submit a real person's contact details ----------------
+# While testing we must NOT put the candidate's real email/phone on live applications.
+# These produce harmless, clearly-fake values so no real inbox/phone is ever contacted.
+
+def dummy_email(email: str) -> str:
+    """Append '023' to the username so it's a different, non-delivering address."""
+    if "@" not in email:
+        return "test.candidate023@example.com"
+    local, domain = email.split("@", 1)
+    return f"{local}023@{domain}"
+
+
+def dummy_phone(seed: str = "") -> str:
+    """Stable, clearly-fake US number: 555 exchange + the 0100-0199 fictional range."""
+    h = int(hashlib.md5((seed or "x").encode()).hexdigest(), 16)
+    area = 200 + (h % 800)            # 200-999
+    last = 100 + (h // 800 % 100)     # 0100-0199 — reserved for fictional use
+    return f"({area}) 555-{last:04d}"
+
+
+def _sanitize_for_test(sheet: AnswerSheet, profile: Profile) -> None:
+    """Replace any email/phone answer with dummy values (in place)."""
+    for a in sheet.answers:
+        names = " ".join(a.field_names).lower()
+        label = a.label.lower()
+        if "email" in names or "email" in label:
+            a.value = dummy_email(profile.email or "")
+        elif "phone" in names or "phone" in label:
+            a.value = dummy_phone(profile.full_name or profile.email)
 
 
 # ---------------- L1: deterministic field matching ----------------
@@ -153,8 +185,13 @@ Answer the question for this candidate. If it's multiple-choice, return the exac
 
 # ---------------- Orchestration ----------------
 
-def answer_form(job: Job, profile: Profile, candidate: str) -> AnswerSheet:
-    """Produce a full answer sheet for one job's form, for one candidate."""
+def answer_form(job: Job, profile: Profile, candidate: str,
+                *, test_mode: bool = True) -> AnswerSheet:
+    """Produce a full answer sheet for one job's form, for one candidate.
+
+    test_mode=True (default while testing) swaps the candidate's real email/phone for
+    harmless dummy values so no real inbox/phone is ever contacted. Set False to go live.
+    """
     cache = _load_cache(candidate)
     sheet = AnswerSheet(job_id=job.job_id)
 
@@ -186,4 +223,6 @@ def answer_form(job: Job, profile: Profile, candidate: str) -> AnswerSheet:
                                if str(o.get("value")) == a.value), a.value)
 
     _save_cache(candidate, cache)
+    if test_mode:
+        _sanitize_for_test(sheet, profile)   # never expose real email/phone while testing
     return sheet

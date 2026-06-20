@@ -69,7 +69,9 @@ def cmd_apply(args):
     job = _fetch_job(args.url)
     print(f"Job: {job.title} @ {job.location} ({job.board})")
 
-    sheet = answer_form(job, prof, args.name)
+    sheet = answer_form(job, prof, args.name, test_mode=not args.live)
+    if not args.live:
+        print("  TEST MODE: using dummy email/phone (no real contact used). Pass --live to use real.")
     resume = _find_resume(args.name, args.resume)
     review_text = build_review(job, sheet, prof, resume or "(no resume set)")
     review_path = save_review(review_text, args.name, job)
@@ -167,6 +169,8 @@ def main(argv=None):
     ap_.add_argument("--fill", action="store_true", help="open browser and fill (no submit)")
     ap_.add_argument("--submit", action="store_true", help="fill AND submit (if nothing needs review)")
     ap_.add_argument("--headless", action="store_true")
+    ap_.add_argument("--live", action="store_true",
+                     help="use the candidate's REAL email/phone (default: dummy test contact)")
     ap_.set_defaults(func=cmd_apply)
 
     try:  # ensure unicode output works on the Windows console
