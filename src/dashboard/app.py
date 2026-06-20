@@ -14,13 +14,15 @@ import json
 import threading
 from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from .. import config
 from ..models import Profile
 from ..pipeline import list_candidates, run_candidate_daily, run_all_candidates
+from ..profile.parse import parse_resume, save_profile
+from ..profile.complete import complete_profile, load_profile
 
 app = FastAPI(title="Job Portal Dashboard")
 
@@ -68,6 +70,105 @@ def _client_card(slug: str) -> dict:
 def clients():
     return {"clients": [_client_card(s) for s in list_candidates()],
             "all_status": _runs.get("__all__", "idle")}
+
+
+@app.post("/api/clients")
+async def create_client(
+    file: UploadFile = File(...),
+    name: str = Form(""),
+    email: str = Form(""),
+    visa_status: str = Form(""),
+    requires_sponsorship: str = Form(""),
+    authorized_us: str = Form(""),
+    desired_salary: str = Form(""),
+    locations: str = Form(""),
+):
+    """Add a candidate: parse their resume into a personalized profile + intake details."""
+    data = await file.read()
+    if not data:
+        raise HTTPException(400, "empty resume file")
+    config.DATA_DIR.mkdir(parents=True, exist_ok=True)
+    tmp = config.DATA_DIR / f"_upload_{file.filename}"
+    tmp.write_bytes(data)
+    try:
+        prof = parse_resume(str(tmp))
+    except Exception as e:
+        raise HTTPException(422, f"could not parse resume: {e}")
+    finally:
+        tmp.unlink(missing_ok=True)
+
+    if email.strip():
+        prof.email = email.strip()
+    cand_name = name.strip() or prof.full_name or "candidate"
+    if name.strip():
+        prof.full_name = name.strip()    # recruiter-provided name is also the display name
+    save_profile(prof, cand_name)
+    # keep the resume in the candidate folder (the pipeline needs it)
+    (config.candidate_dir(cand_name) / file.filename).write_bytes(data)
+
+    intake: dict = {}
+    if visa_status.strip():
+        intake["visa_status"] = visa_status.strip()
+    if requires_sponsorship:
+        intake["requires_sponsorship"] = requires_sponsorship
+    if authorized_us:
+        intake["authorized_us"] = authorized_us
+    if desired_salary.strip():
+        intake["desired_salary"] = desired_salary.strip()
+    if locations.strip():
+        intake["preferred_locations"] = locations.strip()
+    if intake:
+        complete_profile(cand_name, intake)
+
+    return {"slug": _slug(cand_name), "card": _client_card(_slug(cand_name))}
+
+
+@app.patch("/api/clients/{slug}")
+def edit_client(slug: str, payload: dict):
+    """Edit a candidate's profile fields (visa/salary/skills/titles/email...)."""
+    d = config.CANDIDATES_DIR / slug
+    if not (d / "profile.json").exists():
+        raise HTTPException(404, "unknown client")
+    prof = load_profile_by_slug(slug)
+    for k in ("full_name", "email", "location", "desired_salary"):
+        if k in payload and isinstance(payload[k], str):
+            setattr(prof, k, payload[k])
+    if "years_experience" in payload:
+        try:
+            prof.years_experience = float(payload["years_experience"])
+        except (TypeError, ValueError):
+            pass
+    if "skills" in payload and isinstance(payload["skills"], list):
+        prof.skills = [str(s) for s in payload["skills"]]
+    if "target_titles" in payload and isinstance(payload["target_titles"], list):
+        prof.target_titles = [str(t) for t in payload["target_titles"]]
+    wa = payload.get("work_auth") or {}
+    if "visa_status" in wa:
+        prof.work_auth.visa_status = str(wa["visa_status"])
+    if "requires_sponsorship" in wa:
+        prof.work_auth.requires_sponsorship = _as_bool(wa["requires_sponsorship"])
+    if "authorized_us" in wa:
+        prof.work_auth.authorized_us = _as_bool(wa["authorized_us"])
+    (d / "profile.json").write_text(prof.model_dump_json(indent=2), encoding="utf-8")
+    return {"ok": True, "card": _client_card(slug)}
+
+
+@app.delete("/api/clients/{slug}")
+def delete_client(slug: str):
+    import shutil
+    d = config.CANDIDATES_DIR / slug
+    if d.exists():
+        shutil.rmtree(d, ignore_errors=True)
+    return {"ok": True}
+
+
+def load_profile_by_slug(slug: str) -> Profile:
+    return Profile(**json.loads((config.CANDIDATES_DIR / slug / "profile.json").read_text(encoding="utf-8")))
+
+
+def _as_bool(v):
+    s = str(v).strip().lower()
+    return True if s in {"true", "yes", "1", "y"} else False if s in {"false", "no", "0", "n"} else None
 
 
 @app.get("/api/clients/{slug}")

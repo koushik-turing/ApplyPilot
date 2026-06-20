@@ -3,29 +3,77 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Job Portal — Dashboard</title>
+  <title>ApplyPilot — Recruiter Console</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
-    <h1>Job Portal <span class="sub">multi-client daily pipeline</span></h1>
+    <div class="brand">
+      <span class="logo">✈</span>
+      <div>
+        <h1>ApplyPilot</h1>
+        <span class="sub">recruiter console · all candidates, one place</span>
+      </div>
+    </div>
     <div class="actions">
       <span id="allStatus" class="status"></span>
-      <button id="runAll" class="btn primary">Run daily for ALL clients</button>
+      <button id="addBtn" class="btn primary">+ Add candidate</button>
+      <button id="runAll" class="btn dark">▶ Run daily — all</button>
     </div>
   </header>
 
   <main>
+    <!-- CLIENTS GRID -->
     <section id="clientsView">
-      <h2>Clients</h2>
+      <div class="bar">
+        <h2>Candidates</h2>
+        <input id="search" class="search" placeholder="Filter candidates…">
+      </div>
       <div id="clients" class="grid"></div>
+      <div id="emptyState" class="empty hidden">
+        <p>No candidates yet.</p>
+        <button class="btn primary" onclick="document.getElementById('addBtn').click()">+ Add your first candidate</button>
+      </div>
     </section>
 
+    <!-- DETAIL -->
     <section id="detailView" class="hidden">
-      <button id="back" class="btn ghost">&larr; All clients</button>
+      <button id="back" class="btn ghost">← All candidates</button>
       <div id="detail"></div>
     </section>
   </main>
+
+  <!-- ADD CANDIDATE MODAL -->
+  <div id="addModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <h3>Add candidate</h3>
+        <button class="x" onclick="closeAdd()">✕</button>
+      </div>
+      <form id="addForm">
+        <label class="drop" id="drop">
+          <input type="file" id="resumeFile" accept=".pdf,.docx" required hidden>
+          <span id="dropText">📄 Drop a resume here, or click to choose (PDF/DOCX)</span>
+        </label>
+        <p class="hint">We read the resume and auto-build a personalized profile. The fields below are optional — they fill what a resume usually lacks.</p>
+        <div class="form-grid">
+          <label>Name <small>(blank = from resume)</small><input id="f_name" placeholder="auto-detected"></label>
+          <label>Email <input id="f_email" placeholder="auto-detected"></label>
+          <label>Visa status <input id="f_visa" placeholder="e.g. F-1 OPT / Citizen"></label>
+          <label>Desired salary <input id="f_salary" placeholder="e.g. $120,000"></label>
+          <label>Needs sponsorship?
+            <select id="f_sponsor"><option value="">—</option><option value="true">Yes</option><option value="false">No</option></select></label>
+          <label>Authorized in US?
+            <select id="f_auth"><option value="">—</option><option value="true">Yes</option><option value="false">No</option></select></label>
+          <label class="wide">Preferred locations <input id="f_locs" placeholder="e.g. Remote; Charlotte, NC"></label>
+        </div>
+        <div class="modal-foot">
+          <span id="addStatus" class="status"></span>
+          <button type="submit" class="btn primary" id="addSubmit">Create candidate</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

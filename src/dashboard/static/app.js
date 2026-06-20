@@ -1,35 +1,54 @@
 const $ = (s) => document.querySelector(s);
 const api = (p, opt) => fetch(p, opt).then(r => r.json());
+const initials = (n) => (n || "?").split(/\s+/).map(w => w[0]).slice(0, 2).join("").toUpperCase();
 
 let pollTimer = null;
+let allClients = [];
+let detailData = null;
+let sortMode = "match";          // "match" | "recent"
 
+/* ---------------- clients grid ---------------- */
 async function loadClients() {
   const data = await api("/api/clients");
+  allClients = data.clients;
   const all = $("#allStatus");
   all.textContent = data.all_status === "running" ? "running daily for all…"
-                  : data.all_status === "done" ? "last run: done" : "";
+                  : data.all_status === "done" ? "all clients: done" : "";
   all.className = "status " + (data.all_status || "");
+  renderClients();
+  const anyRunning = data.all_status === "running" || allClients.some(c => c.status === "running");
+  if (!anyRunning && pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+}
 
+function renderClients() {
+  const q = ($("#search").value || "").toLowerCase();
+  const list = allClients.filter(c => c.name.toLowerCase().includes(q));
+  $("#emptyState").classList.toggle("hidden", allClients.length > 0);
   const grid = $("#clients");
   grid.innerHTML = "";
-  data.clients.forEach(c => {
+  list.forEach(c => {
     const el = document.createElement("div");
     el.className = "card";
     el.innerHTML = `
+      <div class="top">
+        <div class="avatar">${initials(c.name)}</div>
+        <span class="pill ${c.status}">${c.status}</span>
+      </div>
       <h3>${c.name}</h3>
       <div class="titles">${(c.titles || []).join(" · ") || "—"}</div>
       <div class="stats">
-        <div class="stat"><b>${c.shortlist_count}</b><span>fresh+fit</span></div>
+        <div class="stat"><b>${c.shortlist_count}</b><span>matches</span></div>
         <div class="stat"><b>${c.golden}</b><span>golden</span></div>
         <div class="stat"><b>${c.skills_count}</b><span>skills</span></div>
+        <div class="stat"><b>${c.years ?? "—"}</b><span>yrs</span></div>
       </div>
-      <div class="row">
-        <span class="badge ${c.golden ? "gold" : ""}">${c.status}</span>
-        <button class="btn" data-run="${c.slug}">Run daily</button>
+      <div class="row" style="display:flex;gap:8px;margin-top:14px">
+        <button class="btn sm primary" data-run="${c.slug}">▶ Run daily</button>
+        <button class="btn sm" data-open="${c.slug}">Open</button>
       </div>`;
+    el.querySelector(".avatar").onclick = () => openDetail(c.slug);
     el.querySelector("h3").onclick = () => openDetail(c.slug);
-    el.querySelector(".titles").onclick = () => openDetail(c.slug);
-    el.querySelector(".stats").onclick = () => openDetail(c.slug);
+    el.querySelector("[data-open]").onclick = (e) => { e.stopPropagation(); openDetail(c.slug); };
     el.querySelector("[data-run]").onclick = async (e) => {
       e.stopPropagation();
       await api(`/api/clients/${c.slug}/run`, { method: "POST" });
@@ -37,74 +56,168 @@ async function loadClients() {
     };
     grid.appendChild(el);
   });
-
-  const anyRunning = data.all_status === "running" || data.clients.some(c => c.status === "running");
-  if (!anyRunning && pollTimer) { clearInterval(pollTimer); pollTimer = null; }
 }
 
-function startPolling() {
-  loadClients();
-  if (!pollTimer) pollTimer = setInterval(loadClients, 4000);
-}
+function startPolling() { loadClients(); if (!pollTimer) pollTimer = setInterval(loadClients, 4000); }
 
+/* ---------------- detail ---------------- */
 async function openDetail(slug) {
-  const d = await api(`/api/clients/${slug}`);
+  detailData = await api(`/api/clients/${slug}`);
+  detailData.slug = slug;
   $("#clientsView").classList.add("hidden");
   $("#detailView").classList.remove("hidden");
-  const p = d.profile;
-  const wa = p.work_auth || {};
-  const spons = (s, n) => s === "yes" ? `<span class="gold-pill">H-1B ✓ (${n})</span>`
-                        : s === "no" ? `<span class="warn-pill">no H-1B</span>`
-                        : `<span style="color:#9ca3af">H-1B ?</span>`;
-  const rows = (d.shortlist || []).map(j => `
-    <tr>
-      <td class="fit ${(+j.match) >= 75 ? "hi" : ""}">${Math.round(j.match)}%</td>
-      <td>${j.verdict || ""}</td>
-      <td>${spons(j.sponsors_h1b, j.h1b_approvals)}</td>
-      <td>${j.days_ago != null && j.days_ago !== "" ? j.days_ago + "d ago" : "—"}</td>
-      <td>
-        <a class="joblink" href="${j.url}" target="_blank">${j.title}</a>
-        ${j.strengths ? `<div class="changes">✓ ${j.strengths}</div>` : ""}
-        ${j.gaps ? `<div class="changes" style="color:#b45309">△ ${j.gaps}</div>` : ""}
-      </td>
-      <td>${j.company}</td>
-    </tr>`).join("");
+  renderDetail();
+}
+
+function renderDetail() {
+  const d = detailData, p = d.profile, wa = p.work_auth || {};
+  const golden = (d.tailored || []).filter(t => t.golden).length;
   const tail = (d.tailored || []).map(t => `
     <tr>
-      <td class="fit ${(+t.fit_score) >= 75 ? "hi" : ""}">${Math.round(t.fit_score)}</td>
+      <td class="fit ${t.fit_score >= 75 ? "hi" : "mid"}">${Math.round(t.fit_score)}%</td>
       <td>${t.score_before} → <b>${t.score_after}</b></td>
       <td>${t.golden ? '<span class="gold-pill">✓ golden</span>' : '<span class="warn-pill">below 75</span>'}</td>
       <td><a class="joblink" href="${t.url}" target="_blank">${t.title}</a></td>
-      <td><a class="btn" href="/api/clients/${slug}/resume/${t.file}" >PDF</a></td>
+      <td><a class="btn sm" href="/api/clients/${d.slug}/resume/${t.file}">PDF</a></td>
     </tr>`).join("");
 
   $("#detail").innerHTML = `
-    <h2>${p.full_name || slug}</h2>
+    <h2 class="name">${p.full_name || d.slug}</h2>
     <div class="profile">
-      <div><span>email</span>${p.email || "—"}</div>
-      <div><span>location</span>${p.location || "—"}</div>
-      <div><span>experience</span>${p.years_experience ?? "—"} yrs</div>
-      <div><span>work auth</span>${wa.visa_status || "—"}${wa.requires_sponsorship ? " (needs sponsor)" : ""}</div>
-      <div><span>salary</span>${p.desired_salary || "—"}</div>
-      <div><span>top skills</span>${(p.skills || []).slice(0,8).join(", ")}</div>
+      <div class="editbar">
+        <strong style="font-size:13px;color:#475569">Profile (driven by their resume — editable)</strong>
+        <div>
+          <button class="btn sm primary" id="saveProfile">Save changes</button>
+          <button class="btn sm danger" id="delClient">Delete</button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="fld"><span>Email</span><input id="e_email" value="${p.email || ""}"></div>
+        <div class="fld"><span>Location</span><input id="e_location" value="${p.location || ""}"></div>
+        <div class="fld"><span>Experience (yrs)</span><input id="e_years" value="${p.years_experience ?? ""}" style="min-width:80px"></div>
+        <div class="fld"><span>Visa status</span><input id="e_visa" value="${wa.visa_status || ""}"></div>
+        <div class="fld"><span>Needs sponsorship</span><input id="e_sponsor" value="${wa.requires_sponsorship ?? ""}" style="min-width:90px"></div>
+        <div class="fld"><span>Desired salary</span><input id="e_salary" value="${p.desired_salary || ""}"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="fld" style="flex:1"><span>Target titles</span><input id="e_titles" value="${(p.target_titles||[]).join(", ")}" style="width:100%"></div>
+      </div>
+      <div class="row" style="margin-top:12px">
+        <div class="fld" style="flex:1"><span>Skills</span><input id="e_skills" value="${(p.skills||[]).join(", ")}" style="width:100%"></div>
+      </div>
     </div>
-    <h3 class="section">Golden tailored resumes (${(d.tailored||[]).filter(t=>t.golden).length})</h3>
+
+    <div class="section-head">
+      <h3>Golden tailored resumes <span style="color:#6b7280;font-weight:400">(${golden})</span></h3>
+    </div>
     ${tail ? `<table><thead><tr><th>Fit</th><th>ATS</th><th>Standard</th><th>Job</th><th>Resume</th></tr></thead><tbody>${tail}</tbody></table>`
            : `<p style="color:#6b7280">No tailored resumes yet — click “Run daily”.</p>`}
-    <h3 class="section">Today's fresh + fit shortlist (${(d.shortlist||[]).length})</h3>
-    ${rows ? `<table><thead><tr><th>Match</th><th>Verdict</th><th>Sponsorship</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th></tr></thead><tbody>${rows}</tbody></table>`
-           : `<p style="color:#6b7280">No shortlist yet — click “Run daily”.</p>`}
-  `;
+
+    <div class="section-head">
+      <h3>Matched jobs <span style="color:#6b7280;font-weight:400">(${(d.shortlist||[]).length})</span></h3>
+      <div class="sortwrap">Sort:
+        <div class="seg">
+          <button data-sort="match" class="${sortMode==='match'?'active':''}">Match %</button>
+          <button data-sort="recent" class="${sortMode==='recent'?'active':''}">Most recent</button>
+        </div>
+      </div>
+    </div>
+    <div id="shortlistTable"></div>`;
+
+  renderShortlist();
+  $("#saveProfile").onclick = saveProfile;
+  $("#delClient").onclick = deleteClient;
+  document.querySelectorAll("[data-sort]").forEach(b => b.onclick = () => { sortMode = b.dataset.sort; renderDetail(); });
 }
 
-$("#back").onclick = () => {
+function renderShortlist() {
+  const rows = [...(detailData.shortlist || [])];
+  const da = (j) => (j.days_ago === "" || j.days_ago == null) ? 999 : +j.days_ago;
+  rows.sort((a, b) => sortMode === "recent" ? (da(a) - da(b)) || (b.match - a.match)
+                                            : (b.match - a.match) || (da(a) - da(b)));
+  const spons = (s, n) => s === "yes" ? `<span class="gold-pill">H-1B ✓ (${n})</span>`
+                        : s === "no" ? `<span class="warn-pill">no H-1B</span>`
+                        : `<span style="color:#9ca3af">H-1B ?</span>`;
+  const dtag = (j) => { const n = da(j); return n === 999 ? `<span class="daytag">unknown</span>`
+    : n === 0 ? `<span class="daytag today">today</span>` : `<span class="daytag">${n}d ago</span>`; };
+  const html = `<table><thead><tr><th>Match</th><th>Verdict</th><th>Sponsorship</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th></tr></thead><tbody>${
+    rows.map(j => `
+      <tr>
+        <td class="fit ${j.match>=75?"hi":j.match>=60?"mid":"lo"}">${Math.round(j.match)}%</td>
+        <td>${j.verdict || ""}</td>
+        <td>${spons(j.sponsors_h1b, j.h1b_approvals)}</td>
+        <td>${dtag(j)}</td>
+        <td><a class="joblink" href="${j.url}" target="_blank">${j.title}</a>
+          ${j.strengths ? `<div class="changes">✓ ${j.strengths}</div>` : ""}
+          ${j.gaps ? `<div class="changes" style="color:#b45309">△ ${j.gaps}</div>` : ""}</td>
+        <td>${j.company}</td>
+      </tr>`).join("")}</tbody></table>`;
+  $("#shortlistTable").innerHTML = rows.length ? html : `<p style="color:#6b7280">No matches yet — click “Run daily”.</p>`;
+}
+
+async function saveProfile() {
+  const v = (id) => $(id).value.trim();
+  const list = (id) => v(id) ? v(id).split(",").map(s => s.trim()).filter(Boolean) : [];
+  const payload = {
+    email: v("#e_email"), location: v("#e_location"), desired_salary: v("#e_salary"),
+    years_experience: v("#e_years"), skills: list("#e_skills"), target_titles: list("#e_titles"),
+    work_auth: { visa_status: v("#e_visa"), requires_sponsorship: v("#e_sponsor") },
+  };
+  await fetch(`/api/clients/${detailData.slug}`, {
+    method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+  $("#saveProfile").textContent = "Saved ✓";
+  setTimeout(() => { if ($("#saveProfile")) $("#saveProfile").textContent = "Save changes"; }, 1500);
+}
+
+async function deleteClient() {
+  if (!confirm(`Delete ${detailData.profile.full_name || detailData.slug}? This removes their data.`)) return;
+  await fetch(`/api/clients/${detailData.slug}`, { method: "DELETE" });
+  backToClients();
+}
+
+/* ---------------- add candidate ---------------- */
+function openAdd() { $("#addModal").classList.remove("hidden"); }
+function closeAdd() { $("#addModal").classList.add("hidden"); $("#addForm").reset(); $("#dropText").textContent = "📄 Drop a resume here, or click to choose (PDF/DOCX)"; $("#drop").classList.remove("has"); $("#addStatus").textContent = ""; }
+window.closeAdd = closeAdd;
+
+$("#addBtn").onclick = openAdd;
+$("#drop").onclick = () => $("#resumeFile").click();
+$("#resumeFile").onchange = () => {
+  const f = $("#resumeFile").files[0];
+  if (f) { $("#dropText").textContent = "📄 " + f.name; $("#drop").classList.add("has"); }
+};
+$("#addForm").onsubmit = async (e) => {
+  e.preventDefault();
+  const f = $("#resumeFile").files[0];
+  if (!f) { $("#addStatus").textContent = "Choose a resume first."; return; }
+  const fd = new FormData();
+  fd.append("file", f);
+  fd.append("name", $("#f_name").value);
+  fd.append("email", $("#f_email").value);
+  fd.append("visa_status", $("#f_visa").value);
+  fd.append("desired_salary", $("#f_salary").value);
+  fd.append("requires_sponsorship", $("#f_sponsor").value);
+  fd.append("authorized_us", $("#f_auth").value);
+  fd.append("locations", $("#f_locs").value);
+  $("#addSubmit").disabled = true; $("#addStatus").textContent = "Reading resume…";
+  try {
+    const r = await fetch("/api/clients", { method: "POST", body: fd });
+    if (!r.ok) throw new Error((await r.json()).detail || "failed");
+    closeAdd();
+    await loadClients();
+  } catch (err) {
+    $("#addStatus").className = "status error"; $("#addStatus").textContent = String(err.message || err);
+  } finally { $("#addSubmit").disabled = false; }
+};
+
+/* ---------------- nav / global ---------------- */
+function backToClients() {
   $("#detailView").classList.add("hidden");
   $("#clientsView").classList.remove("hidden");
   loadClients();
-};
-$("#runAll").onclick = async () => {
-  await api("/api/run-all", { method: "POST" });
-  startPolling();
-};
+}
+$("#back").onclick = backToClients;
+$("#search").oninput = renderClients;
+$("#runAll").onclick = async () => { await api("/api/run-all", { method: "POST" }); startPolling(); };
 
 loadClients();
