@@ -36,10 +36,17 @@ def rank_jobs(
       Stage 2 (AI, precise): AI-score only the top `ai_cap` heuristic survivors (bounds cost
                              when the firehose is huge) -> real match %; keep >= min_fit."""
     from ..score.sponsorship import tag_jobs
+    from .usfilter import us_only
 
     profile = load_profile(candidate)
     matcher = build_matcher(profile)
     gate = prefilter if ai_score else min_fit
+
+    # US-only: we target USA jobs; drop everything else up front (saves scoring cost).
+    before_us = len(jobs)
+    jobs = us_only(jobs)
+    if on_progress and before_us != len(jobs):
+        on_progress(f"  US filter: kept {len(jobs)}/{before_us} (dropped {before_us - len(jobs)} non-US)")
 
     # Sponsorship layer: tag every job; for candidates who NEED sponsorship, knock out
     # CONFIRMED non-sponsors (in USCIS data with 0 approvals). Unknown companies are kept.
