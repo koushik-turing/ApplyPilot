@@ -8,6 +8,7 @@ day's ranked shortlist (fresh + good-fit) ready for batch tailoring.
 from __future__ import annotations
 
 import csv
+import json
 
 from concurrent.futures import ThreadPoolExecutor
 

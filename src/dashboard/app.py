@@ -211,7 +211,7 @@ def client_detail(slug: str):
                     ("full_name", "email", "location", "years_experience", "skills",
                      "target_titles", "work_auth", "desired_salary", "answer_bank",
                      "apply_mode", "auto_min_match")},
-        "shortlist": [j for j in _read_shortlist(d) if is_us(j.get("location", ""))][:50],
+        "shortlist": [j for j in _read_shortlist(d) if is_us(j.get("location", ""))][:200],
         "tailored": tailored,
     }
 
@@ -441,13 +441,17 @@ def tailor_now(slug: str, url: str):
     if pdf_path.exists():
         return StreamingResponse(iter([pdf_path.read_bytes()]), media_type="application/pdf",
                                  headers={"Content-Disposition": f'attachment; filename="tailored_{key}.pdf"'})
-    # find the JD content (from the crawl's jobs cache)
+    # find the JD content (from the crawl's jobs cache, else re-fetch it live)
     jobs_cache = _read_json(config.CANDIDATES_DIR / slug / "jobs_cache.json") or {}
     jd = jobs_cache.get(url, {})
     jd_text = jd.get("content", "")
     title = (jd.get("title") or "resume").replace(" ", "_")[:40]
     if not jd_text:
-        raise HTTPException(404, "JD not found for this URL (re-run the crawl).")
+        jd_title, jd_text = _refetch_jd(url)
+        if jd_title:
+            title = jd_title.replace(" ", "_")[:40]
+    if not jd_text:
+        raise HTTPException(404, "Could not load the job description for this URL.")
     resume = _candidate_resume(slug)
     if not resume:
         raise HTTPException(404, "no resume on file for this candidate")
@@ -465,6 +469,34 @@ def tailor_now(slug: str, url: str):
                     "score_before": res["score_before"], "score_after": res["score_after"]}), encoding="utf-8")
     return StreamingResponse(iter([pdf]), media_type="application/pdf",
                              headers={"Content-Disposition": f'attachment; filename="{title}_tailored.pdf"'})
+
+
+def _refetch_jd(url: str) -> tuple[str, str]:
+    """Re-fetch a job's (title, JD text) from its URL. Greenhouse (incl custom domains) via
+    the API; other ATS via a best-effort page fetch. Used when jobs_cache lacks the URL."""
+    from ..discover.ats_client import GreenhouseClient, resolve_greenhouse
+    gh = resolve_greenhouse(url)
+    if gh:
+        board, jid = gh
+        c = GreenhouseClient()
+        try:
+            raw = c.get_job_form(board, jid)
+            return raw.title, raw.content
+        except Exception:
+            pass
+        finally:
+            c.close()
+    try:
+        import re as _re
+        import httpx
+        html = httpx.get(url, timeout=15, follow_redirects=True,
+                         headers={"User-Agent": "Mozilla/5.0 (job-portal)"}).text
+        text = _re.sub(r"<(script|style)[^>]*>.*?</\1>", " ", html, flags=_re.S | _re.I)
+        text = _re.sub(r"<[^>]+>", " ", text)
+        text = _re.sub(r"&[a-z]+;", " ", text)
+        return "", _re.sub(r"\s+", " ", text)[:6000]
+    except Exception:
+        return "", ""
 
 
 def _candidate_resume(slug: str) -> Path | None:
