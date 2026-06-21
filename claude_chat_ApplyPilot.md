@@ -360,6 +360,12 @@ Self-audit + probing found and fixed real failure modes:
 - Fixed candidate cache key (was full_name -> stray folders); now the slug.
 - **Multi-select** questions supported (`multi_value_multi_select`): pick multiple labels (country->US,
   experience->matching skills); `Answer.values` + fill selects each.
+- **Custom-domain Greenhouse** (`resolve_greenhouse`): many companies host Greenhouse on their OWN
+  domain (stripe.com/jobs/.../<id>/apply, brex.com/careers...). The old parser only matched
+  greenhouse.io -> these were wrongly sent to the generic filler, missing the real questions. Now we
+  extract the job id + candidate board tokens from the domain and VERIFY against the Greenhouse API
+  (no false positives). Verified: stripe.com URL -> structured 17-question fill. Lesson: always
+  resolve+verify the ATS, don't assume from the hostname.
 - **Non-Greenhouse fill** (`submit/generic_fill.py`): Lever/Ashby/Workable/custom have no questions API,
   so a generic DOM filler does the universal fields (name/email/phone/links) + resume + screenshot;
   custom questions left for the recruiter (auto-submit disabled for schema-less forms). Verified on
