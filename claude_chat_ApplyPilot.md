@@ -333,6 +333,23 @@ What was added/changed after the doc's first draft:
 5. Ideas vs Jobright (brainstormed): referral/hiring-manager finder, interview prep, company research
    card, AI copilot chat, analytics/funnel, A/B resume variants, daily digest email.
 
+### 12i. FORM-AUDIT HARDENING (DONE) — `tools/audit_forms.py`
+Ran the engine against ~180 REAL forms across ~140 multi-industry boards (fintech/data/AI/
+consumer/SaaS/health) to find real question types + issues, then evolved it. Results:
+- **98% of answers are no-AI** (deterministic + cache), ~2% Claude — fast, cheap, consistent.
+- Fixed the GRAVE dropdown bug (was typing raw option IDs like 163595155003 / '1'): the engine
+  now stores/selects the human LABEL for every dropdown; never types a non-option value (skips).
+- **EEO/pronouns/gender/race/veteran/disability are NEVER guessed** -> "Decline to self-identify"
+  (or candidate's stated pref); if no decline option, flagged for the recruiter.
+- Added deterministic handlers (discovered from the audit): how-did-you-hear, country->US,
+  preferred/first name, (ever/prev/current) worked-at-X -> No, age 18+ -> Yes, consent/privacy-
+  notice -> affirm, government-official/PEP -> No, preferred office location, optional social links
+  -> blank, conditional "If you answered..." -> blank (checked last so specific Qs win).
+- DOUBTS to recruiter are now ONLY genuine required questions the engine shouldn't guess
+  (pronouns w/o decline option, contextual conditionals, candidate-specific multi-selects, hybrid
+  willingness). They surface as "⚠ check" in the Review modal and can be pre-answered in the
+  answer bank. Re-run `python tools/audit_forms.py` anytime to keep hardening.
+
 ### 12h. JOBRIGHT-INSPIRED FEATURES (DONE) — researched their flow + best practices, then built
 Research takeaways (sources in chat): prefill screening answers once & reuse; QUALITY beats volume
 (11-20 targeted apps ~9.25% interview vs 100+ at 2.58% → validates our fit-gating); keyword sweet
