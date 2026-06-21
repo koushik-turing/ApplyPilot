@@ -35,24 +35,32 @@ def clean_jd(html_or_text: str) -> str:
     return re.sub(r"\s+", " ", t).strip()
 
 
-def tailor_for_job(resume_text: str, jd_text: str, *, timeout: float = 200.0) -> dict:
+def tailor_for_job(resume_text: str, jd_text: str, *, timeout: float = 360.0,
+                   retries: int = 1) -> dict:
     """
     Tailor a resume to a job description. Returns:
       {score_before, score_after, tailored_resume, changes, engine}
-    Raises RuntimeError if the engine isn't running.
+    Retries once on transient errors (Opus tailoring under concurrent load can be slow).
+    Note: callers (batch) check engine availability once up front, so we don't health-check
+    per call here (that probe times out under load and caused false failures).
     """
-    if not engine_available():
-        raise RuntimeError(
-            f"ATS engine not reachable at {ATS_API}. Start it: "
-            "cd ATS_Resume_Maker/backend && python -m uvicorn app.main:app --port 8000"
-        )
-    r = httpx.post(
-        f"{ATS_API}/api/tailor",
-        data={"resume_text": resume_text, "job_description": clean_jd(jd_text)},
-        timeout=timeout,
-    )
-    r.raise_for_status()
-    d = r.json()
+    last_err = None
+    for attempt in range(retries + 1):
+        try:
+            r = httpx.post(
+                f"{ATS_API}/api/tailor",
+                data={"resume_text": resume_text, "job_description": clean_jd(jd_text)},
+                timeout=timeout,
+            )
+            r.raise_for_status()
+            d = r.json()
+            break
+        except Exception as e:
+            last_err = e
+            if attempt >= retries:
+                raise
+    else:
+        raise last_err
     return {
         "score_before": d["score_before"]["overall"],
         "score_after": d["score_after"]["overall"],
