@@ -72,20 +72,33 @@ _RE_EEO = re.compile(
 
 
 def _snap_label(q: FormQuestion, text: str) -> str | None:
-    """Return the OPTION LABEL matching `text` (exact, else case-insensitive, else
-    contains). None if no option matches — so we never put a non-option value in a select."""
+    """Return the OPTION LABEL matching `text`. Exact first, then WHOLE-WORD/phrase match
+    in either direction (never a loose substring — so 'No' can't match 'Not applicable' and
+    'India' can't match 'Indiana'). None if nothing matches, so we never put a wrong/non-
+    option value into a select."""
     if not q.options:
         return text
     t = str(text or "").strip().lower()
     if not t:
         return None
+    # 1) exact (case-insensitive)
     for o in q.options:
         if str(o.get("label", "")).strip().lower() == t:
             return o.get("label")
+    # 2) the answer appears as a whole word/phrase inside the option label
+    pat = re.compile(r"\b" + re.escape(t) + r"\b")
+    for o in q.options:
+        if pat.search(str(o.get("label", "")).strip().lower()):
+            return o.get("label")
+    # 3) the option label appears as a whole word/phrase inside the answer
+    #    (e.g. answer 'Remote, US' -> option 'Remote'); prefer the longest such option.
+    cands = []
     for o in q.options:
         lab = str(o.get("label", "")).strip().lower()
-        if t in lab or lab in t:
-            return o.get("label")
+        if lab and re.search(r"\b" + re.escape(lab) + r"\b", t):
+            cands.append(o.get("label"))
+    if cands:
+        return max(cands, key=len)
     return None
 
 
