@@ -421,6 +421,82 @@ def application_screenshot(slug: str, fname: str):
     return FileResponse(str(p), media_type="image/png")
 
 
+def _workspace(slug: str) -> Path:
+    """Where a candidate's DELIVERABLES (Excel + tailored PDFs) live. Sai -> manikanta/."""
+    d = (config.ROOT / "manikanta") if slug == "sai_manikanta" else (config.CANDIDATES_DIR / slug / "deliverables")
+    (d / "tailored_resumes").mkdir(parents=True, exist_ok=True)
+    return d
+
+
+@app.get("/api/clients/{slug}/tailor-now")
+def tailor_now(slug: str, url: str):
+    """On-demand GOLDEN tailoring for ONE job (by URL). Tailors the candidate's resume to
+    that JD, saves the PDF in the candidate's workspace (manikanta/ for Sai), and streams it.
+    Cached so re-clicks are instant."""
+    from ..tailor.client import tailor_for_job, export_resume
+    import hashlib
+    ws = _workspace(slug)
+    key = hashlib.md5(url.encode()).hexdigest()[:12]
+    pdf_path = ws / "tailored_resumes" / f"{key}.pdf"
+    if pdf_path.exists():
+        return StreamingResponse(iter([pdf_path.read_bytes()]), media_type="application/pdf",
+                                 headers={"Content-Disposition": f'attachment; filename="tailored_{key}.pdf"'})
+    # find the JD content (from the crawl's jobs cache)
+    jobs_cache = _read_json(config.CANDIDATES_DIR / slug / "jobs_cache.json") or {}
+    jd = jobs_cache.get(url, {})
+    jd_text = jd.get("content", "")
+    title = (jd.get("title") or "resume").replace(" ", "_")[:40]
+    if not jd_text:
+        raise HTTPException(404, "JD not found for this URL (re-run the crawl).")
+    resume = _candidate_resume(slug)
+    if not resume:
+        raise HTTPException(404, "no resume on file for this candidate")
+    from ..profile.parse import read_pdf_text
+    jd_full = f"Job Title: {jd.get('title','')}\n\n{jd_text}"
+    try:
+        res = tailor_for_job(read_pdf_text(resume), jd_full)
+        pdf = export_resume(res["tailored_resume"], "pdf")
+    except Exception as e:
+        raise HTTPException(503, f"tailoring failed (is the ATS engine on :8000?): {e}")
+    pdf_path.write_bytes(pdf)
+    # remember the score alongside
+    (ws / "tailored_resumes" / f"{key}.json").write_text(
+        json.dumps({"url": url, "title": jd.get("title"),
+                    "score_before": res["score_before"], "score_after": res["score_after"]}), encoding="utf-8")
+    return StreamingResponse(iter([pdf]), media_type="application/pdf",
+                             headers={"Content-Disposition": f'attachment; filename="{title}_tailored.pdf"'})
+
+
+def _candidate_resume(slug: str) -> Path | None:
+    d = config.CANDIDATES_DIR / slug
+    for pat in ("*.pdf", "*.docx"):
+        hits = sorted(d.glob(pat))
+        if hits:
+            return hits[0]
+    return None
+
+
+@app.get("/api/clients/{slug}/excel")
+def export_excel(slug: str):
+    """Export the candidate's matched-jobs shortlist to an .xlsx (match %, days-ago,
+    sponsorship, company, link). Saved in the workspace + streamed."""
+    from openpyxl import Workbook
+    rows = _read_shortlist(config.CANDIDATES_DIR / slug)
+    rows = [r for r in rows if True]  # already US-only from the crawl
+    wb = Workbook(); ws = wb.active; ws.title = "Matches"
+    cols = ["match", "verdict", "days_ago", "posted_on", "sponsors_h1b", "h1b_approvals",
+            "title", "company", "location", "url"]
+    ws.append(["Match %", "Verdict", "Days Ago", "Posted On", "Sponsors H-1B", "H-1B Approvals",
+               "Job Title", "Company", "Location", "Job Link"])
+    for r in sorted(rows, key=lambda x: -float(x.get("match") or 0)):
+        ws.append([r.get(c, "") for c in cols])
+    out = _workspace(slug) / f"{slug}_job_matches.xlsx"
+    wb.save(str(out))
+    return StreamingResponse(iter([out.read_bytes()]),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{slug}_job_matches.xlsx"'})
+
+
 def _bg_run(key: str, fn, *args, **kw):
     with _lock:
         _runs[key] = "running"

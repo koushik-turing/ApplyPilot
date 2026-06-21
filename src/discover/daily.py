@@ -221,7 +221,18 @@ def daily_crawl(
                                ai_score=ai_score, on_progress=on_progress)
     shortlist = [shortlist_row(r, j) for r, j in graded]
     _save(shortlist, candidate)
+    _save_jobs_cache(graded, candidate)
     return shortlist
+
+
+def _save_jobs_cache(graded, candidate: str):
+    """Store each shortlisted job's JD content (keyed by URL) so on-demand tailoring has the
+    JD without re-fetching. Keeps the shortlist CSV small."""
+    cache = {j.absolute_url: {"title": j.title, "board": j.board, "ats": getattr(j, "ats", ""),
+                              "location": j.location, "content": j.content}
+             for _, j in graded if j.absolute_url}
+    (config.candidate_dir(candidate) / "jobs_cache.json").write_text(
+        json.dumps(cache), encoding="utf-8")
 
 
 def _save(shortlist: list[dict], candidate: str):
