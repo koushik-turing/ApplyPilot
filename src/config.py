@@ -22,6 +22,11 @@ MODEL_SMART = os.getenv("MODEL_SMART", "claude-sonnet-4-6")
 MODEL_PREMIUM = os.getenv("MODEL_PREMIUM", "claude-opus-4-8")
 
 
+# Live-apply safety switch. While testing (default) real submissions are DISABLED so we
+# never fire a real application with dummy test contact. Set APPLYPILOT_LIVE=1 to go live.
+LIVE_APPLY = os.getenv("APPLYPILOT_LIVE", "").strip().lower() in ("1", "true", "yes", "on")
+
+
 def get_api_key() -> str:
     """Return the Anthropic API key or raise a clear error."""
     key = os.getenv("ANTHROPIC_API_KEY")

@@ -255,7 +255,7 @@ def _gen_answers(slug: str, url: str) -> list[dict]:
                   questions=[FormQuestion(label=q.label, required=q.required, field_type=q.field_type,
                              field_names=q.field_names, options=q.options) for q in raw.questions])
         prof = load_profile_by_slug(slug)
-        sheet = answer_form(job, prof, prof.full_name or slug)   # test-mode dummy contact by default
+        sheet = answer_form(job, prof, slug)   # slug = stable cache key; test-mode dummy contact
         return [{"label": a.label.strip(), "value": a.value, "source": a.source.value,
                  "needs_human": a.needs_human} for a in sheet.answers]
     except Exception:
@@ -309,7 +309,7 @@ def save_application(slug: str, fname: str, payload: dict):
     return {"ok": True, "status": r.get("status")}
 
 
-def _build_job_and_sheet(slug: str, r: dict):
+def _build_job_and_sheet(slug: str, r: dict, *, test_mode: bool = True):
     """Fetch the live Greenhouse form, build the answer sheet, and apply recruiter edits."""
     from ..discover.ats_client import GreenhouseClient, parse_greenhouse_url
     from ..models import Job, FormQuestion
@@ -328,7 +328,7 @@ def _build_job_and_sheet(slug: str, r: dict):
               questions=[FormQuestion(label=q.label, required=q.required, field_type=q.field_type,
                          field_names=q.field_names, options=q.options) for q in raw.questions])
     prof = load_profile_by_slug(slug)
-    sheet = answer_form(job, prof, prof.full_name or slug)
+    sheet = answer_form(job, prof, slug, test_mode=test_mode)   # slug = stable cache key
     # apply recruiter-edited answer values (match by label)
     edited = {str(a.get("label", "")).strip().lower(): a.get("value", "")
               for a in (r.get("answers") or [])}
@@ -365,7 +365,13 @@ def fill_application(slug: str, fname: str, submit: bool = False):
     r = _read_json(f)
     if not r:
         raise HTTPException(404, "application not found")
-    job, sheet = _build_job_and_sheet(slug, r)
+    # SAFETY: real submit is blocked while testing (so we never fire a real application
+    # with dummy contact). Set APPLYPILOT_LIVE=1 to enable. Preview (submit=False) is always OK.
+    if submit and not config.LIVE_APPLY:
+        return {"status": "blocked",
+                "reason": "Testing mode — real submission is disabled. Set APPLYPILOT_LIVE=1 to go live."}
+    # Preview uses dummy contact; a real (live) submit uses the candidate's real contact.
+    job, sheet = _build_job_and_sheet(slug, r, test_mode=not submit)
     if job is None:
         raise HTTPException(422, "Only Greenhouse forms can be auto-filled/previewed right now.")
     # HARD US-ONLY GUARD: never fill/submit a non-US job (even stale ones from old runs).
