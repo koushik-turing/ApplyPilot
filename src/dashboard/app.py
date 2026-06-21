@@ -306,6 +306,93 @@ def save_application(slug: str, fname: str, payload: dict):
     return {"ok": True, "status": r.get("status")}
 
 
+def _build_job_and_sheet(slug: str, r: dict):
+    """Fetch the live Greenhouse form, build the answer sheet, and apply recruiter edits."""
+    from ..discover.ats_client import GreenhouseClient, parse_greenhouse_url
+    from ..models import Job, FormQuestion
+    from ..answer.engine import answer_form
+    parsed = parse_greenhouse_url(r.get("url", ""))
+    if not parsed:
+        return None, None
+    board, job_id = parsed
+    c = GreenhouseClient()
+    try:
+        raw = c.get_job_form(board, job_id)
+    finally:
+        c.close()
+    job = Job(board=raw.board, job_id=raw.job_id, title=raw.title, location=raw.location,
+              url=raw.absolute_url, content=raw.content,
+              questions=[FormQuestion(label=q.label, required=q.required, field_type=q.field_type,
+                         field_names=q.field_names, options=q.options) for q in raw.questions])
+    prof = load_profile_by_slug(slug)
+    sheet = answer_form(job, prof, prof.full_name or slug)
+    # apply recruiter-edited answer values (match by label)
+    edited = {str(a.get("label", "")).strip().lower(): a.get("value", "")
+              for a in (r.get("answers") or [])}
+    for a in sheet.answers:
+        k = a.label.strip().lower()
+        if k in edited and edited[k]:
+            a.value = edited[k]
+    return job, sheet
+
+
+def _tailored_pdf(slug: str, r: dict, fname: str) -> str | None:
+    """Export the (edited) tailored resume to a PDF the browser can upload."""
+    import httpx
+    sdir = config.CANDIDATES_DIR / slug / "screenshots"
+    sdir.mkdir(parents=True, exist_ok=True)
+    try:
+        resp = httpx.post("http://127.0.0.1:8000/api/export",
+                          params={"format": "pdf", "template": "modern"},
+                          json=r["tailored_resume"], timeout=60)
+        resp.raise_for_status()
+        p = sdir / f"resume_{fname}.pdf"
+        p.write_bytes(resp.content)
+        return str(p)
+    except Exception:
+        return None
+
+
+@app.post("/api/clients/{slug}/application/{fname}/fill")
+def fill_application(slug: str, fname: str, submit: bool = False):
+    """Fill the REAL job form in a browser (Playwright) with the AI/edited answers + tailored
+    resume, screenshot it for the recruiter to verify. submit=true actually submits."""
+    from ..submit.apply import fill_form
+    f = config.CANDIDATES_DIR / slug / "tailored" / fname
+    r = _read_json(f)
+    if not r:
+        raise HTTPException(404, "application not found")
+    job, sheet = _build_job_and_sheet(slug, r)
+    if job is None:
+        raise HTTPException(422, "Only Greenhouse forms can be auto-filled/previewed right now.")
+    resume_pdf = _tailored_pdf(slug, r, fname) or ""
+    sdir = config.CANDIDATES_DIR / slug / "screenshots"
+    result = fill_form(job, sheet, resume_pdf, submit=submit, headless=True, screenshot_dir=sdir)
+
+    shot = result.get("screenshot")
+    if shot:
+        r["last_screenshot"] = Path(shot).name
+    if submit and result.get("status") == "submitted":
+        r["status"] = "submitted"
+    f.write_text(json.dumps(r, indent=2), encoding="utf-8")
+    return {"status": result.get("status"), "filled": result.get("filled", []),
+            "skipped": result.get("skipped", []), "note": result.get("note", ""),
+            "reason": result.get("reason", ""),
+            "screenshot": f"/api/clients/{slug}/application/{fname}/screenshot" if shot else None,
+            "needs_review": sheet.needs_review}
+
+
+@app.get("/api/clients/{slug}/application/{fname}/screenshot")
+def application_screenshot(slug: str, fname: str):
+    from fastapi.responses import FileResponse
+    r = _read_json(config.CANDIDATES_DIR / slug / "tailored" / fname)
+    shot = (r or {}).get("last_screenshot")
+    p = config.CANDIDATES_DIR / slug / "screenshots" / (shot or "")
+    if not shot or not p.exists():
+        raise HTTPException(404, "no screenshot yet")
+    return FileResponse(str(p), media_type="image/png")
+
+
 def _bg_run(key: str, fn, *args, **kw):
     with _lock:
         _runs[key] = "running"

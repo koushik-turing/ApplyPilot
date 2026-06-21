@@ -313,10 +313,42 @@ async function saveApp(status) {
     method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
   $("#appStatus").textContent = status ? `status: ${status}` : "saved ✓";
 }
-function closeApp() { $("#appModal").classList.add("hidden"); appData = null; }
+function closeApp() { $("#appModal").classList.add("hidden"); $("#appPreviewArea").classList.add("hidden"); appData = null; }
 window.openApp = openApp; window.closeApp = closeApp;
 $("#appSave").onclick = () => saveApp(null);
-$("#appSubmit").onclick = async () => { await saveApp("submitted"); setTimeout(() => { closeApp(); openDetail(detailData.slug); }, 700); };
+
+// Preview: fill the REAL form in a browser and show the screenshot for verification.
+$("#appPreview").onclick = async () => {
+  await saveApp(null);                 // persist edits first so the fill uses them
+  const area = $("#appPreviewArea");
+  area.classList.remove("hidden");
+  area.innerHTML = `<div class="preview-load">⏳ Opening the real job form and filling it… (10-20s)</div>`;
+  try {
+    const res = await api(`/api/clients/${detailData.slug}/application/${appData.file}/fill?submit=false`, { method: "POST" });
+    if (res.screenshot) {
+      area.innerHTML = `
+        <div class="preview-head">📸 This is the AI filling the <b>real</b> application form. Verify, then Approve & submit.
+          <span class="muted"> · filled ${res.filled.length}, skipped ${res.skipped.length}${res.needs_review ? ' · ⚠ some fields need your input' : ''}</span></div>
+        <img class="preview-img" src="${res.screenshot}?t=${Date.now()}" alt="filled form">`;
+    } else {
+      area.innerHTML = `<div class="preview-load">Couldn't preview: ${res.reason || res.note || "only Greenhouse forms supported"}.</div>`;
+    }
+  } catch (e) {
+    area.innerHTML = `<div class="preview-load">Preview failed: ${e.message || e}. (Is the ATS engine running on :8000?)</div>`;
+  }
+};
+
+// Approve & submit: actually submit the real form (supervised approval).
+$("#appSubmit").onclick = async () => {
+  await saveApp(null);
+  if (!confirm("Submit this application on the real job site now?")) return;
+  $("#appStatus").textContent = "submitting on the real form…";
+  try {
+    const res = await api(`/api/clients/${detailData.slug}/application/${appData.file}/fill?submit=true`, { method: "POST" });
+    if (res.status === "submitted") { $("#appStatus").textContent = "submitted ✓"; setTimeout(() => { closeApp(); openDetail(detailData.slug); }, 900); }
+    else { $("#appStatus").textContent = res.reason || res.note || `status: ${res.status}`; }
+  } catch (e) { $("#appStatus").textContent = "submit failed: " + (e.message || e); }
+};
 
 /* ---------------- nav / global ---------------- */
 function backToClients() {

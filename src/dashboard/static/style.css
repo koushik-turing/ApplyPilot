@@ -121,3 +121,9 @@ a.joblink{ color:var(--accent); text-decoration:none; font-weight:500; } a.jobli
 .statepill{ font-size:10.5px; padding:2px 8px; border-radius:20px; margin-left:8px; font-weight:600; }
 .statepill.submitted{ background:#ecfdf3; color:var(--gold); } .statepill.approved{ background:#dbeafe; color:#1d4ed8; }
 .statepill.skipped{ background:#f1f5f9; color:#64748b; }
+
+/* live-form preview */
+.preview-area{ margin-top:16px; border-top:1px solid var(--line); padding-top:14px; }
+.preview-load{ padding:24px; text-align:center; color:var(--mut); font-size:14px; background:#fafbff; border-radius:10px; }
+.preview-head{ font-size:13px; color:#334155; margin-bottom:10px; } .preview-head .muted{ color:var(--mut); }
+.preview-img{ width:100%; border:1px solid var(--line); border-radius:10px; box-shadow:0 4px 16px rgba(15,23,42,.08); }
