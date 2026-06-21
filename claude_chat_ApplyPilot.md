@@ -350,6 +350,21 @@ consumer/SaaS/health) to find real question types + issues, then evolved it. Res
   willingness). They surface as "⚠ check" in the Review modal and can be pre-answered in the
   answer bank. Re-run `python tools/audit_forms.py` anytime to keep hardening.
 
+### 12j. EDGE-CASE HARDENING + MULTI-SELECT + NON-GREENHOUSE (DONE)
+Self-audit + probing found and fixed real failure modes:
+- `_snap_label` substring bug ('No'->'Not applicable', 'India'->'Indiana') -> word-boundary match.
+- Required-empty fields now flag + block auto-submit; required non-resume files (cover letter) flagged.
+- Robust submit button (multiple names) + resume upload targets the resume input (not cover-letter).
+- **Live-apply safety gate** (`config.LIVE_APPLY`, env APPLYPILOT_LIVE, default OFF): real submits are
+  BLOCKED while testing so we never fire a real app with dummy contact; preview always dummy.
+- Fixed candidate cache key (was full_name -> stray folders); now the slug.
+- **Multi-select** questions supported (`multi_value_multi_select`): pick multiple labels (country->US,
+  experience->matching skills); `Answer.values` + fill selects each.
+- **Non-Greenhouse fill** (`submit/generic_fill.py`): Lever/Ashby/Workable/custom have no questions API,
+  so a generic DOM filler does the universal fields (name/email/phone/links) + resume + screenshot;
+  custom questions left for the recruiter (auto-submit disabled for schema-less forms). Verified on
+  a live 15five (Lever) form.
+
 ### 12h. JOBRIGHT-INSPIRED FEATURES (DONE) — researched their flow + best practices, then built
 Research takeaways (sources in chat): prefill screening answers once & reuse; QUALITY beats volume
 (11-20 targeted apps ~9.25% interview vs 100+ at 2.58% → validates our fit-gating); keyword sweet
