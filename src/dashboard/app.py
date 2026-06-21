@@ -370,15 +370,30 @@ def fill_application(slug: str, fname: str, submit: bool = False):
     if submit and not config.LIVE_APPLY:
         return {"status": "blocked",
                 "reason": "Testing mode — real submission is disabled. Set APPLYPILOT_LIVE=1 to go live."}
+    from ..discover.usfilter import is_us
+    # HARD US-ONLY GUARD (works for any ATS via the stored location).
+    if not is_us(r.get("location", "")):
+        raise HTTPException(422, f"This job is not in the USA ({r.get('location')}). We only apply to US jobs.")
+
     # Preview uses dummy contact; a real (live) submit uses the candidate's real contact.
     job, sheet = _build_job_and_sheet(slug, r, test_mode=not submit)
-    if job is None:
-        raise HTTPException(422, "Only Greenhouse forms can be auto-filled/previewed right now.")
-    # HARD US-ONLY GUARD: never fill/submit a non-US job (even stale ones from old runs).
-    from ..discover.usfilter import is_us
-    if not is_us(job.location):
-        raise HTTPException(422, f"This job is not in the USA ({job.location}). We only apply to US jobs.")
     resume_pdf = _tailored_pdf(slug, r, fname) or ""
+
+    # Non-Greenhouse (Lever/Ashby/Workable/custom): no questions API -> generic field fill.
+    if job is None:
+        from ..submit.generic_fill import fill_generic
+        prof = load_profile_by_slug(slug)
+        sdir = config.CANDIDATES_DIR / slug / "screenshots"
+        res = fill_generic(r.get("url", ""), prof, resume_path=resume_pdf, submit=False,
+                           headless=True, screenshot_dir=sdir, test_mode=not submit)
+        shot = res.get("screenshot")
+        if shot:
+            r["last_screenshot"] = Path(shot).name
+            f.write_text(json.dumps(r, indent=2), encoding="utf-8")
+        return {"status": res.get("status"), "filled": res.get("filled", []), "skipped": [],
+                "note": res.get("note", ""), "reason": "",
+                "screenshot": f"/api/clients/{slug}/application/{fname}/screenshot" if shot else None,
+                "needs_review": True}
     sdir = config.CANDIDATES_DIR / slug / "screenshots"
     result = fill_form(job, sheet, resume_pdf, submit=submit, headless=True, screenshot_dir=sdir)
 
