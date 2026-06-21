@@ -128,13 +128,48 @@ def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
     if "preferred" in label and "name" in label:
         return mk(p.full_name.split()[0] if p.full_name else "")
 
-    # Conditional follow-ups ("If you answered Yes above, explain...") — don't blindly
-    # answer; leave blank (skipped) and flag only if it's required.
-    if re.match(r"\s*if (you |your |applicable|yes|no|selected|the answer|so)", label):
-        return mk("", conf=0.0, human=bool(q.required))
+    # EEO / demographic — NEVER AI-guessed. Use candidate's stated pref, else "Decline".
+    if _RE_EEO.search(label):
+        pref = p.eeo.get(label) or p.eeo.get("default")
+        lab = (_snap_label(q, pref) if pref else None) or _decline_label(q)
+        if lab:
+            return mk(lab)
+        return mk("", conf=0.0, human=True)   # no decline option -> let a human handle it
 
-    # "How did you hear / first learn about us" (very common) — use the answer-bank value,
-    # else a sensible default, snapped to a real option when it's a dropdown.
+    # Age "at least 18" -> Yes (true for any working candidate)
+    if re.search(r"at least 18|18 years of age|over 18|older|legal working age", label):
+        return mk(_snap_label(q, "Yes") or "Yes") if q.options else mk("Yes")
+
+    # Consent / acknowledgement / "confirm receipt" — required to apply -> affirmative.
+    if any(k in label for k in ("i consent", "do you consent", "i acknowledge", "do you acknowledge",
+                                "i understand", "confirm receipt", "i agree", "do you agree",
+                                "privacy notice", "consent to")):
+        if q.options:
+            lab = (_snap_label(q, "Yes") or _snap_label(q, "I agree") or _snap_label(q, "I consent")
+                   or _snap_label(q, "I acknowledge") or _snap_label(q, "I confirm")
+                   or _snap_label(q, "I understand"))
+            if lab:
+                return mk(lab)
+        return mk("Yes")
+
+    # Government official / politically-exposed-person screening -> No (recruiter can edit).
+    if "government official" in label or "politically exposed" in label or "public official" in label:
+        return mk(_snap_label(q, "No") or "No") if q.options else mk("No")
+
+    # "Have you (currently/previously/ever) worked/been employed at <X>" -> No.
+    # (Checked BEFORE the conditional catch so 'If you currently work at X' isn't mis-handled.)
+    if (("previously" in label or "currently" in label or "ever" in label)
+            and ("employ" in label or "worked" in label or "work for" in label or "work at" in label)):
+        if q.options:
+            lab = _snap_label(q, "No") or next(
+                (o.get("label") for o in q.options
+                 if any(k in str(o.get("label", "")).lower() for k in ("not ", "never", "no,", "have not"))), None)
+            if lab:
+                return mk(lab)
+        else:
+            return mk("No")
+
+    # "How did you hear / first learn about us" — answer-bank value, else a sensible option.
     if "how did you hear" in label or "how did you first learn" in label or "how were you referred" in label:
         pref = (p.answer_bank or {}).get("how_heard")
         if q.options:
@@ -150,24 +185,17 @@ def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
         if lab:
             return mk(lab)
 
-    # "Have you previously worked/been employed here" — default No (recruiter can edit).
-    if ("previously" in label or "currently" in label) and ("employ" in label or "worked for" in label):
+    # Preferred office location -> candidate's location (snap to option when a select).
+    if "office location" in label or ("preferred" in label and "location" in label):
+        loc = (p.preferred_locations[0] if p.preferred_locations else p.location) or ""
         if q.options:
-            lab = _snap_label(q, "No") or next(
-                (o.get("label") for o in q.options
-                 if any(k in str(o.get("label", "")).lower() for k in ("not ", "never", "no,"))), None)
-            if lab:
-                return mk(lab)
-        else:
-            return mk("No")
+            lab = _snap_label(q, loc) if loc else None
+            return mk(lab) if lab else mk("", conf=0.3, human=bool(q.required))
+        return mk(loc, human=not loc and bool(q.required))
 
-    # EEO / demographic — NEVER AI-guessed. Use candidate's stated pref, else "Decline".
-    if _RE_EEO.search(label):
-        pref = p.eeo.get(label) or p.eeo.get("default")
-        lab = (_snap_label(q, pref) if pref else None) or _decline_label(q)
-        if lab:
-            return mk(lab)
-        return mk("", conf=0.0, human=True)   # no decline option -> let a human handle it
+    # Optional social/link fields the candidate may not have -> leave blank, not a doubt.
+    if any(k in label for k in ("twitter", "other links", "instagram", "facebook", "social media")):
+        return mk("")
 
     # Hard immigration facts — NEVER AI-guessed. Store the LABEL (Yes/No), snapped to the
     # form's actual option text. Flag for human if profile lacks the data.
@@ -197,6 +225,12 @@ def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
     if "years of experience" in label or "years' experience" in label:
         if p.years_experience is not None:
             return mk(str(int(p.years_experience)))
+
+    # Conditional follow-ups ("If you answered Yes above, explain / which state...") — checked
+    # LAST so specific questions are handled first. Don't blindly answer; leave blank and
+    # flag only if required (the recruiter resolves it in context).
+    if re.match(r"\s*if (you |your |applicable|yes|no|selected|the answer|so\b)", label):
+        return mk("", conf=0.0, human=bool(q.required))
 
     return None
 
