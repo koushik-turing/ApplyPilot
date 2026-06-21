@@ -97,7 +97,8 @@ class AnswerSource(str, Enum):
 class Answer(BaseModel):
     label: str
     field_names: list[str]
-    value: str                        # for selects, this is the option *value/id*
+    value: str                        # the answer (option LABEL for single-selects; joined for multi)
+    values: list[str] = Field(default_factory=list)   # option labels for MULTI-selects
     source: AnswerSource
     confidence: float = 1.0
     needs_human: bool = False

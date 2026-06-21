@@ -96,10 +96,29 @@ def fill_form(
         qmap = {fn: q for q in job.questions for fn in q.field_names}
 
         for a in sheet.answers:
+            q = next((qmap[fn] for fn in a.field_names if fn in qmap), None)
+
+            # MULTI-SELECT: pick each value (e.g. country=United States, several skills).
+            if q and q.field_type == "multi_value_multi_select":
+                vals = a.values or ([a.value] if a.value else [])
+                if not vals:
+                    result["skipped"].append(a.label)
+                    continue
+                placed = False
+                for name in a.field_names:
+                    el = _find_field(page, name)
+                    if el is None:
+                        continue
+                    picked = [_select_option(page, el, v) for v in vals]
+                    placed = any(picked)
+                    if placed:
+                        break
+                (result["filled"] if placed else result["skipped"]).append(a.label)
+                continue
+
             if not a.value:
                 result["skipped"].append(a.label)
                 continue
-            q = next((qmap[fn] for fn in a.field_names if fn in qmap), None)
             is_select = bool(q and q.options)
 
             label_value = a.value

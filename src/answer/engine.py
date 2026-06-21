@@ -112,6 +112,28 @@ def _decline_label(q: FormQuestion) -> str | None:
     return None
 
 
+def _multi_select_answer(q: FormQuestion, p: Profile) -> Answer:
+    """Pick MULTIPLE option labels for a multi_value_multi_select question:
+    country -> United States (US-only); experience/skills -> options matching the
+    candidate's skills; otherwise leave to the recruiter (flag if required)."""
+    label = q.label.lower()
+    vals: list[str] = []
+    if "country" in label or "countries" in label:
+        lab = _snap_label(q, "United States") or _snap_label(q, "USA") or _snap_label(q, "US")
+        vals = [lab] if lab else []
+    elif any(k in label for k in ("experience with", "familiar with", "proficient", "skills",
+                                  "technologies", "worked with", "languages", "tools", "stacks")):
+        toks = {t for s in p.skills for t in re.split(r"[\s/]+", s.lower()) if len(t) >= 3}
+        for o in q.options:
+            ol = str(o.get("label", "")).lower()
+            if any(re.search(r"\b" + re.escape(t) + r"\b", ol) for t in toks):
+                vals.append(o.get("label"))
+    needs_human = (not vals) and bool(q.required)
+    return Answer(label=q.label, field_names=q.field_names, value="; ".join(vals), values=vals,
+                  source=AnswerSource.DETERMINISTIC, confidence=1.0 if vals else 0.0,
+                  needs_human=needs_human)
+
+
 def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
     """Return a deterministic answer if this is a known hard field, else None."""
     label = q.label.lower()
@@ -372,6 +394,11 @@ def answer_form(job: Job, profile: Profile, candidate: str,
                 sheet.answers.append(Answer(
                     label=q.label, field_names=q.field_names, value="",
                     source=AnswerSource.DETERMINISTIC, confidence=0.0, needs_human=True))
+            continue
+
+        # Multi-select (pick multiple options) — handled specially before L1.
+        if q.field_type == "multi_value_multi_select":
+            sheet.answers.append(_multi_select_answer(q, profile))
             continue
 
         # L1 — deterministic hard fields
