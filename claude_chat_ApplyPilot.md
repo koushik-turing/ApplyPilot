@@ -388,4 +388,88 @@ We're already ahead on multi-candidate + sponsorship + golden tailoring + true s
    add recruiter comments, see "what the AI changed", then Save / Download PDF / Approve & submit. Sets
    status (pending/approved/submitted/skipped); status pill on the golden-resume row. Edits+comments are
    stored (foundation for the "learn from edits" loop — feeding back into tailoring is still TODO).
-```
+
+---
+
+## 13. SESSION UPDATE — 2026-06-22 (custom-domain Greenhouse, full cache, Manikanta workspace)
+
+### 13a. CUSTOM-DOMAIN GREENHOUSE (fixed — user caught it)
+`stripe.com/jobs/listing/.../7923209/apply` (and brex.com/careers, etc.) are Greenhouse-backed but the
+old parser only matched `greenhouse.io` → wrongly routed to the generic filler, missing the 17 real
+questions. New `resolve_greenhouse(url)` (`discover/ats_client.py`): extracts the job id (gh_jid or a
+long numeric path segment) + candidate board tokens from the domain, and VERIFIES against the Greenhouse
+API before trusting (no false positives). All apply/preview callers use it. **Lesson: resolve+verify the
+ATS from the API, never assume from the hostname.**
+
+### 13b. EDGE-CASE / SELF-AUDIT FIXES (probe-and-fix, high standard)
+- `_snap_label` was loose substring → 'No' matched 'Not applicable', 'India'→'Indiana'. Now whole-word/
+  phrase match (else None — never a wrong dropdown value). Verified with a probe suite.
+- **Required-empty** fields now flag needs_human + block auto-submit; **required non-resume file**
+  (cover letter) flagged too. **Submit button** tries several names; **resume upload** targets the
+  resume input (not the cover-letter slot).
+- **LIVE-APPLY GATE** (`config.LIVE_APPLY`, env `APPLYPILOT_LIVE`, default OFF): real submits are BLOCKED
+  while testing so we never fire a real app with dummy contact; preview always dummy; live submit uses
+  real contact. Fixed cache key (was full_name → stray folders; now slug).
+- **Multi-select** (`multi_value_multi_select`): pick multiple labels (country→US, experience→matching
+  skills); `Answer.values`; fill selects each.
+- **Non-Greenhouse fill** (`submit/generic_fill.py`): Lever/Ashby/Workable/custom have no questions API →
+  generic DOM filler does the universal fields (name/email/phone/links) + resume + screenshot; custom Qs
+  left for the recruiter (auto-submit disabled for schema-less forms). Verified on a live 15five (Lever).
+
+### 13c. FORM-ANSWER ENGINE — now 95-98% no-AI (audited on ~180 real forms)
+`tools/audit_forms.py` ran the engine over ~180 real forms across ~140 multi-industry boards.
+- Fixed the GRAVE dropdown bug (was typing raw option IDs like 163595155003 / '1'): the engine now
+  stores/selects the human LABEL for every select; never a non-option value (skips instead).
+- EEO/pronouns/gender/race/veteran/disability NEVER guessed → 'Decline to self-identify' (or candidate
+  pref); flagged if no decline option.
+- Deterministic handlers added from the audits: how-did-you-hear, country→US, preferred name,
+  (ever/prev/current) worked-at-X→No, age 18+→Yes, consent/privacy-notice→affirm, gov-official/PEP→No,
+  preferred office location, optional social links→blank, conditional 'If you answered...'→blank.
+  Location/city → candidate's real location (NEVER an AI-guessed city — caught 'Atlanta' for a Charlotte
+  candidate on a live Datadog form).
+- DOUBTS to recruiter are now only genuine required Qs the engine shouldn't guess (pronouns w/o decline,
+  contextual conditionals, candidate-specific multi-selects). Re-run the audit anytime.
+- L2 cache: do NOT cache company/role-specific answers ('why this company') — re-reason per job; only
+  generic recurring answers cache. (Was risking one company's "why" answer reused for another.)
+- **HOW ANSWERING WORKS:** facts (name/visa/salary) = profile (deterministic, no AI); 'why fit / why
+  company / free-text' = **Claude reasons** over resume + that JD + answer bank (composed, truthful, not
+  a template); sensitive/unknown = recruiter (flagged) or answer bank.
+
+### 13d. FULL BOARD CACHE (the firehose)
+`python -m src.run build-cache` swept ALL 15,533 seed boards → **255,946 jobs**, **8,625 LIVE boards**
+(Greenhouse 4,776 · Lever 1,669 · Ashby 2,180) → `seed/live_tokens.json`. Daily `--seed` then sweeps only
+live boards. `tools/crawl_candidate.py` = full live-board crawl → shortlist + jobs_cache + Excel (no
+upfront tailoring). NOTE: sweeping 8,625 boards with JD content takes ~10-15 min — run in the background
+without a `timeout` wrapper (a 10-min timeout killed it once).
+
+### 13e. MANIKANTA WORKSPACE (the user's main ask — DONE)
+A dedicated workspace + UI for Sai (and a general tool for anyone):
+- **General tailoring tool** = the ATS Resume Maker (`:8000`): upload any resume + paste any JD → golden
+  tailored resume + ATS score. (Unchanged, golden engine.)
+- **Sai specifically:** re-added from the OFFICIAL resume `Sai_Manikanta_Karnati_Resume.pdf` (50 skills).
+  **IMPORTANT FACT: Sai needs NO sponsorship** (`requires_sponsorship=False`, authorized) — corrected
+  mid-session; this also widened his pool (no sponsorship knockout).
+- Crawl (full cache, US-only, 14d, fit>=45) → **92 fresh US matches** with Match % + Days Ago.
+- **Excel** in `manikanta/sai_manikanta_job_matches.xlsx` (Match %, Days Ago, Sponsorship, Company, Link).
+- **Deliverables live in `manikanta/`** (Excel + `tailored_resumes/`); shared engine stays in `src/`.
+  `_workspace(slug)` → `manikanta/` for sai_manikanta, else `candidates/<slug>/deliverables/`.
+- **UI (dashboard → candidate):** all matches listed, **sortable Match% / Most Recent**, **Export Excel**.
+  Each job row:
+  - `↗ Open` (real posting)
+  - **📄 Tailored Resume** button → on click golden-tailors that JD (once, cached) → reveals **PDF** + **DOC**
+    download links + a `✓ tailored` marker (so you can tell which are done). Files are named after the
+    CANDIDATE (`Sai_Manikanta_Karnati_Resume.pdf` / `.docx`) — no 'tailored' in the name.
+  - **Status dropdown** (Not completed / Completed / Error, default Not completed) persisted to
+    `candidates/<slug>/app_status.json` → recruiter tracks each application.
+- Endpoints: `GET /api/clients/{slug}/tailor-now?url=&fmt=pdf|docx&prepare=` (caches structured golden
+  resume once, exports either format; re-fetches the JD if not in `jobs_cache.json`),
+  `GET /api/clients/{slug}/excel`, `POST /api/clients/{slug}/job-status?url=&status=`.
+- Bug fixed: `daily.py` was missing `import json` (crashed `_save_jobs_cache` at the END of the long
+  crawl — the shortlist had already saved). Also shortlist display cap 50→200 to show all ~100.
+
+### 13f. STILL TODO (priority)
+1. Daily **scheduling** (Task Scheduler) of `run-all --seed`; keep ATS engine + dashboard up.
+2. **Application tracker** is now partly here (per-job status) — extend to a funnel/CRM view + email loop.
+3. **Cover-letter generator** (would also let us auto-fill required cover-letter fields).
+4. Optimize the big crawl (sweep content=false → fetch content only for survivors) to cut the ~15 min.
+5. Likhitha (and other candidates) the same workspace treatment; bump Sai's match cap toward 100.
