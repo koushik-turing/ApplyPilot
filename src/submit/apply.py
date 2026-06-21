@@ -101,11 +101,21 @@ def fill_form(
                 continue
             q = next((qmap[fn] for fn in a.field_names if fn in qmap), None)
             is_select = bool(q and q.options)
-            # The answer stores the option *value/id*; the UI needs the *label*.
-            ui_value = a.value
+
+            label_value = a.value
             if is_select:
-                ui_value = next((o.get("label") for o in q.options
-                                 if str(o.get("value")) == str(a.value)), a.value)
+                # a.value should be the option LABEL. Verify it matches a real option;
+                # if it's a legacy value/id, map id->label. If it still isn't a valid
+                # option, SKIP — never type a raw id/garbage into a dropdown.
+                opt_labels = {str(o.get("label", "")).strip().lower(): o.get("label")
+                              for o in q.options}
+                if label_value.strip().lower() not in opt_labels:
+                    mapped = next((o.get("label") for o in q.options
+                                   if str(o.get("value")) == str(a.value)), None)
+                    label_value = mapped or label_value
+                if label_value.strip().lower() not in opt_labels:
+                    result["skipped"].append(a.label + " (no matching option)")
+                    continue
 
             placed = False
             for name in a.field_names:
@@ -114,9 +124,9 @@ def fill_form(
                     continue
                 try:
                     if is_select:
-                        placed = _select_option(page, el, ui_value)
+                        placed = _select_option(page, el, label_value)
                     else:
-                        el.fill(ui_value)
+                        el.fill(label_value)
                         placed = True
                 except Exception:
                     placed = False

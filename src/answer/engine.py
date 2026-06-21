@@ -65,6 +65,40 @@ def _yesno(q: FormQuestion, yes: bool) -> str | None:
     return _opt_value(q, "Yes" if yes else "No")
 
 
+# EEO / demographic questions — NEVER AI-guessed. Default to the "decline" option.
+_RE_EEO = re.compile(
+    r"gender|pronoun|\brace\b|ethnic|hispanic|latino|veteran|disabilit|"
+    r"sexual orientation|self.?identif|transgender", re.I)
+
+
+def _snap_label(q: FormQuestion, text: str) -> str | None:
+    """Return the OPTION LABEL matching `text` (exact, else case-insensitive, else
+    contains). None if no option matches — so we never put a non-option value in a select."""
+    if not q.options:
+        return text
+    t = str(text or "").strip().lower()
+    if not t:
+        return None
+    for o in q.options:
+        if str(o.get("label", "")).strip().lower() == t:
+            return o.get("label")
+    for o in q.options:
+        lab = str(o.get("label", "")).strip().lower()
+        if t in lab or lab in t:
+            return o.get("label")
+    return None
+
+
+def _decline_label(q: FormQuestion) -> str | None:
+    """The 'decline to self-identify' / 'prefer not to say' option label, if present."""
+    for o in q.options:
+        lab = str(o.get("label", "")).lower()
+        if any(k in lab for k in ("decline", "prefer not", "don't wish", "do not wish",
+                                  "not to answer", "wish not", "i don't want", "rather not")):
+            return o.get("label")
+    return None
+
+
 def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
     """Return a deterministic answer if this is a known hard field, else None."""
     label = q.label.lower()
@@ -90,19 +124,28 @@ def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
     if ("website" in label or "portfolio" in label):
         return mk(p.website)
 
-    # Hard immigration facts — NEVER AI-guessed. Flag for human if profile lacks the data.
+    # EEO / demographic — NEVER AI-guessed. Use candidate's stated pref, else "Decline".
+    if _RE_EEO.search(label):
+        pref = p.eeo.get(label) or p.eeo.get("default")
+        lab = (_snap_label(q, pref) if pref else None) or _decline_label(q)
+        if lab:
+            return mk(lab)
+        return mk("", conf=0.0, human=True)   # no decline option -> let a human handle it
+
+    # Hard immigration facts — NEVER AI-guessed. Store the LABEL (Yes/No), snapped to the
+    # form's actual option text. Flag for human if profile lacks the data.
     if "sponsorship" in label or ("visa" in label and "require" in label):
         v = p.work_auth.requires_sponsorship
         if v is None:
             return mk("", conf=0.0, human=True)
-        mapped = _yesno(q, v) if q.options else ("Yes" if v else "No")
-        return mk(mapped or ("Yes" if v else "No"))
+        ans = "Yes" if v else "No"
+        return mk(_snap_label(q, ans) or ans if q.options else ans)
     if "authorized to work" in label or "legally authorized" in label:
         v = p.work_auth.authorized_us
         if v is None:
             return mk("", conf=0.0, human=True)
-        mapped = _yesno(q, v) if q.options else ("Yes" if v else "No")
-        return mk(mapped or ("Yes" if v else "No"))
+        ans = "Yes" if v else "No"
+        return mk(_snap_label(q, ans) or ans if q.options else ans)
 
     # Compensation
     if "salary" in label or "compensation" in label or "desired pay" in label:
@@ -186,12 +229,19 @@ return the exact option label.
                       source=AnswerSource.CLAUDE, confidence=0.0, needs_human=True)
 
     value = ans_text
-    if q.options:  # map chosen label back to its option value/id
-        mapped = _opt_value(q, ans_text)
-        value = mapped if mapped is not None else ans_text
+    needs_human = conf < 0.5
+    if q.options:
+        # store the OPTION LABEL (snapped to a real choice) — never a raw value/id, and
+        # never free text that isn't an option. If Claude's answer isn't a valid option,
+        # flag for a human rather than guessing.
+        snapped = _snap_label(q, ans_text)
+        if snapped is None:
+            value, needs_human = "", True
+        else:
+            value = snapped
     return Answer(label=q.label, field_names=q.field_names, value=value,
                   source=AnswerSource.CLAUDE, confidence=conf,
-                  needs_human=conf < 0.5 or q.required and not value)
+                  needs_human=needs_human or (q.required and not value))
 
 
 # ---------------- Orchestration ----------------
@@ -216,22 +266,22 @@ def answer_form(job: Job, profile: Profile, candidate: str,
             sheet.answers.append(a)
             continue
 
-        # L2 — cached recurring answer
+        # L2 — cached recurring answer (cache stores the LABEL; snap to a valid option)
         key = _cache_key(q.label)
         if key in cache and cache[key]:
             val = cache[key]
             if q.options:
-                val = _opt_value(q, val) or val
-            sheet.answers.append(Answer(label=q.label, field_names=q.field_names,
-                                        value=val, source=AnswerSource.CACHE, confidence=0.9))
-            continue
+                val = _snap_label(q, val)
+            if val:
+                sheet.answers.append(Answer(label=q.label, field_names=q.field_names,
+                                            value=val, source=AnswerSource.CACHE, confidence=0.9))
+                continue
 
         # L3 — Claude reasoning for new/free-text
         a = _l3_answer(q, profile, job)
         sheet.answers.append(a)
-        if a.value and a.confidence >= 0.7:   # remember confident free-text answers
-            cache[key] = next((o["label"] for o in q.options
-                               if str(o.get("value")) == a.value), a.value)
+        if a.value and a.confidence >= 0.7:   # remember confident answers (as the label)
+            cache[key] = a.value
 
     _save_cache(candidate, cache)
     if test_mode:
