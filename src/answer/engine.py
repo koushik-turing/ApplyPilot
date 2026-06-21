@@ -266,19 +266,16 @@ return the exact option label.
                       source=AnswerSource.CLAUDE, confidence=0.0, needs_human=True)
 
     value = ans_text
-    needs_human = conf < 0.5
     if q.options:
         # store the OPTION LABEL (snapped to a real choice) — never a raw value/id, and
-        # never free text that isn't an option. If Claude's answer isn't a valid option,
-        # flag for a human rather than guessing.
+        # never free text that isn't an option.
         snapped = _snap_label(q, ans_text)
-        if snapped is None:
-            value, needs_human = "", True
-        else:
-            value = snapped
+        value = snapped if snapped is not None else ""
+    # Raise a DOUBT for the recruiter only when a REQUIRED question can't be answered
+    # confidently. Optional fields we can't fill are just left blank (not a doubt).
+    needs_human = bool(q.required) and (not value or conf < 0.5)
     return Answer(label=q.label, field_names=q.field_names, value=value,
-                  source=AnswerSource.CLAUDE, confidence=conf,
-                  needs_human=needs_human or (q.required and not value))
+                  source=AnswerSource.CLAUDE, confidence=conf, needs_human=needs_human)
 
 
 # ---------------- Orchestration ----------------
