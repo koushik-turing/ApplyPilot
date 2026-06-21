@@ -8,6 +8,7 @@ select-skips / low-confidence / doubts.
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from collections import Counter
@@ -24,13 +25,43 @@ from src.models import Job, FormQuestion
 from src.profile.complete import load_profile
 from src.answer.engine import answer_form
 
-# Boards known to have live jobs + rich forms (mix of domains).
-BOARDS = ["affirm", "stripe", "databricks", "anthropic", "gitlab", "discord", "robinhood",
-          "coinbase", "airtable", "instacart", "doordash", "reddit", "plaid", "brex",
-          "scaleai", "ramp", "figma", "notion", "asana", "datadog"]
+# Broad, multi-industry board list + a sample from the seed lists for variety.
+_CURATED = [
+    # fintech / finance
+    "affirm", "stripe", "robinhood", "coinbase", "plaid", "brex", "ramp", "sofi", "chime",
+    "marqeta", "mercury", "gusto", "betterment", "wealthsimple",
+    # data / dev / infra
+    "databricks", "snowflake", "datadog", "gitlab", "hashicorp", "confluent", "cockroachlabs",
+    "temporal", "fivetran", "vercel", "retool", "cribl", "samsara", "benchling",
+    # ai
+    "anthropic", "openai", "scaleai", "huggingface", "cohere", "runwayml",
+    # consumer / marketplace
+    "discord", "reddit", "instacart", "doordash", "airtable", "notion", "asana", "figma",
+    "duolingo", "grammarly", "faire", "whatnot", "warbyparker", "thredup",
+    # hr / ops / saas
+    "rippling", "deel", "lattice", "webflow", "zapier", "calendly", "loom",
+    # health
+    "oscar", "devoted", "included-health", "hims", "ro",
+]
 
-FORMS_TARGET = 70
-ANSWER_SAMPLE = 12          # how many forms to run the full answer engine on
+FORMS_TARGET = 180
+ANSWER_SAMPLE = 25          # how many forms to run the full answer engine on
+SEED_SAMPLE = 60            # extra boards sampled from the seed list for variety
+
+
+def _boards() -> list[str]:
+    out = list(dict.fromkeys(_CURATED))
+    try:
+        seed = json.loads((Path(__file__).resolve().parent.parent / "seed" /
+                           "greenhouse_companies.json").read_text(encoding="utf-8"))
+        step = max(1, len(seed) // SEED_SAMPLE)
+        out += [seed[i] for i in range(0, len(seed), step)]
+    except Exception:
+        pass
+    return list(dict.fromkeys(out))
+
+
+BOARDS = None  # set in main()
 
 
 def categorize(q: FormQuestion) -> str:
@@ -60,11 +91,11 @@ def categorize(q: FormQuestion) -> str:
     return "free_text_short"
 
 
-def gather_forms(target: int) -> list[Job]:
+def gather_forms(boards: list[str], target: int) -> list[Job]:
     c = GreenhouseClient()
     forms: list[Job] = []
     try:
-        for board in BOARDS:
+        for board in boards:
             if len(forms) >= target:
                 break
             try:
@@ -90,8 +121,9 @@ def gather_forms(target: int) -> list[Job]:
 
 
 def main():
-    print("Gathering real job forms...", flush=True)
-    forms = gather_forms(FORMS_TARGET)
+    boards = _boards()
+    print(f"Gathering real job forms from {len(boards)} boards...", flush=True)
+    forms = gather_forms(boards, FORMS_TARGET)
     print(f"\nGathered {len(forms)} forms.\n")
 
     # ---- Phase 1: question-type frequency across ALL forms ----
@@ -123,35 +155,34 @@ def main():
     print("\n" + "=" * 64)
     print(f"ANSWER-ENGINE RUN on {ANSWER_SAMPLE} forms (candidate: {prof.full_name}):")
     src_counter: Counter = Counter()
-    needs_human: list[str] = []
-    skipped_selects: list[str] = []
-    low_conf: list[str] = []
+    doubts: Counter = Counter()            # distinct REQUIRED questions flagged needs_human
+    claude_qs: Counter = Counter()         # distinct questions that fell to Claude (L3)
     for job in forms[:ANSWER_SAMPLE]:
         try:
             sheet = answer_form(job, prof, "Sai Manikanta")
         except Exception as e:
             print(f"  [{job.board}] answer_form FAILED: {type(e).__name__}")
             continue
-        qmap = {a.label: q for q in job.questions for a in [type("o", (), {"label": q.label})()]}
         for a in sheet.answers:
             src_counter[a.source.value] += 1
-            q = next((qq for qq in job.questions if qq.label == a.label), None)
-            is_sel = bool(q and q.options)
+            lab = re.sub(r"\s+", " ", a.label.strip())[:70]
             if a.needs_human:
-                needs_human.append(f"[{job.board}] {a.label.strip()[:60]}")
-            elif is_sel and not a.value:
-                skipped_selects.append(f"[{job.board}] {a.label.strip()[:60]}")
-        print(f"  [{job.board}] {job.title[:34]}: {len(sheet.answers)} Qs, "
-              f"needs_human={sum(1 for a in sheet.answers if a.needs_human)}", flush=True)
+                doubts[lab] += 1
+            if a.source.value == "claude":
+                claude_qs[lab] += 1
+        print(f"  [{job.board}] {job.title[:30]}: {len(sheet.answers)} Qs, "
+              f"doubts={sum(1 for a in sheet.answers if a.needs_human)}", flush=True)
 
     print("\nANSWER SOURCES:", dict(src_counter))
-    print(f"\nNEEDS-HUMAN (doubts to raise to recruiter) — {len(needs_human)}:")
-    for x in needs_human[:30]:
-        print(f"  ? {x}")
-    if skipped_selects:
-        print(f"\nSELECTS WITH NO ANSWER — {len(skipped_selects)}:")
-        for x in skipped_selects[:20]:
-            print(f"  - {x}")
+    tot = sum(src_counter.values()) or 1
+    print(f"  -> {100*(src_counter['deterministic']+src_counter['cache'])/tot:.0f}% no-AI, "
+          f"{100*src_counter['claude']/tot:.0f}% Claude")
+    print(f"\nGENUINE DOUBTS to raise to recruiter (distinct required Qs) — {len(doubts)}:")
+    for lab, n in doubts.most_common(30):
+        print(f"  ?{n:>2}x  {lab}")
+    print(f"\nQUESTIONS THAT FELL TO CLAUDE (candidates for new deterministic handlers) — {len(claude_qs)}:")
+    for lab, n in claude_qs.most_common(30):
+        print(f"  {n:>2}x  {lab}")
 
 
 if __name__ == "__main__":
