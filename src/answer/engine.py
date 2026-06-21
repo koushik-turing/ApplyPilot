@@ -270,6 +270,17 @@ def _cache_key(label: str) -> str:
     return re.sub(r"\s+", " ", label.strip().lower())
 
 
+# Questions whose answer depends on THIS company/role — never cache/reuse across jobs.
+_RE_COMPANY_SPECIFIC = re.compile(
+    r"\bwhy\b|this (role|company|position|team|job|opportunity)|interest(ed)? in|"
+    r"excites? you|drawn to|this organi[sz]ation|join (us|our|the team)|"
+    r"about (us|this)|cover letter", re.I)
+
+
+def _is_company_specific(q: FormQuestion) -> bool:
+    return bool(_RE_COMPANY_SPECIFIC.search(q.label))
+
+
 # ---------------- L3: Claude reasoning for free-text ----------------
 
 L3_SYSTEM = (
@@ -348,9 +359,10 @@ def answer_form(job: Job, profile: Profile, candidate: str,
             sheet.answers.append(a)
             continue
 
-        # L2 — cached recurring answer (cache stores the LABEL; snap to a valid option)
+        # L2 — cached recurring answer (cache stores the LABEL; snap to a valid option).
+        # Skip the cache for company/role-specific questions — those are re-reasoned per job.
         key = _cache_key(q.label)
-        if key in cache and cache[key]:
+        if key in cache and cache[key] and not _is_company_specific(q):
             val = cache[key]
             if q.options:
                 val = _snap_label(q, val)
@@ -362,7 +374,10 @@ def answer_form(job: Job, profile: Profile, candidate: str,
         # L3 — Claude reasoning for new/free-text
         a = _l3_answer(q, profile, job)
         sheet.answers.append(a)
-        if a.value and a.confidence >= 0.7:   # remember confident answers (as the label)
+        # Cache only GENERIC, company-agnostic answers. Company/role-specific free-text
+        # ("why this company/role", cover-letter style) must be re-reasoned per job, never
+        # reused across companies.
+        if a.value and a.confidence >= 0.7 and not _is_company_specific(q):
             cache[key] = a.value
 
     _save_cache(candidate, cache)
