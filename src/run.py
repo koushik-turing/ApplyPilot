@@ -20,7 +20,7 @@ from pathlib import Path
 
 from . import config
 from .answer.engine import answer_form
-from .discover.ats_client import GreenhouseClient, parse_greenhouse_url
+from .discover.ats_client import GreenhouseClient, resolve_greenhouse
 from .models import Job, FormQuestion
 from .profile.complete import complete_profile, load_profile
 from .profile.parse import parse_resume, save_profile, read_pdf_text
@@ -56,7 +56,7 @@ def cmd_complete(args):
 
 
 def _fetch_job(url: str) -> Job:
-    parsed = parse_greenhouse_url(url)
+    parsed = resolve_greenhouse(url)
     if not parsed:
         raise SystemExit(f"Could not parse board/job_id from URL: {url}\n"
                          "Only Greenhouse URLs are supported so far.")

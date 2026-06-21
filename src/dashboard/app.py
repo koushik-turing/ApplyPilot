@@ -238,10 +238,10 @@ def download_resume(slug: str, fname: str, fmt: str = "pdf"):
 def _gen_answers(slug: str, url: str) -> list[dict]:
     """Best-effort: generate the form answers for a job (Greenhouse) for review/edit."""
     try:
-        from ..discover.ats_client import GreenhouseClient, parse_greenhouse_url
+        from ..discover.ats_client import GreenhouseClient, resolve_greenhouse
         from ..models import Job, FormQuestion
         from ..answer.engine import answer_form
-        parsed = parse_greenhouse_url(url)
+        parsed = resolve_greenhouse(url)
         if not parsed:
             return []
         board, job_id = parsed
@@ -311,10 +311,10 @@ def save_application(slug: str, fname: str, payload: dict):
 
 def _build_job_and_sheet(slug: str, r: dict, *, test_mode: bool = True):
     """Fetch the live Greenhouse form, build the answer sheet, and apply recruiter edits."""
-    from ..discover.ats_client import GreenhouseClient, parse_greenhouse_url
+    from ..discover.ats_client import GreenhouseClient, resolve_greenhouse
     from ..models import Job, FormQuestion
     from ..answer.engine import answer_form
-    parsed = parse_greenhouse_url(r.get("url", ""))
+    parsed = resolve_greenhouse(r.get("url", ""))
     if not parsed:
         return None, None
     board, job_id = parsed

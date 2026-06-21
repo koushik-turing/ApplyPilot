@@ -123,6 +123,56 @@ def parse_greenhouse_url(url: str) -> tuple[str, str] | None:
     return None
 
 
+def _extract_job_id(url: str) -> str | None:
+    """A Greenhouse job id from any URL: gh_jid=, or a long numeric path segment."""
+    m = re.search(r"[?&]gh_jid=(\d+)", url)
+    if m:
+        return m.group(1)
+    nums = re.findall(r"/(\d{5,})(?=/|$|\?|#)", url)
+    return nums[-1] if nums else None
+
+
+def _candidate_boards(url: str) -> list[str]:
+    """Likely Greenhouse board tokens from a custom-domain URL (e.g. stripe.com -> 'stripe',
+    careers.brex.com -> 'brex'). We verify each against the API before trusting it."""
+    from urllib.parse import urlparse
+    host = urlparse(url).netloc.lower().split(":")[0]
+    if not host:
+        return []
+    drop = {"www", "jobs", "careers", "boards", "apply", "job-boards", "recruiting",
+            "talent", "work", "job-boards-api", "eu"}
+    labels = [p for p in host.split(".") if p not in drop]
+    if len(labels) >= 2:                      # drop the TLD (.com/.io/.ai/...)
+        labels = labels[:-1]
+    return [l for l in dict.fromkeys(labels)
+            if l and l not in ("greenhouse", "lever", "ashbyhq", "workable")]
+
+
+def resolve_greenhouse(url: str, *, client: httpx.Client | None = None) -> tuple[str, str] | None:
+    """Resolve ANY url to (board, job_id) if it's Greenhouse-backed — including custom domains
+    (stripe.com, brex.com/careers, ...). Verifies candidate board tokens against the public API
+    so we never false-positive. Returns None for genuinely non-Greenhouse sites."""
+    direct = parse_greenhouse_url(url)
+    if direct:
+        return direct
+    job_id = _extract_job_id(url)
+    if not job_id:
+        return None
+    own = client or httpx.Client(timeout=8.0, headers={"User-Agent": "job-portal/1.0"})
+    try:
+        for board in _candidate_boards(url):
+            try:
+                r = own.get(f"{GREENHOUSE_BASE}/{board}/jobs/{job_id}")
+                if r.status_code == 200 and str(r.json().get("id", "")) == str(job_id):
+                    return board, job_id
+            except Exception:
+                continue
+    finally:
+        if client is None:
+            own.close()
+    return None
+
+
 if __name__ == "__main__":
     # Live smoke test — reads a real job's application form via the public API.
     client = GreenhouseClient()
