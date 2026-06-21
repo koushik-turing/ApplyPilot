@@ -187,12 +187,15 @@ def client_detail(slug: str):
     d = config.CANDIDATES_DIR / slug
     if not (d / "profile.json").exists():
         raise HTTPException(404, "unknown client")
+    from ..discover.usfilter import is_us
     prof = _read_json(d / "profile.json") or {}
     tailored = []
     tdir = d / "tailored"
     if tdir.exists():
         for f in sorted(tdir.glob("*.json")):
             r = _read_json(f) or {}
+            if not is_us(r.get("location", "")):
+                continue                                  # US-only: hide stale non-US jobs
             tailored.append({
                 "title": r.get("title"), "url": r.get("url"),
                 "fit_score": r.get("fit_score"), "score_before": r.get("score_before"),
@@ -208,7 +211,7 @@ def client_detail(slug: str):
                     ("full_name", "email", "location", "years_experience", "skills",
                      "target_titles", "work_auth", "desired_salary", "answer_bank",
                      "apply_mode", "auto_min_match")},
-        "shortlist": _read_shortlist(d)[:50],
+        "shortlist": [j for j in _read_shortlist(d) if is_us(j.get("location", ""))][:50],
         "tailored": tailored,
     }
 
@@ -365,6 +368,10 @@ def fill_application(slug: str, fname: str, submit: bool = False):
     job, sheet = _build_job_and_sheet(slug, r)
     if job is None:
         raise HTTPException(422, "Only Greenhouse forms can be auto-filled/previewed right now.")
+    # HARD US-ONLY GUARD: never fill/submit a non-US job (even stale ones from old runs).
+    from ..discover.usfilter import is_us
+    if not is_us(job.location):
+        raise HTTPException(422, f"This job is not in the USA ({job.location}). We only apply to US jobs.")
     resume_pdf = _tailored_pdf(slug, r, fname) or ""
     sdir = config.CANDIDATES_DIR / slug / "screenshots"
     result = fill_form(job, sheet, resume_pdf, submit=submit, headless=True, screenshot_dir=sdir)
