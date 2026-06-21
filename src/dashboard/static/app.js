@@ -164,9 +164,10 @@ function renderShortlist() {
   const spons = (s, n) => s === "yes" ? `<span class="gold-pill">H-1B ✓ (${n})</span>`
                         : s === "no" ? `<span class="warn-pill">no H-1B</span>`
                         : `<span style="color:#9ca3af">H-1B ?</span>`;
-  const dtag = (j) => { const n = da(j); return n === 999 ? `<span class="daytag">unknown</span>`
-    : n === 0 ? `<span class="daytag today">today</span>` : `<span class="daytag">${n}d ago</span>`; };
-  const html = `<table><thead><tr><th>Match</th><th>Verdict</th><th>Sponsorship</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th></tr></thead><tbody>${
+  const dtag = (j) => { const n = da(j); const d = j.posted_on ? ` <span class="muted">(${j.posted_on})</span>` : "";
+    return n === 999 ? `<span class="daytag">unknown</span>`
+    : n === 0 ? `<span class="daytag today">today</span>${d}` : `<span class="daytag">${n}d ago</span>${d}`; };
+  const html = `<table><thead><tr><th>Match</th><th>Verdict</th><th>Sponsorship</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th><th>Verify</th></tr></thead><tbody>${
     rows.map(j => `
       <tr>
         <td class="fit ${j.match>=75?"hi":j.match>=60?"mid":"lo"}">${Math.round(j.match)}%</td>
@@ -176,7 +177,8 @@ function renderShortlist() {
         <td><a class="joblink" href="${j.url}" target="_blank">${j.title}</a>
           ${j.strengths ? `<div class="changes">✓ ${j.strengths}</div>` : ""}
           ${j.gaps ? `<div class="changes" style="color:#b45309">△ ${j.gaps}</div>` : ""}</td>
-        <td>${j.company}</td>
+        <td>${j.company}${j.location ? `<div class="muted" style="font-size:11px">${j.location}</div>` : ""}</td>
+        <td><a class="btn sm" href="${j.url}" target="_blank">↗ Open job</a></td>
       </tr>`).join("")}</tbody></table>`;
   $("#shortlistTable").innerHTML = rows.length ? html : `<p style="color:#6b7280">No matches yet — click “Run daily”.</p>`;
 }
