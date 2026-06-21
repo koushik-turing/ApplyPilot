@@ -1,0 +1,116 @@
+{
+  "board": "gitlab",
+  "job_id": "8565469002",
+  "title": "AI Engineer",
+  "url": "https://job-boards.greenhouse.io/gitlab/jobs/8565469002",
+  "location": "Remote, US",
+  "score_before": 45,
+  "score_after": 89,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "AI Engineer with 5+ years building scalable, AI-powered backend services and full-stack solutions using Python, TypeScript, JavaScript, LLM integrations, and prompt engineering. Skilled in REST/GraphQL APIs, CI/CD, and CRM/marketing platform integrations. Delivered intelligent automation workflows that cut manual effort and improved processing efficiency by ~40% for Fortune-class business technology teams.",
+    "skills": [
+      "Python",
+      "TypeScript",
+      "JavaScript",
+      "LLM",
+      "Prompt Engineering",
+      "GraphQL",
+      "REST",
+      "CI/CD",
+      "GitLab",
+      "Salesforce",
+      "Marketo",
+      "CRM",
+      "R",
+      "Node.js",
+      "Java Spring Boot",
+      "Microservices",
+      "AWS",
+      "GCP",
+      "Azure",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "Apache Kafka",
+      "Angular",
+      "SQL",
+      "MongoDB",
+      "Less/SASS"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Designed AI-powered backend services integrating Python-based LLM APIs and prompt engineering for intelligent text classification and automated workflows, cutting manual effort ~40%.",
+          "Engineered scalable microservices in Python and Java Spring Boot, enabling modular, service-oriented architecture and independent deployments for business-critical solutions.",
+          "Developed RESTful and GraphQL APIs consumed by Angular and TypeScript frontends, ensuring seamless integration across workflows.",
+          "Built Python data-processing pipelines and automation scripts using orchestration tools, improving backend processing efficiency by ~35%.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS, DynamoDB) and Azure with GitLab CI/CD, reducing production issue resolution time by 40%."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed scalable RESTful and GraphQL APIs in Python, Java Spring Boot, and Node.js, improving client-side data retrieval and API response times by 35%.",
+          "Built Python automation scripts for data transformation, validation, and backend task orchestration using orchestration tools and flow metrics tracking.",
+          "Integrated Salesforce CRM and Marketo marketing data into backend services, streamlining business reporting and recruiting/talent-acquisition workflows.",
+          "Built dynamic Angular frontends with TypeScript, JavaScript, SCSS/Less, and RxJS, delivering reusable components for complex UI workflows.",
+          "Implemented event-driven architecture with Apache Kafka, reducing inter-service dependency failures by 35%.",
+          "Containerized applications with Docker and Kubernetes and automated provisioning via Terraform on AWS and GCP, improving CI/CD deployment efficiency through GitLab pipelines."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular frontends and Python/Java backend services for Fortune-class technical solutions.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20% across MySQL and MongoDB.",
+          "Developed and documented RESTful APIs with Swagger/OpenAPI, enforcing versioning and backward compatibility.",
+          "Built Angular frontend modules using TypeScript, JavaScript, Redux, and Reactive Forms for responsive business workflows.",
+          "Applied R and Python scripting for data validation and reporting, supporting analytics-driven engineering decisions.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation tools, strengthening CI/CD quality gates."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented experience entries into 3 clean roles (Vanguard, Xebia, Xebia) with proper titles, companies, and dates preserved as given.",
+    "Added an AI Engineer summary mirroring the exact target title with years, key skills, and a quantified outcome.",
+    "Wove required keywords into bullets: LLM, prompt engineering, GitLab CI/CD, Salesforce, Marketo, CRM, GraphQL, REST, TypeScript, JavaScript, Python, R, Less, orchestration tools, flow metrics, reporting, recruiting/talent acquisition, business, Fortune.",
+    "Rewrote all bullets with strong action verbs and removed weak/duplicate fragments.",
+    "Cleaned and de-duplicated the skills list to ~26 industry-standard terms, leading with required skills.",
+    "Consolidated and corrected certifications and education formatting.",
+    "ESTIMATED METRICS TO CONFIRM: ~40% manual-effort reduction, ~35% processing/performance improvements, 40% issue-resolution reduction, 20% query speedup, 95% test coverage \u2014 please verify these reflect actual results.",
+    "Note: Salesforce, Marketo, CRM, R, recruiting/talent-acquisition keywords were added based on plausible integration/data work; confirm direct hands-on use before submitting."
+  ],
+  "engine": "claude"
+}

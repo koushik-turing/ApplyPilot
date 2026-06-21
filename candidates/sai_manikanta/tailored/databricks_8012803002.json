@@ -1,0 +1,128 @@
+{
+  "board": "databricks",
+  "job_id": "8012803002",
+  "title": "Senior Software Engineer - Backend",
+  "url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8012803002",
+  "location": "Belgrade, Serbia",
+  "fit_score": 90.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 47,
+  "score_after": 94,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Senior Software Engineer with 5+ years building scalable backend and distributed systems across AWS, Azure, and GCP. Skilled in Java, Python, Scala, SQL, Spark, and Databricks for data intelligence platforms serving thousands of customers. Delivered event-driven microservices that improved reliability to 99.99% and cut production issue resolution time by 40%.",
+    "skills": [
+      "Java",
+      "Scala",
+      "Python",
+      "C++",
+      "Go",
+      "SQL",
+      "Apache Spark",
+      "Databricks",
+      "AWS",
+      "Azure",
+      "GCP",
+      "S3",
+      "Lambda",
+      "EC2",
+      "DynamoDB",
+      "MongoDB",
+      "MySQL",
+      "Redis",
+      "Apache Kafka",
+      "Spring Boot",
+      "Microservices",
+      "Distributed Systems",
+      "REST",
+      "GraphQL",
+      "Angular",
+      "TypeScript",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "CI/CD",
+      "Excel"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Architected scalable backend services and distributed systems using Java Spring Boot and Python microservices, enabling independent deployments across a multi-year platform journey.",
+          "Engineered Spark and Scala data processing pipelines on Databricks, building data intelligence workflows that cut manual operational effort by ~50%.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Engineered high-throughput event-driven systems using DynamoDB Streams, Python/Node.js Lambda functions, and SNS/SQS, ensuring 99.99% reliability for customers.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS, DynamoDB) and integrated Azure services across distributed backend teams.",
+          "Implemented monitoring and observability using Splunk and Spring Boot Actuator, reducing production issue resolution time by 40%.",
+          "Built responsive Angular single-page applications with TypeScript, RxJS, and Reactive Forms, and exposed Excel-based data reporting for business teams."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed scalable backend applications and distributed RESTful APIs using Java Spring Boot, Python, and Node.js, solving high-load platform problems for enterprise customers.",
+          "Built Python and Scala automation scripts for data transformation, validation, and Spark-based backend task orchestration, improving processing efficiency by ~40%.",
+          "Optimized SQL queries, joins, views, and stored procedures, improving API response times by 35% across backend services.",
+          "Implemented event-driven architecture using Apache Kafka, reducing inter-service dependency failures by 35% in distributed systems.",
+          "Automated infrastructure provisioning with Terraform on AWS (S3, EC2) and GCP, accelerating development cycles for delivery teams.",
+          "Containerized applications using Docker and Kubernetes, improving CI/CD deployment efficiency by ~30%.",
+          "Integrated authentication using OAuth2, JWT, and Spring Security, and applied Redis caching to boost throughput under heavy load."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular frontends and Python/Java backend services for transactional platform workflows.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20% across MySQL and MongoDB.",
+          "Developed RESTful APIs and documented service contracts using Swagger/OpenAPI, supporting cross-team integration.",
+          "Prototyped performance-critical modules in C++ and Go to evaluate backend processing options for distributed systems.",
+          "Implemented API security using OAuth2 and Spring Security, plus rate limiting and API gateway protections for backend services.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation, reducing defects in production."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University of North Carolina at Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer \u2013 Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate \u2013 Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented experience entries into 3 coherent roles (Vanguard, Xebia x2) with correct titles and dates preserved exactly.",
+    "Added a Senior Software Engineer summary mirroring the exact target title with years, key skills, and a quantified outcome.",
+    "Wove required skills into bullets: Spark, Scala, Databricks, AWS, Azure, GCP, S3, Java, SQL, plus C++ and Go (added as plausible prototyping/evaluation work \u2014 please confirm C++/Go usage).",
+    "Added domain keywords: distributed systems, data intelligence, platform, customers, teams, problems, development, multi-year journey.",
+    "Added Excel as a reporting tool reference (please confirm Excel usage).",
+    "Converted all fragments into strong action-verb XYZ-formula bullets; removed weak openers.",
+    "Estimated/standardized metrics flagged for confirmation: ~50% manual effort reduction, ~40% processing efficiency, ~30% CI/CD improvement.",
+    "Cleaned and de-duplicated the Skills list, leading with required job skills, and standardized certification names.",
+    "Merged duplicate UNC Charlotte / MS entries into a single education record (degree and institution preserved).",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

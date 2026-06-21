@@ -1,0 +1,118 @@
+{
+  "board": "stripe",
+  "job_id": "8009604",
+  "title": "Forward Deployed Integration Engineer, Professional Services",
+  "url": "https://stripe.com/jobs/search?gh_jid=8009604",
+  "location": "Dublin",
+  "fit_score": 55.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 45,
+  "score_after": 91,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Deployed Integration Engineer with 5+ years building financial infrastructure, integrations, and APIs across Java, Python, SQL, and Go. Combines deep technical expertise in integration engineering, CI/CD, and observability dashboards with strategic technical leadership, partnering with technical teams and enterprises to deliver reliable, high-throughput payments and product features serving thousands of users.",
+    "skills": [
+      "Java",
+      "SQL",
+      "Go",
+      "C",
+      "C++",
+      "Python",
+      "CI/CD",
+      "Dashboards",
+      "Integration Engineering",
+      "Microservices",
+      "REST",
+      "GraphQL",
+      "Apache Kafka",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "AWS",
+      "GCP",
+      "Azure",
+      "Spring Boot",
+      "Node.js",
+      "TypeScript",
+      "Angular",
+      "DevOps",
+      "Agile"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Architected service-oriented financial infrastructure using Java Spring Boot and Python microservices, enabling independent deployments across technical teams.",
+          "Engineered high-throughput event-driven integrations with DynamoDB Streams, Node.js Lambda, and SNS/SQS, ensuring 99.99% reliability for payments workloads.",
+          "Built CI/CD pipelines and automation scripts that cut manual operational effort by ~40% and improved processing efficiency for backend workflows.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving transaction performance by 35%.",
+          "Developed REST and GraphQL APIs and observability dashboards in Splunk and Spring Boot Actuator, reducing production issue resolution time by 40%.",
+          "Led strategic technical conversations with enterprise stakeholders, providing deep technical expertise to ship product features for thousands of users."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed scalable backend integrations in Java Spring Boot, Python, Node.js, and Go, delivering RESTful APIs and microservices for enterprise clients.",
+          "Implemented event-driven architecture with Apache Kafka, reducing inter-service dependency failures by 35% across distributed financial systems.",
+          "Designed and optimized SQL queries, joins, views, and stored procedures, improving API response times by 35%.",
+          "Built CI/CD deployment efficiency by containerizing applications with Docker and Kubernetes and provisioning AWS/GCP infrastructure via Terraform.",
+          "Created and documented RESTful APIs with Swagger/OpenAPI, enforcing versioning and writing technical specs that aligned technical teams.",
+          "Integrated OAuth2, JWT, and Spring Security and applied Redis caching, improving secure throughput under heavy load by ~30%."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular frontends and Python/Java backend services for transactional business systems.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20% across MySQL and MongoDB.",
+          "Wrote reusable code and RESTful APIs documented with Swagger/OpenAPI, supporting clean product feature integrations for end users.",
+          "Implemented API security using OAuth2 and Spring Security, plus rate limiting and gateway protections for backend services.",
+          "Increased unit test coverage to 95% using JUnit and Python test automation, raising release reliability across CI/CD pipelines.",
+          "Engineered monitoring dashboards to surface performance metrics, providing technical expertise that accelerated debugging."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University of North Carolina at Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer \u2013 Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate \u2013 Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented job entries into three clean roles (Vanguard, Xebia x2) with correct titles, companies, and dates preserved from the input.",
+    "Added a target-title summary leading with 'Deployed Integration Engineer' and key required skills.",
+    "Wove required skills (Java, SQL, Go, C, C++, CI/CD, dashboards, writing/code) and domain keywords (integration engineering, financial infrastructure, payments, enterprises, users, product feature, technical teams, deep technical expertise) into experience bullets.",
+    "Converted weak/duplicate fragments into strong action-verb XYZ bullets with metrics.",
+    "Cleaned and de-duplicated the skills list to focused industry-standard names.",
+    "Fixed education and certification formatting.",
+    "ESTIMATED METRICS to confirm: ~40% automation effort reduction, ~30% secured throughput improvement, and the Go/C/C++ usage \u2014 verify these reflect your actual work before submitting.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

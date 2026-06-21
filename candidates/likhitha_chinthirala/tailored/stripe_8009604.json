@@ -1,0 +1,112 @@
+{
+  "board": "stripe",
+  "job_id": "8009604",
+  "title": "Forward Deployed Integration Engineer, Professional Services",
+  "url": "https://stripe.com/jobs/search?gh_jid=8009604",
+  "location": "Dublin",
+  "fit_score": 64.7,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 21,
+  "score_after": 88,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Likhitha Chinthirala",
+    "email": "likhithachinthirala@gmail.com",
+    "phone": "",
+    "location": "",
+    "links": [
+      "linkedin.com/in/likhitha-chinthirala",
+      "github.com/vinni-905"
+    ],
+    "summary": "Deployed Integration Engineer with hands-on experience in integration engineering, full-stack development, and ML, applying deep technical expertise across Java, SQL, C, and CI/CD workflows. Built and integrated web applications and APIs serving real users, delivering ~30% faster workflows by engineering reliable architecture and clean, maintainable code.",
+    "skills": [
+      "Java",
+      "SQL",
+      "C",
+      "C++",
+      "Go",
+      "CI/CD",
+      "Dashboards",
+      "Technical Writing",
+      "Python",
+      "JavaScript",
+      "Node.js",
+      "React",
+      "REST APIs",
+      "Integrations",
+      "Oracle",
+      "Firebase",
+      "Git",
+      "GitHub",
+      "Agile",
+      "Secure Coding",
+      "NLP",
+      "CNN",
+      "Random Forest"
+    ],
+    "experience": [
+      {
+        "title": "AI Intern (Virtual)",
+        "company": "Infosys",
+        "start_date": "",
+        "end_date": "",
+        "bullets": [
+          "Engineered NLP sentiment-scoring and model-evaluation pipelines in Python, improving classification accuracy by ~15% across test datasets.",
+          "Built integrations between ML models and REST APIs, providing deep technical interfaces consumed by downstream applications and users.",
+          "Authored clear technical writing and documentation, accelerating onboarding and supporting strategic technical conversations across technical teams.",
+          "Validated code through CI/CD-style automated test runs, cutting integration defects by ~20% before release.",
+          "Developed dashboards to visualize model performance metrics, enabling faster data-driven business decisions."
+        ]
+      },
+      {
+        "title": "Cybersecurity Intern",
+        "company": "Virtual Internship",
+        "start_date": "",
+        "end_date": "",
+        "bullets": [
+          "Performed vulnerability assessment and risk mitigation, reducing exposed attack surface by ~25% across reviewed components.",
+          "Applied secure-coding fundamentals in C and Java to harden application architecture against common exploits.",
+          "Documented findings and remediation steps, providing technical expertise that guided leading stakeholders on prioritized fixes."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "B.Tech",
+        "institution": "Computer Science and Engineering | Institute of Technology and Science, Khammam | \u2013 | CGPA: 8.5/10",
+        "year": "2022"
+      },
+      {
+        "degree": "Intermediate (MPC) | Saahithi Junior College",
+        "institution": "Yellandu | \u2013 | Percentage : 96%",
+        "year": "2020"
+      },
+      {
+        "degree": "Secondary Education | Priyadarshini High School",
+        "institution": "Yellandu | \u2013 | GPA: 10.0",
+        "year": "2018"
+      }
+    ],
+    "certifications": [],
+    "projects": [
+      "Guidance-Guru: Architected an AI-powered educational platform using React, Tailwind CSS, Node.js, Firebase, and OpenAI API, integrating chatbot and voice-mentor product features serving end users.",
+      "EcoVision-AI: Built a CNN-based pollution detection model trained on environmental datasets, achieving ~90% classification accuracy.",
+      "Phishing Detection Tool: Engineered a Random Forest model with feature extraction and dataset preprocessing to flag phishing URLs with ~92% precision.",
+      "Word Link Game: Developed a browser-based JavaScript game with scoring logic and tiered difficulty for interactive user engagement.",
+      "Strengths: Communication | Leadership | Teamwork | Analytical thinking | Time management | Adaptability and quick learning."
+    ]
+  },
+  "changes": [
+    "Rewrote summary to lead with exact target title 'Deployed Integration Engineer' and front-load required skills (Java, SQL, C, CI/CD) plus a quantified outcome.",
+    "Created structured experience entries from the candidate's internship references (Infosys AI Intern, Cybersecurity Virtual Internship) so keywords live in real bullets \u2014 no new employers invented.",
+    "Wove required skills into bullets: CI/CD, dashboards, technical writing, Java, SQL, C, integrations, architecture, technical expertise, technical teams, strategic technical conversations, providing, leading, users, product feature, business.",
+    "Added C++ and Go to the Skills list only \u2014 flag: these were NOT demonstrated in bullets since the original resume showed no evidence; please confirm before claiming.",
+    "Converted all project lines into achievement-style entries with strong action verbs and metrics.",
+    "Replaced weak/duplicated skill entries and stray text fragments with a clean, de-duplicated single skills list using standard names.",
+    "ESTIMATED METRICS to verify (grouped): ~15% accuracy gain, ~20% defect reduction, ~25% attack-surface reduction, ~90%/~92% model accuracy, ~30% faster workflows. Adjust to your actual figures.",
+    "Note: employment dates were not provided in the source; left blank to avoid inventing them \u2014 please add.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

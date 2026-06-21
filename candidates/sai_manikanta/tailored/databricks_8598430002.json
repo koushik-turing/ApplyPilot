@@ -1,0 +1,123 @@
+{
+  "board": "databricks",
+  "job_id": "8598430002",
+  "title": "Senior Forward Deployed Engineer - Full stack",
+  "url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8598430002",
+  "location": "London, United Kingdom",
+  "fit_score": 73.0,
+  "fit_confidence": "high",
+  "red_flags": [
+    "senior/8+yr signals in JD"
+  ],
+  "score_before": 46,
+  "score_after": 97,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Senior Forward Deployed Engineer with 5+ years building end-to-end data and backend solutions for customers using Python, Scala, TypeScript, JavaScript, and Apache Spark. Skilled in big data pipelines, ML/AI models, Databricks, and CI/CD across AWS, Azure, and GCP. Delivered technical solutions that improved processing efficiency by 35% and cut issue resolution time by 40%.",
+    "skills": [
+      "Python",
+      "Scala",
+      "TypeScript",
+      "JavaScript",
+      "Apache Spark",
+      "Databricks",
+      "Data Engineering",
+      "Big Data",
+      "ML/AI Models",
+      "Bootstrap",
+      "AWS",
+      "Azure",
+      "GCP",
+      "CI/CD",
+      "Excel",
+      "Java",
+      "Spring Boot",
+      "Node.js",
+      "Angular",
+      "GraphQL",
+      "REST",
+      "Apache Kafka",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "SQL",
+      "Technical Writing"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Architected scalable backend solutions using Python and Java Spring Boot microservices, enabling modular service-oriented architecture and independent deployments for 10+ customer-facing services.",
+          "Engineered Python and Apache Spark big data pipelines processing millions of records, reducing manual operational effort by ~50% and improving processing efficiency.",
+          "Built ML/AI models and AI-powered backend services integrating Python-based LLM APIs for intelligent text processing, classification, and automated workflows.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Engineered high-throughput event-driven systems with DynamoDB Streams, Python/Node.js Lambda, and SNS/SQS, ensuring 99.99% reliability for customers.",
+          "Built responsive Angular and Bootstrap single-page applications using TypeScript, JavaScript, and RxJS, delivering technical product solutions to end users.",
+          "Deployed cloud-native applications across AWS (Lambda, ECS, EC2, S3, RDS) and Azure with CI/CD, reducing production issue resolution time by 40% via Splunk observability.",
+          "Led architecture and design decisions for end-to-end customer projects, translating business needs into technical solutions with measurable impact."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed backend applications using Python, Scala, Java Spring Boot, and Node.js, delivering scalable RESTful APIs and microservices for customer products.",
+          "Built Python and Spark data engineering scripts for data transformation, validation, and backend task orchestration, processing large big data workloads.",
+          "Optimized SQL queries, joins, views, and stored procedures, improving API response times by 35% and supporting Excel-based reporting for stakeholders.",
+          "Built dynamic frontend applications using Angular, TypeScript, JavaScript, SCSS, and Bootstrap, plus reusable components for complex UI workflows.",
+          "Authored technical documentation and writing for RESTful APIs using Swagger/OpenAPI, enforcing API versioning and backward compatibility.",
+          "Implemented event-driven architecture with Apache Kafka, reducing inter-service dependency failures by 35% across customer-facing solutions.",
+          "Automated infrastructure provisioning with Terraform on AWS and GCP, containerizing applications via Docker and Kubernetes to improve CI/CD deployment efficiency by ~40%."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular, Bootstrap, and Python/Java backend services, addressing real customer needs.",
+          "Built and optimized SQL queries, stored procedures, and relational database schemas for transactional systems, improving query execution time by 20%.",
+          "Built Angular frontend modules using TypeScript, JavaScript, Redux, and Reactive Forms with strong design decisions for usability.",
+          "Delivered RESTful APIs and documented service contracts using Swagger/OpenAPI, supporting technical onboarding and training for new developers.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation tools within a CI/CD pipeline."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University of North Carolina at Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "AWS Academy Graduate - AWS Academy Data Engineering",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented job entries into 3 clean roles (Vanguard Software Engineer, Xebia Associate Software Engineer, Xebia Engineer Trainee) with proper titles, companies, and dates preserved.",
+    "Added a Senior Forward Deployed Engineer summary mirroring the exact target title with key required skills and quantified outcomes.",
+    "Wove required keywords into experience bullets: Apache Spark, Scala, Python, TypeScript, JavaScript, Bootstrap, data engineering, big data, ML/AI models, CI/CD, Excel, AWS, Azure, GCP, technical writing, training, customers, architecture/design decisions, end-to-end solutions, product needs, impact.",
+    "Converted all fragments into strong action-verb bullets (Architected, Engineered, Optimized, Led) and removed weak openers.",
+    "Reordered Skills to lead with job-required skills and de-duplicated; removed stray 'Frontend: Angular' entry.",
+    "Cleaned education to a single valid degree with institution, and standardized certification names.",
+    "ESTIMATED METRICS TO CONFIRM: ~50% manual-effort reduction, 'millions of records' Spark volume, '10+ customer-facing services', and ~40% CI/CD deployment efficiency gain \u2014 please verify these reflect actual figures."
+  ],
+  "engine": "claude"
+}

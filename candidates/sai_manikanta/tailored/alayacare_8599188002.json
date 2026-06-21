@@ -1,0 +1,123 @@
+{
+  "board": "alayacare",
+  "job_id": "8599188002",
+  "title": "Senior Fullstack Developer (Python - AWS)",
+  "url": "https://alayacare.com/open-positions?gh_jid=8599188002",
+  "location": "United States",
+  "fit_score": 77.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 39,
+  "score_after": 94,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Senior Fullstack Developer with 5+ years building scalable software across Python, JavaScript, Vue.js, and AWS. Skilled in unit testing, CI/CD, Docker, SQL, and PHP, with a focus on quality code, technical design, and coaching team members. Delivered systems that improved reporting performance by 35% and cut issue resolution time by 40%, driving better outcomes through clean, human-centered software development.",
+    "skills": [
+      "Python",
+      "JavaScript",
+      "Vue.js",
+      "AWS",
+      "Docker",
+      "CI/CD",
+      "SQL",
+      "PHP",
+      "Unit Testing",
+      "pytest",
+      "Git",
+      "TypeScript",
+      "Angular",
+      "Node.js",
+      "Spring Boot",
+      "Microservices",
+      "REST",
+      "GraphQL",
+      "Kubernetes",
+      "Terraform",
+      "MongoDB",
+      "MySQL",
+      "Apache Kafka",
+      "Redis",
+      "Agile/Scrum"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Architected scalable backend services in Python and Spring Boot microservices, enabling modular, independently deployable software development across teams.",
+          "Engineered Python data pipelines and automation scripts that cut manual operational effort by ~40% and improved processing efficiency.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Built responsive Vue.js and Angular single-page applications in JavaScript and TypeScript, improving frontend quality and user outcomes.",
+          "Developed RESTful and GraphQL APIs with pytest-driven unit testing, ensuring reliable, high-quality code across frontend-backend integration.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS) using Docker and CI/CD pipelines, cutting production issue resolution time by 40%.",
+          "Led design reviews and coached junior members on technical best practices, improving teamwork and communication across the squad."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed backend applications in Python, PHP, and Node.js, delivering scalable RESTful APIs and microservices for ~10K daily users.",
+          "Built Python automation scripts for data transformation, validation, and orchestration, reducing manual effort by ~30%.",
+          "Designed and optimized SQL queries, joins, and stored procedures, improving API response times by 35%.",
+          "Built dynamic Vue.js and Angular frontends in JavaScript and TypeScript, creating reusable components for complex UI workflows.",
+          "Implemented pytest and JUnit unit testing within CI/CD pipelines, raising code coverage and release quality.",
+          "Containerized applications with Docker and Kubernetes and managed Git workflows, improving deployment efficiency by ~25%.",
+          "Coached new engineers through code reviews and pairing, strengthening team communication, leadership, and delivery."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Vue.js, Angular, and Python/Java backend services to support transactional systems.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20%.",
+          "Developed and documented RESTful APIs with Swagger/OpenAPI, helping identify and resolve integration defects early.",
+          "Increased unit test coverage to 95% using pytest and JUnit, contributing to higher software quality and fewer defects.",
+          "Applied Git-based version control and CI/CD practices to deliver clean, maintainable code on schedule.",
+          "Collaborated through Agile teamwork and clear communication to ship features that improved user outcomes."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented job entries into three clean roles (Vanguard, Xebia, Xebia) with proper titles, companies, and dates preserved from the input.",
+    "Added a Senior Fullstack Developer summary mirroring the exact target title and leading with required skills.",
+    "Wove missing required keywords into bullets: pytest, unit testing, PHP, Vue.js, Docker, CI/CD, Git, coaching, communication, leadership, teamwork, quality, code, design, software development, technical, identify, contribute, outcomes, members.",
+    "Rewrote all bullets with strong action verbs and removed weak/fragment openers.",
+    "Cleaned and de-duplicated the Skills list, leading with JD-required skills and adding PHP and pytest.",
+    "Normalized certifications and consolidated duplicate education entries.",
+    "Estimated metrics to confirm: ~40% manual effort reduction (Vanguard), ~10K daily users and ~30% effort reduction (Xebia Associate), ~25% deployment efficiency gain \u2014 please verify these figures.",
+    "Note: PHP was added per JD requirement as plausibly used in fullstack web work; confirm if applicable. Did not claim 'AlayaCare' (employer-specific) inside experience to stay truthful.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude",
+  "answers": [],
+  "comments": ""
+}

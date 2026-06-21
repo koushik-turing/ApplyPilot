@@ -1,0 +1,15 @@
+{
+  "authorized_us": true,
+  "requires_sponsorship": true,
+  "visa_status": "F-1 OPT",
+  "desired_salary": "$120,000",
+  "preferred_locations": "Charlotte, NC; Remote",
+  "open_to_remote": true,
+  "answer_bank": {
+    "why_interested": "enjoys building scalable backend and full-stack systems with Java/Python and cloud, and ML-powered features",
+    "how_heard": "found the role through an online job board while searching for backend/full-stack roles",
+    "willing_to_relocate": "open to relocating in the US for the right opportunity",
+    "remote_preference": "open to remote, hybrid, or onsite in the US",
+    "start_date": "available with 2 weeks notice"
+  }
+}

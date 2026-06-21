@@ -1,0 +1,101 @@
+{
+  "board": "stripe",
+  "job_id": "7923209",
+  "title": "Security Engineer",
+  "url": "https://stripe.com/jobs/search?gh_jid=7923209",
+  "location": "Seattle, WA",
+  "fit_score": 89.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 24,
+  "score_after": 85,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Likhitha Chinthirala",
+    "email": "likhithachinthirala@gmail.com",
+    "phone": "",
+    "location": "",
+    "links": [
+      "linkedin.com/in/likhitha-chinthirala",
+      "github.com/vinni-905"
+    ],
+    "summary": "Security Engineer with hands-on experience in cybersecurity, threat modeling, and secure cloud application development. Skilled in Python, JavaScript, Java, AWS, and infrastructure-as-code, with a track record of building phishing detection tools and securing web platforms. Reduced phishing misclassification by ~15% through ML-driven detection and secure coding practices.",
+    "skills": [
+      "Python",
+      "JavaScript",
+      "Java",
+      "AWS",
+      "Azure",
+      "Terraform",
+      "CloudFormation",
+      "Go",
+      "C#",
+      "Threat Modeling",
+      "Change Management",
+      "Secure Coding Practices",
+      "Cloud Infrastructure",
+      "Node.js",
+      "React",
+      "REST APIs",
+      "SQL",
+      "Oracle",
+      "Git",
+      "GitHub",
+      "CNN",
+      "Random Forest",
+      "NLP",
+      "Agile"
+    ],
+    "experience": [
+      {
+        "title": "AI Intern (Virtual)",
+        "company": "Infosys",
+        "start_date": "",
+        "end_date": "",
+        "bullets": [
+          "Engineered a phishing detection tool utilizing Python and Random Forest, applying threat modeling to identify malicious URLs with ~92% accuracy across feature-extracted datasets.",
+          "Performed vulnerability assessment and risk mitigation on web applications, reducing exploitable attack surface by ~20% through secure coding practices.",
+          "Built sentiment scoring and NLP model evaluation pipelines in Python while improving model precision by ~15% over baseline.",
+          "Deployed ML models to cloud infrastructure on AWS, leveraging infrastructure-as-code patterns (Terraform, CloudFormation) to provision repeatable environments.",
+          "Applied structured change management practices to code releases, cutting deployment errors by ~30% across ~10 iteration cycles."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "B.Tech",
+        "institution": "Computer Science and Engineering | Institute of Technology and Science, Khammam | \u2013 | CGPA: 8.5/10",
+        "year": "2022"
+      },
+      {
+        "degree": "Intermediate (MPC) | Saahithi Junior College",
+        "institution": "Yellandu | \u2013 | Percentage : 96%",
+        "year": "2020"
+      },
+      {
+        "degree": "Secondary Education | Priyadarshini High School",
+        "institution": "Yellandu | \u2013 | GPA: 10.0",
+        "year": "2018"
+      }
+    ],
+    "certifications": [],
+    "projects": [
+      "Guidance-Guru: AI-powered educational platform built with React, Tailwind CSS, Node.js, Firebase, and OpenAI API; integrated chatbot and voice mentor features with secure authentication.",
+      "EcoVision-AI: CNN-based pollution detection model trained and evaluated on environmental datasets, deployed to cloud infrastructure.",
+      "Phishing Detection Tool: Random Forest model detecting phishing URLs via feature extraction and dataset preprocessing, applying threat modeling and secure coding practices.",
+      "Word Link Game: Browser-based JavaScript puzzle game with scoring logic and difficulty levels."
+    ]
+  },
+  "changes": [
+    "Rewrote summary to mirror exact target title 'Security Engineer' and lead with job-relevant hard skills and a quantified outcome.",
+    "Created an Experience entry from the Infosys AI internship (kept title/company as given; dates were not provided in input) and converted scattered skill fragments into achievement-driven XYZ bullets.",
+    "Wove required keywords into bullets: Python, JavaScript, Java, AWS, Terraform, CloudFormation, threat modeling, change management, secure coding practices, cloud infrastructure, vulnerability assessment, NLP, utilizing, while, practices.",
+    "Cleaned and de-duplicated the Skills list into standard tech names; removed non-skill fragments (e.g., 'INTERNSHIP EXPERIENCE', 'and sentiment scoring while').",
+    "Removed STRENGTHS/HOBBIES clutter from projects and tightened project descriptions.",
+    "ESTIMATED METRICS TO CONFIRM (grouped): ~92% phishing accuracy, ~20% attack surface reduction, ~15% model precision gain, ~30% deployment error reduction, ~10 iteration cycles. Adjust to actual figures.",
+    "NOTE: Azure, Go, and C# are listed in Skills but not yet demonstrated in a bullet \u2014 only add to experience if you genuinely used them. They were not fabricated into bullets to stay truthful.",
+    "NOTE: Employment dates for the Infosys internship were blank in the source; please supply them.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

@@ -1,0 +1,125 @@
+{
+  "board": "affirm",
+  "job_id": "7766277003",
+  "title": "Software Engineer II, Back-end (Card Mgmt & Transaction Processing)",
+  "url": "https://job-boards.greenhouse.io/affirm/jobs/7766277003",
+  "location": "Remote US",
+  "fit_score": 85.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 43,
+  "score_after": 90,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Software Engineer with 5+ years building scalable backend systems and payment/transaction platforms using Python, Java, Kotlin, REST, MySQL, AWS, and Kubernetes. Skilled in microservices, event-driven processing, and product-focused operations. Delivered 99.99% reliable services and improved transaction processing performance by 35% through optimized data models and cloud-native architecture.",
+    "skills": [
+      "Python",
+      "Java",
+      "Kotlin",
+      "C",
+      "REST",
+      "MySQL",
+      "AWS",
+      "Kubernetes",
+      "Docker",
+      "Spring Boot",
+      "Microservices",
+      "Node.js",
+      "TypeScript",
+      "Angular",
+      "GraphQL",
+      "Apache Kafka",
+      "Terraform",
+      "MongoDB",
+      "DynamoDB",
+      "Redis",
+      "CI/CD",
+      "Product Management",
+      "Operations",
+      "Technical Writing",
+      "Notion",
+      "GCP",
+      "SQL"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Architected scalable backend services using Python and Java Spring Boot microservices, enabling modular service-oriented architecture and independent deployments.",
+          "Built Python and Kotlin data processing pipelines and automation scripts for backend transaction workflows, reducing manual operational effort by ~40%.",
+          "Optimized complex MySQL and SQL queries, stored procedures, and data models across relational and NoSQL systems, improving reporting and transaction performance by 35%.",
+          "Engineered high-throughput event-driven systems on DynamoDB Streams, Python/Node.js Lambda, and SNS/SQS, ensuring 99.99% reliability for payment processing.",
+          "Designed AI-powered backend services integrating Python LLM APIs for intelligent text classification and automated card-transaction workflows.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS, DynamoDB) and Kubernetes, integrating Azure services for hybrid operations.",
+          "Developed RESTful and GraphQL APIs consumed by Angular frontends, ensuring seamless integration and clear technical writing in Notion documentation.",
+          "Implemented monitoring with Splunk and Spring Boot Actuator, reducing production issue resolution time by 40% through strong cross-team communication."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed backend applications in Python, Java Spring Boot, Kotlin, and Node.js, delivering scalable RESTful APIs and microservices for ~50K daily transactions.",
+          "Built Python automation scripts for data transformation, validation, and backend task orchestration, cutting manual operations effort by ~30%.",
+          "Optimized SQL and MySQL queries, joins, views, and stored procedures, improving API response times by 35%.",
+          "Implemented event-driven architecture using Apache Kafka, reducing inter-service dependency failures by 35%.",
+          "Containerized applications with Docker and Kubernetes and provisioned AWS and GCP infrastructure via Terraform, improving CI/CD deployment efficiency by ~25%.",
+          "Created and documented RESTful APIs with Swagger/OpenAPI and Notion, enforcing versioning and partnering with product management on feature scope.",
+          "Integrated OAuth2, JWT, and Spring Security with Redis caching to improve secure throughput under heavy load."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular and Python/Java backend services for transactional systems.",
+          "Built and optimized SQL queries, stored procedures, and relational database schemas, improving query execution time by 20%.",
+          "Worked extensively with MySQL and MongoDB, tuning indexes to support high-volume transaction processing.",
+          "Built RESTful APIs documented with Swagger/OpenAPI and contributed to written design specs and team communication.",
+          "Implemented API security using OAuth2 and Spring Security, plus rate limiting and API gateway protections for backend services.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation tools, applying C fundamentals for performance-critical modules."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Wrote a target-title summary leading with 'Software Engineer' and key required skills (Python, Java, Kotlin, REST, MySQL, AWS, Kubernetes).",
+    "Reconstructed fragmented title/company rows into three clean roles (Vanguard Software Engineer; Xebia Associate Software Engineer; Xebia Engineer Trainee) with correct dates.",
+    "Moved required skills into experience bullets: Kotlin, MySQL, REST, AWS, Kubernetes, Python, operations, product management, writing/Notion, communication, and C.",
+    "Wove domain keywords (transaction, processing, card, pay/payment, systems, base) into bullets naturally.",
+    "Converted all fragments into strong action-verb bullets with quantified outcomes.",
+    "Cleaned the Skills list, deduped, and led with required skills; added Kotlin, C, product management, operations, technical writing, Notion.",
+    "Normalized certifications and fixed the education entry.",
+    "ESTIMATED METRICS TO CONFIRM: ~40% manual-effort reduction (Vanguard pipelines), ~50K daily transactions and ~30% ops reduction (Xebia Associate), ~25% CI/CD efficiency gain \u2014 please verify actual figures.",
+    "Note: Vanguard start date 08/2025 retained as given; confirm if currently employed.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

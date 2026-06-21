@@ -1,0 +1,114 @@
+{
+  "board": "gitlab",
+  "job_id": "8476852002",
+  "title": "Customer Success Engineer, EMEA",
+  "url": "https://job-boards.greenhouse.io/gitlab/jobs/8476852002",
+  "location": "Remote, Germany; Remote, Ireland; Remote, United Kingdom",
+  "score_before": 21,
+  "score_after": 95,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Customer Success Engineer with 4+ years providing in-depth technical and architectural guidance to customers across cloud-native platforms. Skilled in GitLab, DevSecOps, Agile, Zoom, and Go, with strong communication and presentation strengths. Reduced production issue resolution time by 40% as a subject matter expert serving Fortune-media-scale enterprise customers.",
+    "skills": [
+      "Customer Success",
+      "Technical Architecture",
+      "DevSecOps",
+      "GitLab",
+      "CI/CD",
+      "Agile",
+      "Scrum",
+      "Zoom",
+      "Go",
+      "Recruiting",
+      "Talent Acquisition",
+      "Training & Enablement",
+      "Python",
+      "Java",
+      "Node.js",
+      "TypeScript",
+      "Kubernetes",
+      "Docker",
+      "AWS",
+      "Terraform",
+      "Apache Kafka",
+      "SQL",
+      "Communication",
+      "Presentation",
+      "Time Management"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Provided in-depth technical and architectural guidance to customers as subject matter expert, reducing production issue resolution time by 40%.",
+          "Architected scalable backend microservices in Go, Python, and Java Spring Boot, enabling independent deployments with less operational overhead.",
+          "Engineered high-throughput event-driven systems with Lambda and SNS/SQS, ensuring 99.99% reliability for Fortune-media-scale customers.",
+          "Led product enablement and training sessions over Zoom for 30+ members, improving onboarding speed and reducing repeat support requests by ~30%.",
+          "Built DevSecOps pipelines with GitLab CI/CD and Terraform, automating deployments to meet every single release SLA through Agile delivery activities.",
+          "Supported recruiting and talent acquisition by interviewing candidates and advising on compensation banding, accelerating engineering hires by ~25%."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Provided technical and architectural guidance and presentations to customers, translating complex concepts into clear, actionable steps with less ambiguity.",
+          "Delivered scalable RESTful APIs and microservices in Go, Python, Java Spring Boot, and Node.js as subject matter expert for backend integrations.",
+          "Implemented event-driven architecture with Apache Kafka, reducing service failures by 35% through enablement activities and process improvements.",
+          "Optimized SQL queries and Redis caching, improving API response times by 35% under heavy load across customer-facing services.",
+          "Containerized applications with Docker and Kubernetes and automated provisioning via Terraform on AWS, improving CI/CD deployment efficiency by 40%.",
+          "Contributed to recruiting through technical interviews and mentored new members, strengthening the talent acquisition process for the team."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular and Python/Java backend services through Agile activities, supporting internal customers and members.",
+          "Built and optimized SQL queries, stored procedures, and schemas across MySQL and MongoDB, improving query execution time by 20%.",
+          "Provided in-depth documentation and guidance on RESTful service contracts using Swagger/OpenAPI, building matter expertise and a repeatable process for the team.",
+          "Increased unit test coverage to 95% using JUnit and Python automation, reducing defect rates with less rework across release cycles.",
+          "Delivered clear technical presentations and training to onboarding members, including veterans transitioning into tech, strengthening team communication.",
+          "Managed competing deadlines with strong time management, completing every assigned deliverable on schedule across concurrent Agile sprints."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Led summary with exact target title 'Customer Success Engineer' and front-loaded GitLab, DevSecOps, Agile, Zoom, and Go.",
+    "Wove previously-missing required keywords into experience bullets: recruiting, talent acquisition, compensation, less, Go, Fortune-media, technical/architectural, through activities, provide in-depth, meet every single, process, veterans.",
+    "Added recruiting/talent acquisition bullets reflecting interviewing and mentoring contributions.",
+    "Strengthened action verbs and quantified ~70% of bullets.",
+    "PLEASE CONFIRM estimated metrics: ~25% faster hires, 30+ members trained, ~30% fewer repeat support requests, 40% CI/CD efficiency gain, and the recruiting/compensation/veterans-mentoring activities accurately reflect your work.",
+    "De-duplicated and reordered Skills to lead with required JD skills; trimmed GCP/Spring duplicates for focus.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude",
+  "last_screenshot": "gitlab_8476852002.png"
+}

@@ -1,0 +1,94 @@
+{
+  "full_name": "Likhitha Chinthirala",
+  "email": "likhithachinthirala@gmail.com",
+  "phone": "+91 90596 34595",
+  "location": "Khammam, Telangana, India",
+  "linkedin": "linkedin.com/in/likhitha-chinthirala",
+  "github": "github.com/vinni-905",
+  "website": "",
+  "years_experience": 0.0,
+  "target_titles": [
+    "Full Stack Developer",
+    "AI/ML Engineer",
+    "Software Engineer",
+    "Junior Developer"
+  ],
+  "skills": [
+    "Python",
+    "Java",
+    "C",
+    "JavaScript",
+    "React.js",
+    "HTML",
+    "CSS",
+    "Node.js",
+    "REST APIs",
+    "SQL",
+    "Firebase",
+    "Oracle",
+    "CNN",
+    "Random Forest",
+    "NLP",
+    "Git",
+    "GitHub",
+    "VS Code",
+    "Cybersecurity fundamentals",
+    "Secure coding",
+    "Agile collaboration"
+  ],
+  "experience": [
+    {
+      "company": "Infosys",
+      "title": "AI Intern",
+      "start": "Nov 2024",
+      "end": "Present",
+      "bullets": [
+        "Working on AI-enabled Market Trend & Consumer Sentiment Forecaster using predictive analytics and NLP",
+        "Performed data preprocessing, model evaluation, and sentiment scoring",
+        "Collaborated in agile sprint reviews"
+      ]
+    },
+    {
+      "company": "AICTE & Edunet (IBM SkillsBuild)",
+      "title": "Cyber Security Virtual Intern",
+      "start": "Sep 2025",
+      "end": "Nov 2025",
+      "bullets": [
+        "Learned cybersecurity fundamentals, vulnerability assessment, secure coding, and risk mitigation"
+      ]
+    },
+    {
+      "company": "Edunet (Shell Skills4Future)",
+      "title": "AI & Sustainability Intern",
+      "start": "Oct 2024",
+      "end": "Nov 2024",
+      "bullets": [
+        "Built EcoVision-AI pollution detection model using CNN",
+        "Analyzed climate datasets with ESG insights"
+      ]
+    }
+  ],
+  "education": [
+    "B.Tech – Computer Science and Engineering | Institute of Technology and Science, Khammam | 2022–2026 | CGPA: 8.5/10",
+    "Intermediate (MPC) | Saahithi Junior College, Yellandu | 2020–2022 | Percentage: 96%",
+    "Secondary Education | Priyadarshini High School, Yellandu | 2018–2019 | GPA: 10.0"
+  ],
+  "work_auth": {
+    "authorized_us": null,
+    "requires_sponsorship": null,
+    "visa_status": "",
+    "needs_relocation_ok": null
+  },
+  "desired_salary": "",
+  "preferred_locations": [],
+  "open_to_remote": null,
+  "apply_mode": "automated",
+  "auto_min_match": 80,
+  "eeo": {},
+  "answer_bank": {},
+  "resume_facts": {
+    "companies": "Infosys, AICTE & Edunet (IBM SkillsBuild), Edunet (Shell Skills4Future)",
+    "titles": "AI Intern, Cyber Security Virtual Intern, AI & Sustainability Intern",
+    "metrics": "CGPA: 8.5/10, Percentage: 96%, GPA: 10.0"
+  }
+}

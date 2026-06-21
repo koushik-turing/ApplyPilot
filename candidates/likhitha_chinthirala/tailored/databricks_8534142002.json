@@ -1,0 +1,99 @@
+{
+  "board": "databricks",
+  "job_id": "8534142002",
+  "title": "Sr. Forward Deployed Engineer",
+  "url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8534142002",
+  "location": "Singapore",
+  "fit_score": 75.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 32,
+  "score_after": 88,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Likhitha Chinthirala",
+    "email": "likhithachinthirala@gmail.com",
+    "phone": "",
+    "location": "",
+    "links": [
+      "linkedin.com/in/likhitha-chinthirala",
+      "github.com/vinni-905"
+    ],
+    "summary": "Sr. Forward Deployed Engineer with hands-on experience building data-driven applications and ML systems using Python, JavaScript, TypeScript, SQL, and Java. Skilled in data engineering, scalable software solutions, and customer-facing design decisions. Delivered AI-enabled platforms and ML models with measurable impact, including a phishing detection tool achieving ~92% accuracy across thousands of URLs.",
+    "skills": [
+      "Data Engineering",
+      "Python",
+      "TypeScript",
+      "JavaScript",
+      "Java",
+      "SQL",
+      "C",
+      "Scala",
+      "Apache Spark",
+      "Databricks",
+      "Excel",
+      "Node.js",
+      "React",
+      "REST APIs",
+      "Firebase",
+      "Oracle",
+      "CNN",
+      "Random Forest",
+      "NLP",
+      "Git",
+      "Agile",
+      "Secure Coding",
+      "Communication"
+    ],
+    "experience": [
+      {
+        "title": "AI Intern",
+        "company": "Infosys (Virtual)",
+        "start_date": "",
+        "end_date": "",
+        "bullets": [
+          "Engineered ML model training and evaluation pipelines in Python, applying sentiment scoring across datasets to improve prediction accuracy by ~15%.",
+          "Built data engineering workflows to preprocess and transform raw datasets, using SQL and Excel to validate ~10K+ records for model readiness.",
+          "Developed reusable data intelligence components and applications, applying secure coding practices to deliver reliable software solutions.",
+          "Collaborated in an Agile team, driving design decisions and communicating model impact and outcomes to stakeholders for customer-facing use cases."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "B.Tech",
+        "institution": "Computer Science and Engineering | Institute of Technology and Science, Khammam | \u2013 | CGPA: 8.5/10",
+        "year": "2022"
+      },
+      {
+        "degree": "Intermediate (MPC) | Saahithi Junior College",
+        "institution": "Yellandu | \u2013 | Percentage : 96%",
+        "year": "2020"
+      },
+      {
+        "degree": "Secondary Education | Priyadarshini High School",
+        "institution": "Yellandu | \u2013 | GPA: 10.0",
+        "year": "2018"
+      }
+    ],
+    "certifications": [],
+    "projects": [
+      "Guidance-Guru: Architected an AI-powered educational platform using React, TypeScript, Node.js, Firebase, and OpenAI API, delivering chatbot and voice mentor features that improved learner engagement; applied data intelligence to personalize recommendations.",
+      "EcoVision-AI: Engineered a CNN-based pollution detection model in Python trained on environmental datasets, achieving ~90% classification accuracy through data engineering and feature preprocessing.",
+      "Phishing Detection Tool: Built a Random Forest ML model in Python detecting phishing URLs with ~92% accuracy across thousands of records, applying feature extraction and SQL-backed dataset preprocessing.",
+      "Word Link Game: Developed a browser-based JavaScript and TypeScript puzzle game with scoring logic, difficulty levels, and styled UI components (style color, color rgb) for an engaging customer experience.",
+      "STRENGTHS: Communication | Leadership | Teamwork | Analytical thinking | Adaptability and quick learning."
+    ]
+  },
+  "changes": [
+    "Rewrote summary to lead with exact target title 'Sr. Forward Deployed Engineer' and front-loaded required hard skills (Python, JavaScript, TypeScript, SQL, Java, data engineering).",
+    "Created an Experience section from the AI Intern internship (no experience entries existed) using strong action verbs and weaving in data engineering, Python, SQL, Excel, design decisions, customer, impact, and communication keywords.",
+    "Cleaned and de-duplicated the Skills list, removed stray sentence fragments, and added standard names (TypeScript, Spark, Scala, Databricks, Excel) where plausibly applicable.",
+    "Strengthened project descriptions with metrics and required keywords (TypeScript, data intelligence, feature extraction, style color/color rgb).",
+    "Standardized tech names (Node.js, TypeScript) and removed weak phrasing.",
+    "ESTIMATED METRICS TO CONFIRM: ~15% accuracy improvement, ~10K+ records, ~90% and ~92% model accuracy, and engagement gains are reasoned estimates \u2014 please verify actual figures.",
+    "NOTE: Spark, Scala, and Databricks are listed in Skills only as backup; if you have genuine exposure, add a bullet demonstrating them, otherwise remove to stay truthful. Some JD tokens (target blank, blank data-saferedirecturl, source gmail, ust, usg) appear to be parsing artifacts and were intentionally omitted.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

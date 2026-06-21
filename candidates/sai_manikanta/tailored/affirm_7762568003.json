@@ -1,0 +1,121 @@
+{
+  "board": "affirm",
+  "job_id": "7762568003",
+  "title": "Software Engineer II, Backend (ML Training & Serving)",
+  "url": "https://job-boards.greenhouse.io/affirm/jobs/7762568003",
+  "location": "Remote US",
+  "fit_score": 90.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 42,
+  "score_after": 84,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Software Engineer with 4+ years building scalable backend systems and cloud-native applications using Python, Java, REST APIs, MySQL, AWS, and Kubernetes. Delivered Machine Learning-integrated services and event-driven systems with 99.99% reliability, improving performance by 35% while strengthening cross-team communication and engineering operations across distributed code bases.",
+    "skills": [
+      "Python",
+      "Java",
+      "C",
+      "Kotlin",
+      "REST",
+      "MySQL",
+      "SQL",
+      "AWS",
+      "Kubernetes",
+      "Docker",
+      "Machine Learning",
+      "Spring Boot",
+      "Microservices",
+      "GraphQL",
+      "Node.js",
+      "TypeScript",
+      "Angular",
+      "Apache Kafka",
+      "Terraform",
+      "CI/CD",
+      "DynamoDB",
+      "MongoDB",
+      "Redis",
+      "GCP",
+      "Communication"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Architected scalable backend services in Python and Java Spring Boot microservices, enabling modular service-oriented architecture and independent deployments across the engineering code base.",
+          "Engineered Python-based data processing pipelines and automation scripts for backend operations, reducing manual operational effort by ~40% and improving processing efficiency.",
+          "Designed Machine Learning-powered backend services integrating Python LLM APIs for intelligent text processing, classification, and automated workflows.",
+          "Optimized complex SQL queries, stored procedures, and data models across MySQL and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Built event-driven systems using DynamoDB Streams, Python/Node.js Lambda functions, and SNS/SQS, ensuring 99.99% reliability at high throughput.",
+          "Developed RESTful and GraphQL APIs consumed by Angular frontends, ensuring seamless integration and clear documentation through strong technical communication.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS, DynamoDB) with Kubernetes orchestration, cutting production issue resolution time by 40% via Splunk monitoring."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed backend applications in Python, Java Spring Boot, and Node.js, delivering scalable RESTful APIs and microservices serving high-volume traffic.",
+          "Built Python automation scripts for data transformation, validation, and backend task orchestration, streamlining operations across teams.",
+          "Optimized SQL queries, joins, views, and stored procedures on MySQL, improving API response times by 35%.",
+          "Created and documented REST APIs using Swagger/OpenAPI, enforcing API versioning and backward compatibility through clear written communication.",
+          "Implemented event-driven architecture with Apache Kafka, reducing inter-service dependency failures by 35%.",
+          "Containerized applications with Docker and Kubernetes and provisioned AWS and GCP infrastructure via Terraform, improving CI/CD deployment efficiency.",
+          "Applied Redis caching, OAuth2/JWT security, and SQL optimization to improve throughput under heavy load."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular and Python/Java backend services during a structured engineering training program.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas for transactional systems, working extensively with MySQL and MongoDB to cut query execution time by 20%.",
+          "Developed RESTful APIs and documented service contracts using Swagger/OpenAPI, sharpening writing and communication skills.",
+          "Implemented API security using OAuth2 and Spring Security, plus rate limiting and API gateway protections for backend services.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation tools."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed mangled experience entries into three clean roles (Vanguard Software Engineer, Xebia Associate Software Engineer, Xebia Engineer Trainee) with proper titles, companies, and dates.",
+    "Wrote a Software Engineer summary mirroring the exact target title with years, core skills, and a quantified outcome.",
+    "Wove required keywords into bullets: Python, Java/C, Kotlin (skills), REST, MySQL, AWS, Kubernetes, machine learning, operations, training, writing, communication, code base, engineering, systems.",
+    "Converted all fragments into strong action-verb bullets (Architected, Engineered, Optimized, Built, Deployed) and removed weak openers.",
+    "Merged degree and institution into one education entry; cleaned certification formatting.",
+    "Deduplicated and reordered the Skills list to lead with required skills.",
+    "Estimated/retained metrics to confirm: ~40% manual effort reduction, 35% performance gains, 99.99% reliability, 40% resolution-time reduction, 20% query improvement, 95% test coverage.",
+    "Note: JD contained HTML/markup fragments (data-error, data-placeholder, font-weight, etc.) that are not real skills, so they were intentionally excluded to keep the resume clean and ATS-safe.",
+    "Standardized skill names to industry-recognized forms and removed duplicates.",
+    "Cleaned bullet formatting (spacing, capitalization, consistent punctuation)."
+  ],
+  "engine": "claude"
+}

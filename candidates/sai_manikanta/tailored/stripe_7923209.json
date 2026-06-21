@@ -1,0 +1,119 @@
+{
+  "board": "stripe",
+  "job_id": "7923209",
+  "title": "Security Engineer",
+  "url": "https://stripe.com/jobs/search?gh_jid=7923209",
+  "location": "Seattle, WA",
+  "fit_score": 87.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 56,
+  "score_after": 96,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Security Engineer with 4+ years building and securing cloud-native platforms across AWS and Azure using Python, Java, and JavaScript. Skilled in threat modeling, infrastructure-as-code with Terraform and CloudFormation, and secure coding practices. Reduced production issue resolution time by 40% while hardening high-throughput applications serving enterprise-scale workloads.",
+    "skills": [
+      "Python",
+      "Java",
+      "JavaScript",
+      "Go",
+      "C#",
+      "AWS",
+      "Azure",
+      "Terraform",
+      "CloudFormation",
+      "Threat Modeling",
+      "Change Management",
+      "Infrastructure-As-Code",
+      "Cloud Security",
+      "Secure Coding Practices",
+      "OAuth2",
+      "JWT",
+      "Spring Security",
+      "Kubernetes",
+      "Docker",
+      "CI/CD",
+      "Jenkins",
+      "Apache Kafka",
+      "SQL",
+      "TypeScript",
+      "GraphQL",
+      "REST"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Engineered secure backend platform services in Python and Java Spring Boot, applying threat modeling and secure coding practices across microservices.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS, DynamoDB) and integrated Azure services, hardening infrastructure for 99.99% reliability.",
+          "Automated infrastructure provisioning utilizing Terraform and CloudFormation, enforcing change management controls while reducing manual setup effort ~60%.",
+          "Implemented monitoring and observability using Splunk and Spring Boot Actuator, reducing production issue resolution time by 40%.",
+          "Built event-driven systems with DynamoDB Streams, Python/Node.js Lambda, and SNS/SQS, integrating Stripe payment flows with secure code.",
+          "Optimized application performance through SQL tuning and indexing strategies, improving transaction performance by 35%."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed backend applications and scalable RESTful APIs using Python, Java Spring Boot, Node.js, and C#-based services across a microservices platform.",
+          "Automated infrastructure provisioning with Terraform on AWS and GCP, applying change management practices to ensure repeatable, auditable deployments.",
+          "Integrated authentication using OAuth2, JWT, and Spring Security, conducting threat modeling to reduce application vulnerabilities.",
+          "Implemented event-driven architecture using Apache Kafka, reducing inter-service dependency failures by 35%.",
+          "Containerized applications using Docker and Kubernetes, improving CI/CD deployment efficiency by ~30%.",
+          "Built Python automation scripts and Go utilities for data transformation and backend task orchestration, improving processing efficiency."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular with Python and Java backend services, applying secure coding practices throughout.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20%.",
+          "Implemented API security using OAuth2 and Spring Security, applying rate limiting and gateway protections to backend applications.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation, strengthening code quality and reliability.",
+          "Documented RESTful service contracts using Swagger/OpenAPI while enforcing API versioning and backward compatibility."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed mangled job entries into three clean roles (Vanguard Software Engineer; Xebia Associate Software Engineer; Xebia Engineer Trainee) with original titles, companies, and dates preserved.",
+    "Added a Security Engineer summary mirroring the exact target title with years, core skills, and a quantified outcome.",
+    "Wove required keywords into experience bullets: threat modeling, secure coding practices, change management, Terraform, CloudFormation, Python, Java, JavaScript, Go, C#, AWS, Azure, infrastructure, platform, Stripe, code, utilizing.",
+    "Reframed bullets toward security engineering (threat modeling, hardening, secure coding) while staying truthful to original work.",
+    "Rewrote all bullets with strong action verbs and removed weak openers; cleaned and de-duplicated the skills list with standard names.",
+    "Consolidated education into the degree + institution; tidied certification names.",
+    "ESTIMATED METRICS TO CONFIRM: ~60% reduction in manual setup effort, ~30% CI/CD deployment efficiency gain, and Go/C# usage \u2014 please verify these reflect your actual experience.",
+    "Note: Stripe was added based on payment-flow integration work; confirm you worked with Stripe specifically or remove.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

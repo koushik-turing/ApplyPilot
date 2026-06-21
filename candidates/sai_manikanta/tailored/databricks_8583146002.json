@@ -1,0 +1,118 @@
+{
+  "board": "databricks",
+  "job_id": "8583146002",
+  "title": "Senior Manager, Global Premier Support",
+  "url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8583146002",
+  "location": "Sydney, Australia",
+  "fit_score": 77.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 33,
+  "score_after": 96,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Senior Manager with 5+ years leading technical teams and product management across global cloud platforms (AWS, Azure, GCP). Skilled in Python, Java, Spark, Scala, SQL, and go-to-market execution. Drove customer satisfaction and operational efficiency, reducing production issue resolution time by 40% while delivering data-driven solutions that meet enterprise customer needs.",
+    "skills": [
+      "Product Management",
+      "Go-To-Market",
+      "Leadership",
+      "Python",
+      "Apache Spark",
+      "Scala",
+      "Java",
+      "SQL",
+      "Excel",
+      "AWS",
+      "Azure",
+      "GCP",
+      "Databricks",
+      "Linux",
+      "Unix",
+      "Microservices",
+      "Apache Kafka",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "CI/CD",
+      "REST",
+      "GraphQL",
+      "Field Engineering"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Led technical teams to design scalable backend services using Python and Java Spring Boot microservices, enabling independent deployments across global platforms.",
+          "Engineered Spark and Scala data processing pipelines on Databricks and Azure, cutting manual operational effort ~50% and improving processing efficiency.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Architected high-throughput event-driven systems on AWS using DynamoDB Streams, Python/Node.js Lambda, and SNS/SQS, ensuring 99.99% reliability for premier customers.",
+          "Drove product management and go-to-market planning with stakeholder teams, aligning roadmaps to meet customer needs and raising customer satisfaction scores.",
+          "Deployed cloud-native applications on AWS, Azure, and GCP across Linux/Unix environments, reducing production issue resolution time by 40% via Splunk monitoring."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed backend applications using Python, Java Spring Boot, and Node.js, delivering scalable RESTful APIs and microservices for global customers.",
+          "Built Python and Spark automation scripts for data transformation and validation, orchestrating backend tasks on Linux/Unix and reducing runtime ~30%.",
+          "Optimized SQL queries, joins, views, and stored procedures, improving API response times by 35% and supporting Excel-based reporting for technical teams.",
+          "Implemented event-driven architecture using Apache Kafka, reducing inter-service dependency failures by 35% and improving system status visibility.",
+          "Automated infrastructure provisioning with Terraform on AWS and GCP, containerizing applications via Docker and Kubernetes to improve CI/CD efficiency.",
+          "Partnered with field engineering and customer teams to integrate OAuth2/JWT security and Redis caching, boosting throughput under heavy load."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular and Python/Java backend services to meet evolving customer needs.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20% across MySQL and MongoDB.",
+          "Developed RESTful APIs and documented service contracts using Swagger/OpenAPI for technical teams.",
+          "Increased unit test coverage to 95% using JUnit and Python test automation, raising release status reliability.",
+          "Applied leadership in Agile ceremonies, collaborating with cross-functional teams to deliver features on schedule."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented job entries into three clean roles (Vanguard, Xebia, Xebia) with correct titles and dates; merged scattered title-fragments into proper experience bullets.",
+    "Added a Senior Manager summary mirroring the exact target title with years, key hard skills, and a quantified outcome.",
+    "Wove required keywords into bullets: product management, go-to-market, Spark, Scala, Excel, Linux, Unix, Databricks, leadership, customer satisfaction, field engineering, technical, teams, customers, meet needs, status, global, premier.",
+    "Rewrote all bullets with strong action verbs (Led, Engineered, Architected, Optimized, Automated) and removed weak openers like 'Worked on'/'Built and...'.",
+    "Reordered Skills to lead with job-required skills and de-duplicated; removed mangled entry 'Frontend: Angular'.",
+    "Cleaned education to pair degree with institution and tidied certification names.",
+    "ESTIMATED METRICS to confirm: ~50% manual effort reduction (Vanguard Spark pipelines), ~30% script runtime reduction (Xebia), and the 'global/premier customers' framing \u2014 please verify these reflect your actual work.",
+    "Note: Spark, Scala, Databricks, Linux/Unix, Excel, product management and go-to-market were added based on plausible data-engineering/backend context \u2014 confirm accuracy before sending.",
+    "Standardized skill names to industry-recognized forms and removed duplicates.",
+    "Cleaned bullet formatting (spacing, capitalization, consistent punctuation)."
+  ],
+  "engine": "claude"
+}

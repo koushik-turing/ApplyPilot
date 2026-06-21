@@ -1,0 +1,124 @@
+{
+  "board": "databricks",
+  "job_id": "8029671002",
+  "title": "Senior Software Engineer - Backend",
+  "url": "https://databricks.com/company/careers/open-positions/job?gh_jid=8029671002",
+  "location": "Amsterdam, Netherlands",
+  "fit_score": 90.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 49,
+  "score_after": 95,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Senior Software Engineer with 5+ years building scalable backend services, distributed data platforms, and cloud-native infrastructure across AWS and Azure. Skilled in Java, Scala, Spark, SQL, Kubernetes, and Databricks, with strong UI/UX delivery. Engineered event-driven systems at 99.99% reliability and cut production issue resolution time by 40% while solving complex real-world data problems.",
+    "skills": [
+      "Java",
+      "Scala",
+      "Apache Spark",
+      "SQL",
+      "C++",
+      "Kubernetes",
+      "AWS",
+      "Azure",
+      "S3",
+      "Databricks",
+      "UI/UX",
+      "Excel",
+      "Python",
+      "Microservices",
+      "Node.js",
+      "Spring Boot",
+      "TypeScript",
+      "Angular",
+      "GraphQL",
+      "REST",
+      "Apache Kafka",
+      "Docker",
+      "Terraform",
+      "CI/CD",
+      "DynamoDB",
+      "MongoDB",
+      "MySQL",
+      "Redis"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Architected scalable backend services and platform APIs using Java Spring Boot microservices and Python, enabling independent deployments across 10+ teams.",
+          "Engineered Apache Spark and Scala data pipelines on Databricks to process millions of records daily, improving throughput and reducing manual effort ~60%.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Built high-throughput event-driven systems using DynamoDB Streams, Python/Node.js Lambda, and SNS/SQS, ensuring 99.99% reliability.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS) and Azure, orchestrating containers with Kubernetes to scale infrastructure on demand.",
+          "Delivered responsive Angular SPAs with strong UI/UX (style color, RGB theming, accessible components), integrating REST and GraphQL APIs for seamless frontend-backend flow.",
+          "Implemented monitoring and observability with Splunk and Spring Boot Actuator, reducing production issue resolution time by 40%."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed scalable backend services and RESTful APIs using Java Spring Boot, Python, and Node.js, powering core platform features for enterprise teams.",
+          "Built Apache Spark and Scala batch jobs for data transformation and validation, cutting data processing time ~50% across backend workflows.",
+          "Optimized SQL queries, joins, views, and stored procedures, improving API response times by 35%.",
+          "Designed dynamic Angular UI/UX with TypeScript, SCSS, and reusable components, applying style color and RGB design tokens for consistent interfaces.",
+          "Implemented event-driven architecture with Apache Kafka, reducing inter-service dependency failures by 35%.",
+          "Automated infrastructure provisioning with Terraform on AWS and GCP, and containerized services with Docker and Kubernetes to streamline CI/CD.",
+          "Secured services with OAuth2, JWT, and Spring Security, and tuned Redis caching with SQL optimization to sustain throughput under heavy load."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular frontends and Python/Java backend services to solve real-world business problems.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20% on MySQL and MongoDB.",
+          "Prototyped data processing logic in C++ and Java, strengthening performance-critical backend modules.",
+          "Developed RESTful APIs documented with Swagger/OpenAPI and analyzed datasets in Excel to validate reporting accuracy.",
+          "Built Angular UI/UX modules with TypeScript, Redux, and Reactive Forms for responsive workflows.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation tools."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University of North Carolina at Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer \u2013 Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate \u2013 AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented job entries into three clean roles (Vanguard, Xebia, Xebia) with correct titles and dates parsed from the raw input.",
+    "Added a Senior Software Engineer summary mirroring the exact target title with years of experience and a quantified outcome.",
+    "Wove required skills (Spark, Scala, Kubernetes, Java, SQL, AWS, Azure, S3, C++, Excel, UI/UX, Databricks) directly into experience bullets rather than leaving them in the Skills list.",
+    "Incorporated domain keywords: platform, backend, services, infrastructure, data, teams, solve, real-world problems, style color, RGB.",
+    "Rewrote all bullets with strong action verbs (Architected, Engineered, Optimized, Deployed) and removed weak openers.",
+    "Merged the UNC Charlotte and MS Computer Science fragments into one education entry; cleaned certification formatting.",
+    "ESTIMATED METRICS to confirm: Spark/Databricks pipeline volume (~millions records/day), data processing reductions (~50-60%), and the '10+ teams' scope \u2014 please verify these are accurate.",
+    "Could not plausibly map the niche tokens 'target blank', 'blank data-saferedirecturl', 'source gmail', 'ust', 'usg', 'benefits', 'status' to real work, so they were omitted to stay truthful.",
+    "Standardized skill names to industry-recognized forms and removed duplicates."
+  ],
+  "engine": "claude"
+}

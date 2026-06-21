@@ -1,0 +1,153 @@
+{
+  "full_name": "Sai Manikanta Karnati",
+  "email": "reachouttosassm@gmail.com",
+  "phone": "919-538-5336",
+  "location": "Charlotte, NC",
+  "linkedin": "",
+  "github": "",
+  "website": "",
+  "years_experience": 4.0,
+  "target_titles": [
+    "Full-Stack Software Engineer",
+    "Backend Software Engineer",
+    "Microservices Engineer",
+    "Cloud Software Engineer"
+  ],
+  "skills": [
+    "Python",
+    "Java Spring Boot",
+    "Angular",
+    "TypeScript",
+    "Node.js",
+    "RESTful APIs",
+    "GraphQL",
+    "SQL",
+    "MySQL",
+    "MongoDB",
+    "Redis",
+    "DynamoDB",
+    "AWS",
+    "Azure",
+    "Google Cloud Platform",
+    "Docker",
+    "Kubernetes",
+    "Terraform",
+    "Apache Kafka",
+    "AWS SNS/SQS",
+    "CI/CD",
+    "Jenkins",
+    "Splunk",
+    "OAuth2",
+    "JWT",
+    "Spring Security",
+    "RxJS",
+    "Angular Material",
+    "Express.js",
+    "Service-Oriented Architecture",
+    "Microservices",
+    "API Versioning",
+    "OpenAPI/Swagger",
+    "HTML5",
+    "CSS3",
+    "SASS/SCSS",
+    "Vue.js",
+    "React.js",
+    "Spring MVC",
+    "Spring Cloud",
+    "Meteor JS",
+    "JavaScript",
+    "Git",
+    "BitBucket",
+    "JIRA",
+    "Postman",
+    "Confluence",
+    "Agile",
+    "Scrum",
+    "TDD"
+  ],
+  "experience": [
+    {
+      "company": "Vanguard",
+      "title": "Software Engineer",
+      "start": "08/2025",
+      "end": "present",
+      "bullets": [
+        "Designed and developed scalable backend services using Python and Java Spring Boot microservices, enabling modular service-oriented architecture and independent deployments.",
+        "Built Python-based data processing pipelines and automation scripts for backend workflows, reducing manual operational effort and improving processing efficiency.",
+        "Developed and optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+        "Engineered high-throughput event-driven systems using DynamoDB Streams, Python/Node.js Lambda functions, and SNS/SQS, ensuring 99.99% reliability.",
+        "Designed AI-powered backend services integrating Python-based LLM APIs for intelligent text processing, classification, and automated workflows.",
+        "Built responsive Angular single-page applications using TypeScript, RxJS, Angular Material, Reactive Forms, and lazy loading.",
+        "Developed RESTful and GraphQL APIs consumed by Angular frontends, ensuring seamless frontend-backend integration.",
+        "Optimized application performance through SQL tuning, indexing strategies, and database schema improvements.",
+        "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS, DynamoDB) and integrated Azure services. Implemented monitoring and observability using Splunk and Spring Boot Actuator, reducing production issue resolution time by 40%."
+      ]
+    },
+    {
+      "company": "Xebia",
+      "title": "Associate Software Engineer",
+      "start": "01/2022",
+      "end": "12/2023",
+      "bullets": [
+        "Developed backend applications using Python, Java Spring Boot, and Node.js, delivering scalable RESTful APIs and microservices.",
+        "Built Python automation scripts for data transformation, validation, and backend task orchestration.",
+        "Designed and optimized SQL queries, joins, views, and stored procedures, improving API response times by 35%.",
+        "Built dynamic frontend applications using Angular, TypeScript, SCSS, Angular Router, RxJS, and Angular Material.",
+        "Developed reusable Angular components and implemented state management for complex UI workflows.",
+        "Created and documented RESTful APIs using Swagger/OpenAPI, enforcing API versioning and backward compatibility.",
+        "Developed GraphQL APIs to improve client-side data retrieval efficiency.",
+        "Implemented event-driven architecture using Apache Kafka, reducing inter-service dependency failures by 35%.",
+        "Integrated authentication using OAuth2, JWT, and Spring Security.",
+        "Used Redis caching and SQL optimization techniques to improve throughput under heavy load.",
+        "Automated infrastructure provisioning with Terraform on AWS and GCP.",
+        "Containerized applications using Docker and Kubernetes, improving CI/CD deployment efficiency."
+      ]
+    },
+    {
+      "company": "Xebia",
+      "title": "Engineer Trainee",
+      "start": "01/2021",
+      "end": "12/2021",
+      "bullets": [
+        "Developed enterprise applications using Angular and Python/Java backend services.",
+        "Built and optimized SQL queries, stored procedures, and relational database schemas for transactional systems.",
+        "Worked extensively with MySQL and MongoDB, improving query execution time by 20%.",
+        "Developed RESTful APIs and documented service contracts using Swagger/OpenAPI.",
+        "Built Angular frontend modules using TypeScript, Redux, and Reactive Forms.",
+        "Implemented API security using OAuth2 and Spring Security.",
+        "Applied rate limiting and API gateway protections for backend services.",
+        "Increased unit test coverage to 95% using JUnit and Python-based test automation tools."
+      ]
+    }
+  ],
+  "education": [
+    "Master of Science in Computer Science, University Of North Carolina At Charlotte"
+  ],
+  "work_auth": {
+    "authorized_us": true,
+    "requires_sponsorship": false,
+    "visa_status": "Authorized to work in the US (no sponsorship required)",
+    "needs_relocation_ok": null
+  },
+  "desired_salary": "$120,000",
+  "preferred_locations": [
+    "Charlotte",
+    "NC; Remote"
+  ],
+  "open_to_remote": true,
+  "apply_mode": "supervised",
+  "auto_min_match": 80,
+  "eeo": {},
+  "answer_bank": {
+    "why_interested": "enjoys building scalable backend and full-stack systems with Java/Python and cloud, and ML-powered features",
+    "how_heard": "found the role through an online job board while searching for backend/full-stack roles",
+    "willing_to_relocate": "open to relocating in the US for the right opportunity",
+    "remote_preference": "open to remote, hybrid, or onsite in the US",
+    "start_date": "available with 2 weeks notice"
+  },
+  "resume_facts": {
+    "companies": "Vanguard, Xebia",
+    "titles": "Software Engineer, Associate Software Engineer, Engineer Trainee",
+    "metrics": "improving reporting and transaction performance by 35%, ensuring 99.99% reliability, reducing production issue resolution time by 40%, improving API response times by 35%, reducing inter-service dependency failures by 35%, improving query execution time by 20%, Increased unit test coverage to 95%"
+  }
+}

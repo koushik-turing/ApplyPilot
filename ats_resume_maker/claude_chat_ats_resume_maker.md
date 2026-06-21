@@ -232,7 +232,7 @@ curl http://localhost:8000/api/health
 ```
 
 To enable Claude: put a valid key in `backend\.env` →
-`ANTHROPIC_API_KEY="sk-ant-api03-...REDACTED"` and `CLAUDE_MODEL=claude-opus-4-8`, then restart.
+`ANTHROPIC_API_KEY="sk-ant-api03-REDACTED"` and `CLAUDE_MODEL=claude-opus-4-8`, then restart.
 
 ---
 

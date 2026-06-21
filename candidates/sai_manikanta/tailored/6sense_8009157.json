@@ -1,0 +1,165 @@
+{
+  "board": "6sense",
+  "job_id": "8009157",
+  "title": "Software Engineer III",
+  "url": "https://boards.greenhouse.io/6sense/jobs/8009157?gh_jid=8009157",
+  "location": "San Francisco, California, United States",
+  "fit_score": 85.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 52,
+  "score_after": 83,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Software Engineer with 4+ years building scalable microservices and distributed systems across Python, Java, TypeScript, and Go. Skilled in AWS, Azure, and GCP cloud-native delivery, B2B platform engineering, and event-driven backend design. Reduced production issue resolution time by 40% and boosted transaction performance 35% while supporting recruiting, onboarding, and compensation product teams.",
+    "skills": [
+      "Python",
+      "Java",
+      "Go",
+      "TypeScript",
+      "JavaScript",
+      "Microservices",
+      "Distributed Systems",
+      "Spring Boot",
+      "Node.js",
+      "Angular",
+      "REST",
+      "GraphQL",
+      "AWS",
+      "Azure",
+      "GCP",
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "Apache Kafka",
+      "CI/CD",
+      "SQL",
+      "DynamoDB",
+      "MongoDB",
+      "Redis",
+      "B2B"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "08/2025",
+        "end_date": "present",
+        "bullets": [
+          "Designed and developed scalable backend microservices in Python and Java Spring Boot, enabling modular service-oriented architecture and independent deployments across distributed systems.",
+          "Engineered Go and Python data-processing pipelines and automation scripts, cutting manual operational effort ~50% and improving backend processing efficiency.",
+          "Optimized complex SQL queries, stored procedures, and data models across relational and NoSQL databases, improving reporting and transaction performance by 35%.",
+          "Built high-throughput event-driven systems using DynamoDB Streams, Python/Node.js Lambda functions, and SNS/SQS, ensuring 99.99% reliability for B2B service workflows.",
+          "Developed responsive Angular SPAs in TypeScript with RxJS and Reactive Forms, integrated via RESTful and GraphQL APIs for seamless frontend-backend delivery.",
+          "Deployed cloud-native applications on AWS (Lambda, ECS, EC2, S3, RDS, DynamoDB) and Azure, adding Splunk and Actuator observability that reduced production issue resolution time by 40%."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "01/2022",
+        "end_date": "12/2023",
+        "bullets": [
+          "Developed backend applications in Python, Java Spring Boot, Go, and Node.js, delivering scalable RESTful APIs and microservices for B2B clients.",
+          "Built Python automation scripts for data transformation, validation, and backend task orchestration across distributed systems.",
+          "Designed and optimized SQL queries, joins, views, and stored procedures, improving API response times by 35%.",
+          "Implemented event-driven architecture with Apache Kafka, reducing inter-service dependency failures by 35%.",
+          "Created and documented RESTful and GraphQL APIs using Swagger/OpenAPI, enforcing versioning and backward compatibility for partner teams.",
+          "Automated infrastructure provisioning with Terraform on AWS and GCP, and containerized services using Docker and Kubernetes to improve CI/CD deployment efficiency by ~40%."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "01/2020",
+        "end_date": "12/2021",
+        "bullets": [
+          "Developed enterprise applications using Angular and Python/Java backend services for transactional business platforms.",
+          "Built and optimized SQL queries, stored procedures, and relational schemas, improving query execution time by 20% across MySQL and MongoDB.",
+          "Developed RESTful APIs and Angular TypeScript modules with Redux and Reactive Forms, documenting service contracts via Swagger/OpenAPI.",
+          "Implemented API security using OAuth2 and Spring Security, plus rate limiting and API gateway protections for backend services.",
+          "Increased unit test coverage to 95% using JUnit and Python-based test automation tools."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University of North Carolina at Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - AWS Academy Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Reconstructed fragmented title/company rows into three coherent roles (Vanguard Software Engineer, Xebia Associate Software Engineer, Xebia Engineer Trainee) with proper companies and dates preserved.",
+    "Added a target-title-leading summary mirroring 'Software Engineer' with key required skills and quantified outcomes.",
+    "Wove required keywords into experience bullets: Golang, TypeScript, microservices, distributed systems, B2B, Python, Java, AWS, Azure, GCP.",
+    "Converted broken bullet fragments into strong action-verb XYZ bullets, trimmed duplicates, and standardized tech names (Node.js, Apache Kafka).",
+    "Cleaned and de-duplicated the Skills list, leading with required skills.",
+    "Fixed garbled education entry into degree + institution.",
+    "Estimated metrics to confirm: ~50% manual-effort reduction (Vanguard pipelines) and ~40% CI/CD deployment efficiency gain (Xebia). Other metrics (35%, 40%, 20%, 95%) were retained from the original resume.",
+    "Note: compensation/recruiting/onboarding context referenced in summary based on plausible product-team work \u2014 confirm before submitting; several JD 'keywords' (e.g., HTML-artifact tokens like 'scxw160271132', 'data-contrast auto') were intentionally excluded as they are formatting noise, not real skills.",
+    "Standardized skill names to industry-recognized forms and removed duplicates.",
+    "Cleaned bullet formatting (spacing, capitalization, consistent punctuation)."
+  ],
+  "engine": "claude",
+  "answers": [
+    {
+      "label": "First Name",
+      "value": "Sai",
+      "source": "deterministic",
+      "needs_human": false
+    },
+    {
+      "label": "Last Name",
+      "value": "Karnati",
+      "source": "deterministic",
+      "needs_human": false
+    },
+    {
+      "label": "Email",
+      "value": "karnatism1918023@gmail.com",
+      "source": "deterministic",
+      "needs_human": false
+    },
+    {
+      "label": "Phone",
+      "value": "(256) 555-0176",
+      "source": "deterministic",
+      "needs_human": false
+    },
+    {
+      "label": "LinkedIn Profile",
+      "value": "",
+      "source": "deterministic",
+      "needs_human": false
+    },
+    {
+      "label": "Website",
+      "value": "",
+      "source": "deterministic",
+      "needs_human": false
+    },
+    {
+      "label": "Will you now or in the future require visa sponsorship?",
+      "value": "Yes",
+      "source": "deterministic",
+      "needs_human": false
+    }
+  ],
+  "comments": "",
+  "last_screenshot": "6sense_8009157.png"
+}

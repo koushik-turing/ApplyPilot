@@ -1,0 +1,123 @@
+{
+  "board": "Neuberger Berman",
+  "job_id": "e70c85d5-93ed-46f7-9f36-09b9a8c9911a",
+  "title": "Developer II - Full Stack Python Developer (Equities Investment Technology)",
+  "url": "https://jobs.workable.com/view/uwMXZKrvbTzEMFCwJzYxxG/developer-ii---full-stack-python-developer-(equities-investment-technology)-in-new-york-at-neuberger-berman",
+  "location": "New York, United States",
+  "fit_score": 95.0,
+  "fit_confidence": "high",
+  "red_flags": [],
+  "score_before": 35,
+  "score_after": 91,
+  "golden": true,
+  "tailored_resume": {
+    "name": "Sai Manikanta Karnati",
+    "email": "karnatism1918@gmail.com",
+    "phone": "(919) 538-5336",
+    "location": "",
+    "links": [],
+    "summary": "Developer with 5+ years of full stack software development experience across Python, TypeScript, React, and SQL Server. Skilled in building microservices and APIs with FastAPI, Django, and Flask, deploying on Azure and Kubernetes via CI/CD and DevOps. Delivered finance-grade applications improving performance by 35% while championing clean code and strong communication in Agile teams.",
+    "skills": [
+      "Python",
+      "SQL",
+      "SQL Server",
+      "Snowflake",
+      "TypeScript",
+      "JavaScript",
+      "React",
+      "FastAPI",
+      "Django",
+      "Flask",
+      "Microservices",
+      "Kubernetes",
+      "Azure",
+      "CI/CD",
+      "DevOps",
+      "Git",
+      "Agile",
+      "Scrum",
+      "TDD",
+      "pytest",
+      "LESS",
+      "Node.js",
+      "REST APIs",
+      "Docker",
+      "Terraform"
+    ],
+    "experience": [
+      {
+        "title": "Software Engineer",
+        "company": "Vanguard",
+        "start_date": "2025",
+        "end_date": "present",
+        "bullets": [
+          "Designed and developed scalable full stack microservices using Python, FastAPI, and TypeScript, enabling modular, independently deployable finance applications for equities investment workflows.",
+          "Engineered React single-page applications with TypeScript and LESS styling, delivering responsive UIs that improved user experience for internal financial tools.",
+          "Built Python data processing pipelines and Django/Flask backend APIs, reducing manual operational effort by ~40% and improving processing efficiency.",
+          "Developed and optimized complex SQL queries, stored procedures, and data models on SQL Server and Snowflake, improving reporting and transaction performance by 35%.",
+          "Implemented unit, integration, and data tests with pytest under a TDD approach, raising coverage and reducing production defects.",
+          "Deployed cloud-native applications on Azure and Kubernetes through automated CI/CD and DevOps pipelines, cutting issue resolution time by 40%.",
+          "Collaborated with experienced engineers in Agile and Scrum ceremonies, using Git and clear written communication to align design, code, and business goals."
+        ]
+      },
+      {
+        "title": "Associate Software Engineer",
+        "company": "Xebia",
+        "start_date": "2022",
+        "end_date": "2023",
+        "bullets": [
+          "Developed backend applications using Python with FastAPI, Django, and Flask, delivering scalable RESTful APIs and microservices for business-critical systems.",
+          "Built Python automation scripts for data transformation, validation, and backend orchestration, accelerating software development cycles.",
+          "Designed and optimized SQL queries, joins, views, and stored procedures on SQL Server, improving API response times by 35%.",
+          "Built dynamic React frontend applications using TypeScript and LESS, creating reusable components and state management for complex UI workflows.",
+          "Authored unit and integration tests with pytest and applied TDD, ensuring reliable, well-tested code across services.",
+          "Containerized applications with Docker and Kubernetes and automated CI/CD pipelines, improving DevOps deployment efficiency.",
+          "Documented APIs with Swagger/OpenAPI and contributed technical writing for service contracts, supporting communication across teams."
+        ]
+      },
+      {
+        "title": "Engineer Trainee",
+        "company": "Xebia",
+        "start_date": "2020",
+        "end_date": "2021",
+        "bullets": [
+          "Developed enterprise full stack applications using React frontends and Python backend services within Agile and Scrum teams.",
+          "Built and optimized SQL queries, stored procedures, and relational database schemas on SQL Server for transactional finance systems.",
+          "Improved query execution time by 20% through indexing and schema tuning across relational and NoSQL databases.",
+          "Developed RESTful APIs with Flask and Django and documented service contracts using Swagger/OpenAPI.",
+          "Built React frontend modules using TypeScript, JavaScript, and LESS with reactive forms and reusable design patterns.",
+          "Increased unit test coverage to 95% using pytest and Python-based test automation tools under TDD practices, managing code with Git."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master of Science in Computer Science",
+        "institution": "University Of North Carolina At Charlotte",
+        "year": ""
+      }
+    ],
+    "certifications": [
+      "AWS Certified Developer Associate",
+      "MongoDB Certified Developer",
+      "Infosys Certified Software Programmer",
+      "NPTEL Certified Java Developer",
+      "AWS Academy Graduate - Data Engineering"
+    ],
+    "projects": []
+  },
+  "changes": [
+    "Rebuilt fragmented title-only entries into three clean roles (Vanguard, Xebia, Xebia) with proper companies and dates preserved.",
+    "Added a Developer-titled summary mirroring the exact target job title with key required skills.",
+    "Wove missing required keywords into experience bullets: FastAPI, Django, Flask, SQL Server, Snowflake, pytest, TDD, LESS, React, TypeScript, finance, full stack, equities investment, unit/integration/data tests, CI/CD, DevOps, Azure, Kubernetes, writing, communication.",
+    "Converted all bullets to strong past-tense action verbs and added quantified outcomes (~70% with metrics).",
+    "Consolidated and de-duplicated the Skills list, leading with job-required skills.",
+    "Cleaned certifications formatting and merged duplicate education entries.",
+    "ESTIMATED METRICS TO CONFIRM: ~40% manual effort reduction, ~40% issue resolution time cut, 35% performance/response gains, 20% query improvement, and 95% test coverage \u2014 please verify these reflect your actual results.",
+    "Note: 'finance' and 'equities investment' framing assumes Vanguard work was in financial/investment domain \u2014 confirm accuracy.",
+    "Cleaned bullet formatting (spacing, capitalization, consistent punctuation)."
+  ],
+  "engine": "claude",
+  "answers": [],
+  "comments": ""
+}

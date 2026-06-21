@@ -1,5 +1,14 @@
-# ===== SECRETS — never commit =====
+# ============================================================
+#  Only SECRETS and machine-local junk are excluded.
+#  Everything else (code, docs, candidates/, manikanta/, resumes,
+#  Excel, seed/sponsorship data) IS committed so a collaborator
+#  can see and work on the whole project.
+# ============================================================
+
+# ===== SECRETS — never commit (the one hard rule) =====
 .env
+**/.env
+backend/.env
 *.key
 *_key.txt
 adzuna_key.txt
@@ -7,34 +16,17 @@ secrets/
 **/credentials*.json
 **/token*.json
 
-# ===== CANDIDATE PII — never commit real people's data =====
-candidates/
-data/
-*.pdf
-*.docx
-*_resume*.pdf
-*_tailored.*
-Likhitha_*
-Sai_*
-*_checkpoint.json
-*_cache.json
-*.jsonl
-
-# ===== Generated caches =====
-seed/live_tokens.json
-
-# ===== Generated / large outputs =====
-*.xlsx
-*.csv
-*_Jobs.txt
-*_Matches.txt
-api_cache/
-__pycache__/
-*.pyc
+# ===== logs (noise; can contain stray keys/PII) =====
 *.log
 *.log.*
+*.out.log
+*.err.log
 
-# ===== Python env =====
+# ===== generated caches / temp =====
+seed/live_tokens.json
+data/_upload_*
+**/__pycache__/
+*.pyc
 .venv/
 venv/
 env/
@@ -46,8 +38,3 @@ env/
 Thumbs.db
 .vscode/
 .idea/
-
-# candidate deliverables workspace (PDFs/Excel/resume) — not code
-manikanta/
-*_Resume.pdf
-*_Resume.docx
