@@ -168,45 +168,63 @@ function renderShortlist() {
   const dtag = (j) => { const n = da(j); const d = j.posted_on ? ` <span class="muted">(${j.posted_on})</span>` : "";
     return n === 999 ? `<span class="daytag">unknown</span>`
     : n === 0 ? `<span class="daytag today">today</span>${d}` : `<span class="daytag">${n}d ago</span>${d}`; };
-  const html = `<table><thead><tr><th>Match</th><th>Verdict</th><th>Sponsorship</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th><th>Job link / Tailored resume</th></tr></thead><tbody>${
+  const html = `<table><thead><tr><th>Match</th><th>Verdict</th><th>Sponsorship</th><th>Posted</th><th>Job (✓ strengths / △ gaps)</th><th>Company</th><th>Resume</th><th>Status</th></tr></thead><tbody>${
     rows.map(j => `
       <tr>
         <td class="fit ${j.match>=75?"hi":j.match>=60?"mid":"lo"}">${Math.round(j.match)}%</td>
         <td>${j.verdict || ""}</td>
         <td>${spons(j.sponsors_h1b, j.h1b_approvals)}</td>
         <td>${dtag(j)}</td>
-        <td><a class="joblink" href="${j.url}" target="_blank">${j.title}</a>
+        <td><a class="joblink" href="${j.url}" target="_blank">↗ ${j.title}</a>
           ${j.strengths ? `<div class="changes">✓ ${j.strengths}</div>` : ""}
           ${j.gaps ? `<div class="changes" style="color:#b45309">△ ${j.gaps}</div>` : ""}</td>
         <td>${j.company}${j.location ? `<div class="muted" style="font-size:11px">${j.location}</div>` : ""}</td>
-        <td style="white-space:nowrap">
-          <a class="btn sm" href="${j.url}" target="_blank">↗ Open</a>
-          <button class="btn sm primary" data-tailor="${encodeURIComponent(j.url)}">📄 Tailored Resume</button>
-        </td>
+        <td class="actioncell" style="white-space:nowrap"><span class="resumebtns">${resumeButtons(j)}</span></td>
+        <td><select class="statussel st-${j.status}" data-url="${encodeURIComponent(j.url)}">
+          <option value="not_completed" ${j.status==='not_completed'?'selected':''}>Not completed</option>
+          <option value="completed" ${j.status==='completed'?'selected':''}>Completed</option>
+          <option value="error" ${j.status==='error'?'selected':''}>Error</option>
+        </select></td>
       </tr>`).join("")}</tbody></table>`;
   $("#shortlistTable").innerHTML = rows.length ? html : `<p style="color:#6b7280">No matches yet — click “Run daily”.</p>`;
-  document.querySelectorAll("[data-tailor]").forEach(b =>
-    b.onclick = () => downloadTailored(decodeURIComponent(b.dataset.tailor), b));
+  document.querySelectorAll("[data-tailor]").forEach(b => b.onclick = () => prepareTailored(b.dataset.tailor, b));
+  document.querySelectorAll(".statussel").forEach(s => s.onchange = () => setJobStatus(s.dataset.url, s.value, s));
 }
 
-// On-demand golden tailoring: tailor this JD now and download the PDF (cached after first time).
-async function downloadTailored(url, btn) {
+// Resume cell: if already tailored show PDF+DOC download links, else a "Tailored Resume" button.
+function resumeButtons(j) {
+  if (j.tailored) return downloadLinksHtml(j.url);
+  return `<button class="btn sm primary" data-tailor="${encodeURIComponent(j.url)}">📄 Tailored Resume</button>`;
+}
+function downloadLinksHtml(url) {
+  const eu = encodeURIComponent(url), base = `/api/clients/${detailData.slug}/tailor-now?url=${eu}`;
+  return `<span class="gold-pill" style="margin-right:6px">✓ tailored</span>
+    <a class="btn sm" href="${base}&fmt=pdf">PDF</a>
+    <a class="btn sm" href="${base}&fmt=docx">DOC</a>`;
+}
+
+// Click "Tailored Resume" -> golden-tailor (once), then reveal PDF + DOC download options.
+async function prepareTailored(eurl, btn) {
   const orig = btn.textContent;
   btn.textContent = "⏳ Tailoring…"; btn.disabled = true;
   try {
-    const r = await fetch(`/api/clients/${detailData.slug}/tailor-now?url=${encodeURIComponent(url)}`);
+    const r = await fetch(`/api/clients/${detailData.slug}/tailor-now?url=${eurl}&prepare=true`);
     if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || r.statusText); }
-    const blob = await r.blob();
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob); a.download = "tailored_resume.pdf"; a.click();
-    URL.revokeObjectURL(a.href);
-    btn.textContent = "✓ Downloaded";
+    await r.json();
+    const span = btn.closest(".actioncell").querySelector(".resumebtns");
+    span.innerHTML = downloadLinksHtml(decodeURIComponent(eurl));
   } catch (e) {
     btn.textContent = "✗ failed";
     alert("Tailoring failed: " + (e.message || e) + "\n(Is the ATS engine running on :8000?)");
-  } finally {
     setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 2500);
   }
+}
+
+// Recruiter status tracker per job.
+async function setJobStatus(eurl, val, sel) {
+  sel.className = "statussel st-" + val;
+  try { await fetch(`/api/clients/${detailData.slug}/job-status?url=${eurl}&status=${val}`, { method: "POST" }); }
+  catch (e) { /* ignore */ }
 }
 
 const BANK_TOPICS = [

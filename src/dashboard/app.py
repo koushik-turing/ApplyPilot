@@ -211,9 +211,21 @@ def client_detail(slug: str):
                     ("full_name", "email", "location", "years_experience", "skills",
                      "target_titles", "work_auth", "desired_salary", "answer_bank",
                      "apply_mode", "auto_min_match")},
-        "shortlist": [j for j in _read_shortlist(d) if is_us(j.get("location", ""))][:200],
+        "shortlist": _enrich_shortlist(slug, [j for j in _read_shortlist(d)
+                                             if is_us(j.get("location", ""))][:200]),
         "tailored": tailored,
     }
+
+
+def _enrich_shortlist(slug: str, rows: list[dict]) -> list[dict]:
+    """Add per-job 'tailored' (is a golden resume already generated?) + 'status'."""
+    ws = _workspace(slug)
+    status_map = _load_status(slug)
+    for j in rows:
+        url = j.get("url", "")
+        j["tailored"] = (ws / "tailored_resumes" / f"{_job_key(url)}.json").exists()
+        j["status"] = status_map.get(url, "not_completed")
+    return rows
 
 
 @app.get("/api/clients/{slug}/resume/{fname}")
@@ -428,47 +440,78 @@ def _workspace(slug: str) -> Path:
     return d
 
 
-@app.get("/api/clients/{slug}/tailor-now")
-def tailor_now(slug: str, url: str):
-    """On-demand GOLDEN tailoring for ONE job (by URL). Tailors the candidate's resume to
-    that JD, saves the PDF in the candidate's workspace (manikanta/ for Sai), and streams it.
-    Cached so re-clicks are instant."""
-    from ..tailor.client import tailor_for_job, export_resume
+def _job_key(url: str) -> str:
     import hashlib
+    return hashlib.md5(url.encode()).hexdigest()[:12]
+
+
+def _ensure_tailored(slug: str, url: str) -> dict:
+    """Golden-tailor this JD if not already cached; return the cached structured result
+    {tailored_resume, score_before, score_after}. The expensive Opus step runs once."""
     ws = _workspace(slug)
-    key = hashlib.md5(url.encode()).hexdigest()[:12]
-    pdf_path = ws / "tailored_resumes" / f"{key}.pdf"
-    if pdf_path.exists():
-        return StreamingResponse(iter([pdf_path.read_bytes()]), media_type="application/pdf",
-                                 headers={"Content-Disposition": f'attachment; filename="tailored_{key}.pdf"'})
-    # find the JD content (from the crawl's jobs cache, else re-fetch it live)
+    struct = ws / "tailored_resumes" / f"{_job_key(url)}.json"
+    cached = _read_json(struct)
+    if cached and cached.get("tailored_resume"):
+        return cached
     jobs_cache = _read_json(config.CANDIDATES_DIR / slug / "jobs_cache.json") or {}
     jd = jobs_cache.get(url, {})
-    jd_text = jd.get("content", "")
-    title = (jd.get("title") or "resume").replace(" ", "_")[:40]
+    jd_text, title = jd.get("content", ""), jd.get("title", "")
     if not jd_text:
-        jd_title, jd_text = _refetch_jd(url)
-        if jd_title:
-            title = jd_title.replace(" ", "_")[:40]
+        title2, jd_text = _refetch_jd(url)
+        title = title or title2
     if not jd_text:
         raise HTTPException(404, "Could not load the job description for this URL.")
     resume = _candidate_resume(slug)
     if not resume:
         raise HTTPException(404, "no resume on file for this candidate")
+    from ..tailor.client import tailor_for_job
     from ..profile.parse import read_pdf_text
-    jd_full = f"Job Title: {jd.get('title','')}\n\n{jd_text}"
     try:
-        res = tailor_for_job(read_pdf_text(resume), jd_full)
-        pdf = export_resume(res["tailored_resume"], "pdf")
+        res = tailor_for_job(read_pdf_text(resume), f"Job Title: {title}\n\n{jd_text}")
     except Exception as e:
         raise HTTPException(503, f"tailoring failed (is the ATS engine on :8000?): {e}")
-    pdf_path.write_bytes(pdf)
-    # remember the score alongside
-    (ws / "tailored_resumes" / f"{key}.json").write_text(
-        json.dumps({"url": url, "title": jd.get("title"),
-                    "score_before": res["score_before"], "score_after": res["score_after"]}), encoding="utf-8")
-    return StreamingResponse(iter([pdf]), media_type="application/pdf",
-                             headers={"Content-Disposition": f'attachment; filename="{title}_tailored.pdf"'})
+    data = {"url": url, "title": title, "tailored_resume": res["tailored_resume"],
+            "score_before": res["score_before"], "score_after": res["score_after"]}
+    struct.write_text(json.dumps(data), encoding="utf-8")
+    return data
+
+
+@app.get("/api/clients/{slug}/tailor-now")
+def tailor_now(slug: str, url: str, fmt: str = "pdf", prepare: bool = False):
+    """Golden-tailor a JD on demand. prepare=true just generates+caches (returns scores).
+    Otherwise exports the cached tailored resume to PDF or DOCX, named after the candidate."""
+    data = _ensure_tailored(slug, url)
+    if prepare:
+        return {"ok": True, "tailored": True,
+                "score_before": data["score_before"], "score_after": data["score_after"]}
+    prof = load_profile_by_slug(slug)
+    cand = (prof.full_name or slug).strip().replace(" ", "_") or "Candidate"
+    ext = "docx" if fmt.lower() == "docx" else "pdf"
+    from ..tailor.client import export_resume
+    blob = export_resume(data["tailored_resume"], ext)
+    media = ("application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+             if ext == "docx" else "application/pdf")
+    return StreamingResponse(iter([blob]), media_type=media,
+                             headers={"Content-Disposition": f'attachment; filename="{cand}_Resume.{ext}"'})
+
+
+# ---- per-job application status tracker ----
+def _status_path(slug: str) -> Path:
+    return config.CANDIDATES_DIR / slug / "app_status.json"
+
+
+def _load_status(slug: str) -> dict:
+    return _read_json(_status_path(slug)) or {}
+
+
+@app.post("/api/clients/{slug}/job-status")
+def set_job_status(slug: str, url: str, status: str):
+    if status not in ("not_completed", "completed", "error"):
+        raise HTTPException(400, "status must be not_completed|completed|error")
+    st = _load_status(slug)
+    st[url] = status
+    _status_path(slug).write_text(json.dumps(st), encoding="utf-8")
+    return {"ok": True}
 
 
 def _refetch_jd(url: str) -> tuple[str, str]:

@@ -69,6 +69,11 @@ tbody tr:hover{ background:#fafbff; }
 .daytag{ font-size:11px; padding:2px 7px; border-radius:6px; background:#f1f5f9; color:#475569; white-space:nowrap; }
 .daytag.today{ background:#ecfdf3; color:var(--gold); font-weight:600; }
 .muted{ color:var(--mut); }
+.statussel{ border:1px solid var(--line); border-radius:7px; padding:5px 8px; font-size:12px; font-weight:600; cursor:pointer; }
+.statussel.st-not_completed{ background:#f1f5f9; color:#64748b; }
+.statussel.st-completed{ background:#ecfdf3; color:var(--gold); border-color:#86efac; }
+.statussel.st-error{ background:#fef2f2; color:#dc2626; border-color:#fca5a5; }
+.actioncell .btn{ margin-right:4px; }
 
 /* detail */
 #detailView h2.name{ font-size:22px; margin:6px 0 2px; }
