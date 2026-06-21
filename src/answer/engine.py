@@ -216,10 +216,24 @@ def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
     if "salary" in label or "compensation" in label or "desired pay" in label:
         return mk(p.desired_salary, human=not bool(p.desired_salary))
 
-    # Location working from
-    if ("city" in label and "state" in label) or "where will you be working" in label:
-        loc = p.preferred_locations[0] if p.preferred_locations else p.location
-        return mk(loc, human=not bool(loc))
+    # "What city / where do you work / available to work" — use the candidate's real location,
+    # NEVER let AI guess a city. Targeted so it doesn't swallow auth questions that merely
+    # mention 'location'/'based'. (Pure 'which STATE do you reside' is left to L3, which can
+    # derive the state from the candidate's city correctly.)
+    is_loc_q = (re.search(r"\b(what|which)\b.*\bcit(y|ies)\b", label)
+                or re.match(r"\s*(from )?where\b", label)
+                or "where will you be working" in label
+                or "where are you located" in label
+                or ("city" in label and "state" in label)
+                or "intend to work" in label
+                or "available to work" in label)
+    if is_loc_q:
+        loc = (p.preferred_locations[0] if p.preferred_locations else p.location) or ""
+        if q.options:                       # a select -> snap to a real option (US city / Remote)
+            lab = (_snap_label(q, loc) if loc else None) or _snap_label(q, "Remote") \
+                  or _snap_label(q, "United States")
+            return mk(lab) if lab else mk("", conf=0.3, human=bool(q.required))
+        return mk(loc, human=not loc and bool(q.required))
 
     # Years of experience
     if "years of experience" in label or "years' experience" in label:
