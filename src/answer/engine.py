@@ -381,6 +381,14 @@ def answer_form(job: Job, profile: Profile, candidate: str,
             cache[key] = a.value
 
     _save_cache(candidate, cache)
+
+    # SAFETY: any REQUIRED field we couldn't fill must be flagged — so a human resolves it
+    # and (in automated mode) it blocks submit. Prevents submitting an incomplete form.
+    req = {q.label: q.required for q in job.questions}
+    for a in sheet.answers:
+        if not a.value and req.get(a.label):
+            a.needs_human = True
+
     if test_mode:
         _sanitize_for_test(sheet, profile)   # never expose real email/phone while testing
     return sheet

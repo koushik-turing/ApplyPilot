@@ -134,15 +134,28 @@ def fill_form(
                     break
             (result["filled"] if placed else result["skipped"]).append(a.label)
 
-        # Upload resume to the file input
+        # Upload resume — target the RESUME file input specifically (not the cover-letter one).
         if resume_path and Path(resume_path).exists():
-            try:
-                fi = page.locator('input[type="file"]').first
-                if fi.count():
-                    fi.set_input_files(str(resume_path))
-                    result["resume_uploaded"] = True
-            except Exception as e:
-                result["resume_error"] = str(e)
+            uploaded = False
+            for sel in ('input[type="file"]#resume', 'input[type="file"][name="resume"]',
+                        'input[type="file"][id*="resume" i]', 'input[type="file"][name*="resume" i]'):
+                try:
+                    loc = page.locator(sel).first
+                    if loc.count():
+                        loc.set_input_files(str(resume_path))
+                        uploaded = True
+                        break
+                except Exception:
+                    continue
+            if not uploaded:   # fallback: first file input (most forms put resume first)
+                try:
+                    fi = page.locator('input[type="file"]').first
+                    if fi.count():
+                        fi.set_input_files(str(resume_path))
+                        uploaded = True
+                except Exception as e:
+                    result["resume_error"] = str(e)
+            result["resume_uploaded"] = uploaded
 
         # Screenshot for the review queue
         sdir = Path(screenshot_dir) if screenshot_dir else Path(config.DATA_DIR)
@@ -156,7 +169,21 @@ def fill_form(
 
         if submit and not sheet.needs_review:
             try:
-                page.get_by_role("button", name="Submit Application").click()
+                clicked = False
+                for name in ("Submit Application", "Submit application", "Submit",
+                             "Apply", "Apply for this job", "Send Application"):
+                    btn = page.get_by_role("button", name=name)
+                    if btn.count():
+                        btn.first.click()
+                        clicked = True
+                        break
+                if not clicked:        # fallback: a submit-type input/button
+                    sub = page.locator('button[type="submit"], input[type="submit"]').first
+                    if sub.count():
+                        sub.click()
+                        clicked = True
+                if not clicked:
+                    raise RuntimeError("could not find a submit button")
                 page.wait_for_timeout(2500)
                 result["status"] = Status.SUBMITTED.value
             except Exception as e:
