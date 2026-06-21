@@ -363,7 +363,15 @@ def answer_form(job: Job, profile: Profile, candidate: str,
     sheet = AnswerSheet(job_id=job.job_id)
 
     for q in job.questions:
-        if q.field_type == "input_file":   # resume/cover-letter handled by M5 upload
+        if q.field_type == "input_file":
+            # Resume is uploaded by M5. A REQUIRED non-resume file (e.g. a cover letter we
+            # don't generate yet) can't be provided -> flag so the recruiter handles it and
+            # it blocks auto-submit (rather than the form silently rejecting at submit).
+            fn = (" ".join(q.field_names) + " " + q.label).lower()
+            if q.required and "resume" not in fn and "cv" not in fn:
+                sheet.answers.append(Answer(
+                    label=q.label, field_names=q.field_names, value="",
+                    source=AnswerSource.DETERMINISTIC, confidence=0.0, needs_human=True))
             continue
 
         # L1 — deterministic hard fields
