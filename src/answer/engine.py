@@ -124,6 +124,43 @@ def _l1_answer(q: FormQuestion, p: Profile) -> Answer | None:
     if ("website" in label or "portfolio" in label):
         return mk(p.website)
 
+    # Preferred / first name (very common)
+    if "preferred" in label and "name" in label:
+        return mk(p.full_name.split()[0] if p.full_name else "")
+
+    # Conditional follow-ups ("If you answered Yes above, explain...") — don't blindly
+    # answer; leave blank (skipped) and flag only if it's required.
+    if re.match(r"\s*if (you |your |applicable|yes|no|selected|the answer|so)", label):
+        return mk("", conf=0.0, human=bool(q.required))
+
+    # "How did you hear / first learn about us" (very common) — use the answer-bank value,
+    # else a sensible default, snapped to a real option when it's a dropdown.
+    if "how did you hear" in label or "how did you first learn" in label or "how were you referred" in label:
+        pref = (p.answer_bank or {}).get("how_heard")
+        if q.options:
+            lab = (_snap_label(q, pref) if pref else None) or _snap_label(q, "LinkedIn") \
+                  or _snap_label(q, "Job Board") or _snap_label(q, "Company Website") \
+                  or _snap_label(q, "Indeed") or _snap_label(q, "Other")
+            return mk(lab) if lab else mk("", conf=0.3, human=True)
+        return mk(pref or "Online job board")
+
+    # Country selects (e.g. "country you anticipate working from") — we are US-only.
+    if q.options and "country" in label:
+        lab = _snap_label(q, "United States") or _snap_label(q, "USA") or _snap_label(q, "US")
+        if lab:
+            return mk(lab)
+
+    # "Have you previously worked/been employed here" — default No (recruiter can edit).
+    if ("previously" in label or "currently" in label) and ("employ" in label or "worked for" in label):
+        if q.options:
+            lab = _snap_label(q, "No") or next(
+                (o.get("label") for o in q.options
+                 if any(k in str(o.get("label", "")).lower() for k in ("not ", "never", "no,"))), None)
+            if lab:
+                return mk(lab)
+        else:
+            return mk("No")
+
     # EEO / demographic — NEVER AI-guessed. Use candidate's stated pref, else "Decline".
     if _RE_EEO.search(label):
         pref = p.eeo.get(label) or p.eeo.get("default")
