@@ -143,7 +143,6 @@ def scored_fresh_multi(
     The firehose. Workable/Adzuna are query-driven by the candidate's target titles."""
     from .sweep import sweep
     from .sources import fetch_workable, fetch_adzuna
-    from .profile.complete import load_profile
 
     all_jobs, _live = sweep(ats_orgs, max_workers=max_workers, on_progress=on_progress)
 
