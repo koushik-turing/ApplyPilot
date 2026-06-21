@@ -46,3 +46,8 @@ env/
 Thumbs.db
 .vscode/
 .idea/
+
+# candidate deliverables workspace (PDFs/Excel/resume) — not code
+manikanta/
+*_Resume.pdf
+*_Resume.docx
