@@ -473,3 +473,57 @@ A dedicated workspace + UI for Sai (and a general tool for anyone):
 3. **Cover-letter generator** (would also let us auto-fill required cover-letter fields).
 4. Optimize the big crawl (sweep content=false → fetch content only for survivors) to cut the ~15 min.
 5. Likhitha (and other candidates) the same workspace treatment; bump Sai's match cap toward 100.
+
+---
+
+## 14. GIT / BRANCHES / WORKTREES / COLLABORATION (2026-06-22)
+
+### 14a. GitHub remote
+- **Repo:** https://github.com/koushik-turing/ApplyPilot — **PUBLIC** (owner's decision; candidate data is
+  included so a collaborator can work; SECRETS are NOT — `.env`/API key git-ignored & verified absent).
+- gh CLI authenticated as `koushik-turing`. Add the friend as a collaborator (or fork+PR) to let him push.
+- **Friend setup:** clone → `pip install -r requirements.txt` → `playwright install chromium` →
+  copy `ats_resume_maker/backend/.env.example` → `.env` and add his OWN `ANTHROPIC_API_KEY`.
+- API-key hygiene: full key never committed; the only doc reference was redacted and git history was
+  rewritten (filter-branch) + force-pushed so even the last-4-char fragment is gone (verified 0 across
+  local + remote, current files + all history; live `.env` URL returns 404).
+
+### 14b. Branch strategy (THREE branches, all on GitHub)
+```
+master         ── active development (general app for ALL clients); you + friend build here
+stable         ── FROZEN known-good snapshot; the safety fallback; don't touch unless re-baselining
+sai-production ── Sai's LIVE branch; daily ops run here; receives only vetted features (merged from master)
+```
+Build features on `feature/<name>` → test → merge to `master` → when proven, `git merge master` into
+`sai-production`. `stable` is the guaranteed-working fallback if production ever breaks.
+
+### 14c. Worktrees (parallel folders — set up this session)
+A git **worktree** = a second working folder locked to a different branch, sharing the same repo/history.
+```
+E:\Apply_Pilot_Project_Folder\     → branch master          (BUILD here — you + friend)
+E:\ApplyPilot_sai_production\      → branch sai-production   (Sai's LIVE system RUNS here; has data + .env)
+```
+- Both share the same `.git` (objects shared, not duplicated; ~15-20MB extra working files).
+- A branch can be checked out in only ONE worktree at a time (prevents collisions).
+- `.env` is git-ignored → does NOT auto-copy; it was **manually copied** into the worktree. Any NEW
+  worktree needs its `.env` copied in.
+- Python packages are system-installed (no per-folder venv) → shared, no reinstall.
+- **Ports** if both run at once — Sai prod: engine `:8000`, dashboard `:8050`; dev: engine `:8001`,
+  dashboard `:8051`.
+- Commands: `git worktree add <path> <branch>` · `git worktree list` · `git worktree remove <path>`.
+
+### 14d. Day-to-day workflow
+- **Sai (in `E:\ApplyPilot_sai_production`):** run engine + dashboard (8000/8050) → `python
+  tools/crawl_candidate.py "Sai Manikanta"` for fresh matches → recruiter tailors/downloads/sets status.
+- **Building (in `E:\Apply_Pilot_Project_Folder`):** feature branch → test (8001/8051) → push → merge to
+  master → promote to sai-production via `git merge master`.
+- **DATA POLICY (chosen):** Sai's **daily data is kept as WORKING FILES — NOT committed** (no daily churn
+  in git). The one-time snapshot is already on GitHub for the friend; daily updates stay local on the
+  production worktree. Only CODE changes are committed/pushed.
+
+### 14e. Cost (confirmed)
+FREE: git/branches/worktrees, GitHub public repo + collaborators, running locally, all ATS board APIs
+(Greenhouse/Lever/Ashby/Workable), USCIS sponsorship data, the dashboard/engine, Playwright.
+ONLY cost = **Claude API usage** — tailoring (Opus ~$0.05/resume, ON-DEMAND so you pay per click), AI
+match (Haiku ~$0.001/job), parse (Haiku). ATS score = $0 (offline). ≈ a few cents/day for matching +
+~$0.05 per tailored resume actually generated. Optional later: Adzuna (free key), cloud hosting (free tiers).
